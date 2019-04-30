@@ -178,6 +178,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Application\Settings\PerformanceSettings.cs" />
     <Compile Include="Application\CmdlineCommands.cs" />
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Controls\CollectionListView.xaml.cs">

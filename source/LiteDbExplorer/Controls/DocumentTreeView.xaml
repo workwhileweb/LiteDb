@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LiteDbExplorer.Controls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:properties="clr-namespace:LiteDbExplorer.Properties"
              xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
@@ -66,7 +67,7 @@
                   ItemTemplate="{StaticResource FieldNodeTemplate}"
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Standard"
-                  ScrollViewer.IsDeferredScrollingEnabled="True"
+                  ScrollViewer.IsDeferredScrollingEnabled="{Binding Source={x:Static properties:Settings.Default},Path=DeferredScrolling}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
     </Grid>
 </UserControl>
