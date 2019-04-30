@@ -464,6 +464,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Presentation\Converters\BsonValueToStringConverter.cs" />
+    <Page Include="Themes\Controls.Scrollbar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\DialogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
