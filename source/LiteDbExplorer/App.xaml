@@ -31,7 +31,8 @@
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.NumericUpDown.xaml" />
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.DateTimePicker.xaml" />
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
-                
+                <ResourceDictionary Source="Themes/Controls.ScrollBar.xaml" />
+
             </ResourceDictionary.MergedDictionaries>
 
             <!-- Dragablz Material Design -->
