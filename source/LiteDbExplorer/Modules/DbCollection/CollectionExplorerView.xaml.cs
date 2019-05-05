@@ -1,4 +1,8 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
@@ -16,6 +20,19 @@ namespace LiteDbExplorer.Modules.DbCollection
                 splitContainer.Orientation = splitOrientationSelector.SelectedIndex == 0
                     ? Orientation.Vertical
                     : Orientation.Horizontal;
+            };
+
+            DockSearch.IsVisibleChanged += (sender, args) =>
+            {
+                if (DockSearch.Visibility == Visibility.Visible)
+                {
+                    Dispatcher.Invoke(async () =>
+                    {
+                        await Task.Delay(100);
+                        TextSearch.Focus();
+                        TextSearch.SelectAll();
+                    });
+                }
             };
         }
 
@@ -37,6 +54,16 @@ namespace LiteDbExplorer.Modules.DbCollection
         public void UpdateView(DocumentReference documentReference)
         {
             CollectionListView.UpdateGridColumns(documentReference.LiteDocument);
+        }
+
+        public void Find(string text, bool matchCase)
+        {
+            CollectionListView.Find(text, matchCase);
+        }
+
+        public void FindPrevious(string text, bool matchCase)
+        {
+            CollectionListView.FindPrevious(text, matchCase);
         }
     }
 }

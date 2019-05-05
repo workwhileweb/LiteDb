@@ -1,19 +1,18 @@
 ﻿using System;
-using System.Globalization;
-using System.IO;
 using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
 using System.Xml;
-using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Folding;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Indentation;
 using ICSharpCode.AvalonEdit.Rendering;
+using ICSharpCode.AvalonEdit.Search;
 using LiteDbExplorer.Controls.Editor;
 using LiteDbExplorer.Controls.JsonViewer;
 using LiteDbExplorer.Extensions;
@@ -52,6 +51,10 @@ namespace LiteDbExplorer.Controls
             SetTheme();
             
             ThemeManager.CurrentThemeChanged += (sender, args) => { SetTheme(); };
+            
+            CommandBindings.Add(new CommandBinding(Commands.FindNext, (sender, e) => _searchReplacePanel.FindNext(), CanExecuteWithOpenSearchPanel));
+            CommandBindings.Add(new CommandBinding(Commands.FindPrevious, (sender, e) => _searchReplacePanel.FindPrevious(), CanExecuteWithOpenSearchPanel));
+
         }
 
         public static readonly DependencyProperty DocumentSourceProperty = DependencyProperty.Register(
@@ -108,6 +111,20 @@ namespace LiteDbExplorer.Controls
             }
 
             jsonEditor.SyntaxHighlighting = LoadHighlightingFromAssembly(resourceName);
+        }
+
+        private void CanExecuteWithOpenSearchPanel(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (_searchReplacePanel.IsClosed)
+            {
+                e.CanExecute = false;
+                e.ContinueRouting = true;
+            }
+            else
+            {
+                e.CanExecute = true;
+                e.Handled = true;
+            }
         }
 
         private static IHighlightingDefinition LoadHighlightingFromAssembly(string name)

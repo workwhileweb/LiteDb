@@ -12,7 +12,7 @@ using LiteDbExplorer.Modules.Main;
 namespace LiteDbExplorer.Modules.Database
 {
     [Export(typeof(IDocumentExplorer))]
-    [PartCreationPolicy (CreationPolicy.Shared)]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class DatabasesExplorerViewModel : Screen, IDocumentExplorer
     {
         private readonly IDatabaseInteractions _databaseInteractions;
@@ -20,7 +20,7 @@ namespace LiteDbExplorer.Modules.Database
 
         [ImportingConstructor]
         public DatabasesExplorerViewModel(
-            IDatabaseInteractions databaseInteractions, 
+            IDatabaseInteractions databaseInteractions,
             IApplicationInteraction applicationInteraction)
         {
             _databaseInteractions = databaseInteractions;
@@ -29,16 +29,43 @@ namespace LiteDbExplorer.Modules.Database
             PathDefinitions = databaseInteractions.PathDefinitions;
 
             OpenRecentItemCommand = new RelayCommand<RecentFileInfo>(OpenRecentItem);
-
             ItemDoubleClickCommand = new RelayCommand<CollectionReference>(NodeDoubleClick);
+
+            CloseDatabaseCommand = new RelayCommand(_ => CloseDatabase(), o => CanCloseDatabase());
+            AddFileCommand = new RelayCommand(_ => AddFile(), _ => CanAddFile());
+            AddCollectionCommand = new RelayCommand(_ => AddCollection(), _ => CanAddCollection());
+            RefreshDatabaseCommand = new RelayCommand(_ => RefreshDatabase(), _ => CanRefreshDatabase());
+            RevealInExplorerCommand = new RelayCommand(_ => RevealInExplorer(), _ => CanRevealInExplorer());
+            RenameCollectionCommand = new RelayCommand(_ => RenameCollection(), _ => CanRenameCollection());
+            DropCollectionCommand = new RelayCommand(_ => DropCollection(), _ => CanDropCollection());
+            ExportCollectionCommand = new RelayCommand(_ => ExportCollection(), _ => CanExportCollection());
+            EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), _ => CanEditDbProperties());
         }
-        
+
         public Paths PathDefinitions { get; }
 
         public ICommand OpenRecentItemCommand { get; }
 
         public ICommand ItemDoubleClickCommand { get; }
-        
+
+        public ICommand CloseDatabaseCommand { get; }
+
+        public ICommand AddFileCommand { get; }
+
+        public ICommand AddCollectionCommand { get; }
+
+        public ICommand RefreshDatabaseCommand { get; }
+
+        public ICommand RevealInExplorerCommand { get; }
+
+        public ICommand RenameCollectionCommand { get; }
+
+        public ICommand DropCollectionCommand { get; }
+
+        public ICommand ExportCollectionCommand { get; }
+
+        public ICommand EditDbPropertiesCommand { get; }
+
         [UsedImplicitly]
         public void OpenDatabase()
         {
@@ -91,6 +118,7 @@ namespace LiteDbExplorer.Modules.Database
 
                     break;
                 }
+
                 default:
                     SelectedDatabase = null;
                     SelectedCollection = null;
@@ -100,7 +128,7 @@ namespace LiteDbExplorer.Modules.Database
             Store.Current.SelectDatabase(SelectedDatabase);
             Store.Current.SelectCollection(SelectedCollection);
         }
-        
+
         public void NodeDoubleClick(CollectionReference value)
         {
             var documentSet = IoC.Get<IDocumentSet>();
@@ -148,10 +176,7 @@ namespace LiteDbExplorer.Modules.Database
         public void AddCollection()
         {
             _databaseInteractions.AddCollection(SelectedDatabase)
-                .OnSuccess(reference =>
-                {
-                    _applicationInteraction.ActivateCollection(reference);
-                });
+                .OnSuccess(reference => { _applicationInteraction.ActivateCollection(reference); });
         }
 
         [UsedImplicitly]

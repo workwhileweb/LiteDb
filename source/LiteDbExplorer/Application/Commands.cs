@@ -93,23 +93,23 @@ namespace LiteDbExplorer
             typeof(Commands)
         );
 
-        public static readonly RoutedUICommand Find = new RoutedUICommand
+        /*public static readonly RoutedUICommand Find = new RoutedUICommand
         (
             "Find...",
             nameof(Find),
             typeof(Commands),
-            new InputGestureCollection()
+            new InputGestureCollection
             {
                 new KeyGesture(Key.F, ModifierKeys.Control)
             }
-        );
+        );*/
 
         public static readonly RoutedUICommand FindNext = new RoutedUICommand
         (
             "Find Next",
             nameof(FindNext),
             typeof(Commands),
-            new InputGestureCollection()
+            new InputGestureCollection
             {
                 new KeyGesture(Key.F3)
             }
@@ -120,7 +120,7 @@ namespace LiteDbExplorer
             "Find Previous",
             nameof(FindPrevious),
             typeof(Commands),
-            new InputGestureCollection()
+            new InputGestureCollection
             {
                 new KeyGesture(Key.F3, ModifierKeys.Shift)
             }

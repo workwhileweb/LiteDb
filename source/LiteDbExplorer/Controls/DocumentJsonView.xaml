@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -28,6 +29,8 @@
                             <materialDesign:PackIcon Kind="FindReplace"/>
                         </MenuItem.Icon>
                     </MenuItem>
+                    <MenuItem Command="liteDbExplorer:Commands.FindNext" />
+                    <MenuItem Command="liteDbExplorer:Commands.FindPrevious" />
                 </ContextMenu>
             </avalonEdit:TextEditor.ContextMenu>
         </avalonEdit:TextEditor>

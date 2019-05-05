@@ -6,5 +6,7 @@ namespace LiteDbExplorer.Modules.DbCollection
     {
         void UpdateView(CollectionReference collectionReference);
         void UpdateView(DocumentReference documentReference);
+        void Find(string text, bool matchCase);
+        void FindPrevious(string text, bool matchCase);
     }
 }

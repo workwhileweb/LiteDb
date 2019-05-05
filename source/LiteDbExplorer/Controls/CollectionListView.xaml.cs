@@ -20,7 +20,7 @@ namespace LiteDbExplorer.Controls
     /// </summary>
     public partial class CollectionListView : UserControl
     {
-        private BsonValueToStringConverter _bsonValueToStringConverter = new BsonValueToStringConverter { MaxLength = 200 };
+        private readonly BsonValueToStringConverter _bsonValueToStringConverter;
 
         public static readonly DependencyProperty CollectionReferenceProperty = DependencyProperty.Register(
             nameof(CollectionReference),
@@ -228,6 +228,68 @@ namespace LiteDbExplorer.Controls
             }
 
             ListCollectionData.ItemsSource = collectionReference.Items;
+        }
+
+        public void Find(string text, bool matchCase)
+        {
+            if (string.IsNullOrEmpty(text) || CollectionReference == null)
+            {
+                return;
+            }
+
+            var skipIndex = -1;
+            if (DbItemsSelectedCount > 0)
+            {
+                skipIndex = CollectionReference.Items.IndexOf(DbSelectedItems.Last());
+            }
+
+            foreach (var item in CollectionReference.Items.Skip(skipIndex + 1))
+            {
+                if (ItemMatchesSearch(text, item, matchCase))
+                {
+                    SelectedItem = item;
+                    ScrollIntoSelectedItem();
+                    return;
+                }
+            }
+        }
+
+        public void FindPrevious(string text, bool matchCase)
+        {
+            if (string.IsNullOrEmpty(text) || CollectionReference == null)
+            {
+                return;
+            }
+
+            var skipIndex = 0;
+            if (DbItemsSelectedCount > 0)
+            {
+                skipIndex = CollectionReference.Items.Count - CollectionReference.Items.IndexOf(DbSelectedItems.Last()) - 1;
+            }
+
+            foreach (var item in CollectionReference.Items.Reverse().Skip(skipIndex + 1))
+            {
+                if (ItemMatchesSearch(text, item, matchCase))
+                {
+                    SelectedItem = item;
+                    ScrollIntoSelectedItem();
+                    return;
+                }
+            }
+        }
+
+        private bool ItemMatchesSearch(string matchTerm, DocumentReference document, bool matchCase)
+        {
+            var stringData = JsonSerializer.Serialize(document.LiteDocument);
+
+            if (matchCase)
+            {
+                return stringData.IndexOf(matchTerm, 0, StringComparison.InvariantCulture) != -1;
+            }
+            else
+            {
+                return stringData.IndexOf(matchTerm, 0, StringComparison.InvariantCultureIgnoreCase) != -1;
+            }
         }
 
         private void ListCollectionDataOnMouseDoubleClick(object sender, MouseButtonEventArgs e)

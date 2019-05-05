@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Security;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
@@ -47,9 +50,23 @@ namespace LiteDbExplorer.Modules.DbCollection
             ContentMaxLength = Properties.Settings.Default.CollectionExplorer_ContentMaxLength;
             DoubleClickAction = Properties.Settings.Default.CollectionExplorer_DoubleClickAction;
 
+            FindTextModel = new FindTextModel();
+
             ItemDoubleClickCommand = new RelayCommand<DocumentReference>(OnItemDoubleClick);
+
+            AddDocumentCommand = new RelayCommand(_=> AddDocument(), o => CanAddDocument());
+            EditDocumentCommand = new RelayCommand(_=> EditDocument(), o => CanEditDocument());
+            RemoveDocumentCommand = new RelayCommand(_=> RemoveDocument(), o => CanRemoveDocument());
+            ExportDocumentCommand = new RelayCommand(_=> ExportDocument(), o => CanExportDocument());
+            CopyDocumentCommand = new RelayCommand(_=> CopyDocument(), o => CanCopyDocument());
+            PasteDocumentCommand = new RelayCommand(_=> PasteDocument(), o => CanPasteDocument());
+            RefreshCollectionCommand = new RelayCommand(_=> RefreshCollection(), o => CanRefreshCollection());
+            EditDbPropertiesCommand = new RelayCommand(_=> EditDbProperties(), o => CanEditDbProperties());
+            FindCommand = new RelayCommand(_=> OpenFind(), o => CanOpenFind());
+            FindNextCommand = new RelayCommand(_=> Find(), o => CanFind());
+            FindPreviousCommand = new RelayCommand(_=> FindPrevious(), o => CanFind());
         }
-        
+
         public CollectionItemDoubleClickAction DoubleClickAction { get; }
 
         public int ContentMaxLength { get; }
@@ -57,6 +74,30 @@ namespace LiteDbExplorer.Modules.DbCollection
         public Orientation SplitOrientation { get; }
 
         public RelayCommand<DocumentReference> ItemDoubleClickCommand { get; }
+
+        public ICommand AddDocumentCommand { get; }
+
+        public ICommand EditDocumentCommand { get; }
+
+        public ICommand RemoveDocumentCommand { get; }
+
+        public ICommand ExportDocumentCommand { get; }
+
+        public ICommand CopyDocumentCommand { get; }
+
+        public ICommand PasteDocumentCommand { get; }
+
+        public ICommand RefreshCollectionCommand { get; }
+
+        public ICommand EditDbPropertiesCommand { get; }
+
+        public ICommand FindCommand { get; }
+
+        public ICommand FindNextCommand { get; }
+
+        public ICommand FindPreviousCommand { get; }
+
+        public FindTextModel FindTextModel { get; }
 
         public override void Init(CollectionReference value)
         {
@@ -131,7 +172,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         public IDocumentPreview DocumentPreview { get; private set; }
         
         [UsedImplicitly]
-        public bool IsSearchOpen { get; private set; }
+        public bool IsFindOpen { get; private set; }
 
         public bool ShowDocumentPreview
         {
@@ -364,6 +405,61 @@ namespace LiteDbExplorer.Modules.DbCollection
             return CollectionReference?.Database != null;
         }
 
+        [UsedImplicitly]
+        public void OpenFind()
+        {
+            IsFindOpen = true;
+        }
+
+        [UsedImplicitly]
+        public void Find()
+        {
+            IsFindOpen = true;
+
+            _view?.Find(FindTextModel.Text, FindTextModel.MatchCase);
+        }
+
+        [UsedImplicitly]
+        public void FindPrevious()
+        {
+            IsFindOpen = true;
+
+            _view?.FindPrevious(FindTextModel.Text, FindTextModel.MatchCase);
+        }
+
+        [UsedImplicitly]
+        public void CloseFind()
+        {
+            IsFindOpen = false;
+        }
+
+        [UsedImplicitly]
+        public bool CanOpenFind()
+        {
+            return CollectionReference != null;
+        }
+
+        [UsedImplicitly]
+        public bool CanFind()
+        {
+            return CollectionReference != null && IsFindOpen;
+        }
+
         #endregion
+    }
+
+    public class FindTextModel : INotifyPropertyChanged
+    {
+        public string Text { get; set; }
+        
+        public bool MatchCase { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

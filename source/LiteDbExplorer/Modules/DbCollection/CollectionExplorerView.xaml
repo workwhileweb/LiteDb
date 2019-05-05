@@ -17,40 +17,19 @@
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
-    <UserControl.CommandBindings>
-
-        <commands:DataContextCommandBinding Command="liteDbExplorer:Commands.Add"
-                                            Executed="AddDocument"
-                                            CanExecute="CanAddDocument" />
-
-        <commands:DataContextCommandBinding Command="liteDbExplorer:Commands.Edit"
-                                            Executed="EditDocument"
-                                            CanExecute="CanEditDocument" />
-
-        <commands:DataContextCommandBinding Command="liteDbExplorer:Commands.Remove"
-                                            Executed="RemoveDocument"
-                                            CanExecute="CanRemoveDocument" />
-
-        <commands:DataContextCommandBinding Command="liteDbExplorer:Commands.Export"
-                                            Executed="ExportDocument"
-                                            CanExecute="CanExportDocument" />
-
-        <commands:DataContextCommandBinding Command="Copy"
-                                            Executed="CopyDocument"
-                                            CanExecute="CanCopyDocument" />
-
-        <commands:DataContextCommandBinding Command="Paste"
-                                            Executed="PasteDocument"
-                                            CanExecute="CanPasteDocument" />
-
-        <commands:DataContextCommandBinding Command="liteDbExplorer:Commands.RefreshCollection"
-                                            Executed="RefreshCollection"
-                                            CanExecute="CanRefreshCollection" />
-
-        <commands:DataContextCommandBinding Command="liteDbExplorer:Commands.EditDbProperties"
-                                            Executed="EditDbProperties"
-                                            CanExecute="CanEditDbProperties" />
-    </UserControl.CommandBindings>
+    <commands:CommandToCommand.Bindings>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Add" TargetCommand="{Binding AddDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Edit" TargetCommand="{Binding EditDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Remove" TargetCommand="{Binding RemoveDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Export" TargetCommand="{Binding ExportDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Copy" TargetCommand="{Binding CopyDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Paste" TargetCommand="{Binding PasteDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshCollection" TargetCommand="{Binding RefreshCollectionCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" TargetCommand="{Binding EditDbPropertiesCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Find" TargetCommand="{Binding FindCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindNext" TargetCommand="{Binding FindNextCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindPrevious" TargetCommand="{Binding FindPreviousCommand}"/>
+    </commands:CommandToCommand.Bindings>
     <Grid>
         <controls1:SplitContainer x:Name="splitContainer" 
                                  SecondChildIsCollapsed="{Binding HideDocumentPreview, FallbackValue=True}"
@@ -136,14 +115,17 @@
                     </controls1:ToolDockPanel>
 
                     <Border Name="DockSearch" DockPanel.Dock="Top"
-                            Visibility="{Binding IsSearchOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
+                            Visibility="{Binding IsFindOpen, Converter={StaticResource BooleanToVisibilityConverter}}">
                         <materialDesign:Card Margin="10">
                             <StackPanel>
                                 <DockPanel Margin="10,5,10,0">
-                                    <Button FontFamily="Marlett" Content="r" Padding="2"
-                                            DockPanel.Dock="Right" Name="ButtonCloseSearch"
-                                            VerticalContentAlignment="Center" FontWeight="ExtraBold"
-                                            Style="{StaticResource MaterialDesignFlatButton}" />
+                                    <Button x:Name="CloseFind" 
+                                            DockPanel.Dock="Right"
+                                            Padding="2" Height="24" Width="24"
+                                            Style="{StaticResource MaterialDesignFlatButton}"
+                                            cal:Message.Attach="CloseFind()">
+                                        <materialDesign:PackIcon Kind="Close"/>
+                                    </Button>
                                     <TextBlock Text="Search" FontWeight="Bold" VerticalAlignment="Center" />
                                 </DockPanel>
                                 <Grid Margin="5">
@@ -156,13 +138,15 @@
                                         <RowDefinition Height="*" />
                                     </Grid.RowDefinitions>
 
-                                    <TextBox Grid.Column="0" Grid.Row="0" Name="TextSearch" Margin="5">
+                                    <TextBox Grid.Column="0" Grid.Row="0" Name="TextSearch" Margin="5" 
+                                             Text="{Binding FindTextModel.Text}">
                                         <TextBox.InputBindings>
                                             <KeyBinding Key="Return" Command="liteDbExplorer:Commands.FindNext" />
                                         </TextBox.InputBindings>
                                     </TextBox>
                                     <CheckBox Grid.Column="0" Grid.Row="1" Name="CheckSearchCase"
-                                              Content="Match case" VerticalContentAlignment="Center" Margin="5" />
+                                              Content="Match case" VerticalContentAlignment="Center" Margin="5" 
+                                              IsChecked="{Binding FindTextModel.MatchCase}"/>
 
                                     <Button Grid.Column="1" Grid.Row="0" Content="Find Next" Margin="5"
                                             Command="liteDbExplorer:Commands.FindNext" />

@@ -87,11 +87,16 @@
                     </MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Command="liteDbExplorer:Commands.Find">
+                <MenuItem Command="Find">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="Search" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <!--<MenuItem Command="liteDbExplorer:Commands.Find">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="DatabaseSearch" />
                     </MenuItem.Icon>
-                </MenuItem>
+                </MenuItem>-->
                 <MenuItem Command="liteDbExplorer:Commands.FindNext" />
                 <MenuItem Command="liteDbExplorer:Commands.FindPrevious" />
             </MenuItem>
