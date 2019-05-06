@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
@@ -226,6 +227,20 @@ namespace LiteDbExplorer.Controls
 
                 numberEditor.SetBinding(LongUpDown.ValueProperty, binding);
                 return numberEditor;
+            }
+
+            if (bindingValue.IsGuid || bindingValue.Type == BsonType.Guid)
+            {
+                var guidEditor = new MaskedTextBox
+                {
+                    IsReadOnly = readOnly,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Mask = @"AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA",
+                    ValueDataType = typeof(Guid)
+                };
+
+                guidEditor.SetBinding(MaskedTextBox.ValueProperty, binding);
+                return guidEditor;
             }
 
             if (bindingValue.IsString)

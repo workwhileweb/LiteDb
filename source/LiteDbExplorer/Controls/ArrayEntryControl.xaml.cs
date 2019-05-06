@@ -174,6 +174,9 @@ namespace LiteDbExplorer.Controls
                 case "DateTime":
                     newValue = new BsonValue(DateTime.MinValue);
                     break;
+                case "Guid":
+                    newValue = new BsonValue(Guid.Empty);
+                    break;
                 case "Array":
                     newValue = new BsonArray();
                     break;

@@ -50,6 +50,7 @@
                     <MenuItem Header="Int32" Click="NewFieldMenuItem_Click" />
                     <MenuItem Header="Int64" Click="NewFieldMenuItem_Click" />
                     <MenuItem Header="DateTime" Click="NewFieldMenuItem_Click" />
+                    <MenuItem Header="Guid" Click="NewFieldMenuItem_Click" />
                     <MenuItem Header="Array" Click="NewFieldMenuItem_Click" />
                     <MenuItem Header="Document" Click="NewFieldMenuItem_Click" />
                 </StackPanel>
