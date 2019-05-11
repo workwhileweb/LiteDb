@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
+using JetBrains.Annotations;
 using LiteDB;
 
 namespace LiteDbExplorer.Controls
 {
-    public class DocumentFieldData
+    public class DocumentFieldData : INotifyPropertyChanged
     {
         public string Name { get; set; }
 
@@ -20,6 +25,14 @@ namespace LiteDbExplorer.Controls
         {
             Name = name;
             EditControl = editControl;
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
@@ -163,6 +176,12 @@ namespace LiteDbExplorer.Controls
                 expandMode = OpenEditorMode.Window;
             }
 
+            if (_currentDocument[key].IsNull)
+            {
+                var docTypePicker = GetNullValueEditor(key, readOnly, expandMode);
+                return new DocumentFieldData(key, docTypePicker);
+            }
+            
             var valueEdit =
                 BsonValueEditor.GetBsonValueEditor(
                     openMode: expandMode,
@@ -173,6 +192,55 @@ namespace LiteDbExplorer.Controls
                     keyName: key);
 
             return new DocumentFieldData(key, valueEdit);
+        }
+
+        private FrameworkElement GetNullValueEditor(string key, bool readOnly, OpenEditorMode expandMode)
+        {
+            var docTypePicker = new Button
+            {
+                Content = "[Null]",
+                ToolTip = "Select null field type",
+                Style = StyleKit.MaterialDesignEntryButtonStyle
+            };
+
+            if (!readOnly)
+            {
+                var fieldToggleMenuItems = GetFieldToggleMenuItems(key, menuItem =>
+                {
+                    var name = menuItem.Tag as string;
+                    var fieldDefaultValue = GetFieldDefaultValue(menuItem.Header as string);
+                    var documentFieldData = _customControls.First(p => p.Name == name);
+                    _currentDocument[key] = fieldDefaultValue;
+                    documentFieldData.EditControl =
+                        BsonValueEditor.GetBsonValueEditor(
+                            openMode: expandMode,
+                            bindingPath: $"[{key}]",
+                            bindingValue: _currentDocument[key],
+                            bindingSource: _currentDocument,
+                            readOnly: readOnly,
+                            keyName: key);
+                });
+
+                var typeMenuPicker = new ContextMenu();
+                foreach (var menuItem in fieldToggleMenuItems)
+                {
+                    typeMenuPicker.Items.Add(menuItem);
+                }
+
+                docTypePicker.ContextMenu = typeMenuPicker;
+
+                docTypePicker.Click += (sender, args) =>
+                {
+                    if (sender is Button button && button.ContextMenu != null)
+                    {
+                        button.ContextMenu.PlacementTarget = button;
+                        button.ContextMenu.Placement = PlacementMode.Bottom;
+                        button.ContextMenu.IsOpen = true;
+                    }
+                };
+            }
+
+            return docTypePicker;
         }
 
         private void RemoveButton_Click(object sender, RoutedEventArgs e)
@@ -231,6 +299,72 @@ namespace LiteDbExplorer.Controls
             Close();
         }
 
+        private IEnumerable<MenuItem> GetFieldToggleMenuItems(string name, Action<MenuItem> clickAction)
+        {
+            var tags = new[] {"String", "Boolean", "Double", "Decimal", "Int32", "Int64", "DateTime", "Guid", "Array", "Document"};
+            var result = new List<MenuItem>();
+            foreach (var tag in tags)
+            {
+                var menuItem = new MenuItem
+                {
+                    Tag = name,
+                    Header = tag,
+                };
+                menuItem.Click += (sender, args) =>
+                {
+                    if (sender is MenuItem item)
+                    {
+                        clickAction(item);
+                    }
+                };
+                result.Add(menuItem);
+            }
+            return result;
+        }
+
+        private BsonValue GetFieldDefaultValue(string tag)
+        {
+            BsonValue newValue;
+
+            switch (tag)
+            {
+                case "String":
+                    newValue = new BsonValue(string.Empty);
+                    break;
+                case "Boolean":
+                    newValue = new BsonValue(false);
+                    break;
+                case "Double":
+                    newValue = new BsonValue((double) 0);
+                    break;
+                case "Decimal":
+                    newValue = new BsonValue((decimal) 0.0m);
+                    break;
+                case "Int32":
+                    newValue = new BsonValue(0);
+                    break;
+                case "Int64":
+                    newValue = new BsonValue((long) 0);
+                    break;
+                case "DateTime":
+                    newValue = new BsonValue(DateTime.Now);
+                    break;
+                case "Guid":
+                    newValue = new BsonValue(Guid.Empty);
+                    break;
+                case "Array":
+                    newValue = new BsonArray();
+                    break;
+                case "Document":
+                    newValue = new BsonDocument();
+                    break;
+                default:
+                    throw new Exception("Uknown value type.");
+            }
+
+            return newValue;
+        }
+
         private async void NewFieldMenuItem_Click(object sender, RoutedEventArgs e)
         {
             var maybeFieldName = await InputDialogView.Show("DocumentEntryDialogHost", "Enter name of new field.",
@@ -257,51 +391,20 @@ namespace LiteDbExplorer.Controls
                 return;
             }
 
-            var menuItem = sender as MenuItem;
-            BsonValue newValue;
-
-            switch (menuItem.Header as string)
+            if (sender is MenuItem menuItem)
             {
-                case "String":
-                    newValue = new BsonValue(string.Empty);
-                    break;
-                case "Boolean":
-                    newValue = new BsonValue(false);
-                    break;
-                case "Double":
-                    newValue = new BsonValue((double) 0);
-                    break;
-                case "Decimal":
-                    newValue = new BsonValue((decimal) 0.0m);
-                    break;
-                case "Int32":
-                    newValue = new BsonValue(0);
-                    break;
-                case "Int64":
-                    newValue = new BsonValue((long) 0);
-                    break;
-                case "DateTime":
-                    newValue = new BsonValue(DateTime.MinValue);
-                    break;
-                case "Guid":
-                    newValue = new BsonValue(Guid.Empty);
-                    break;
-                case "Array":
-                    newValue = new BsonArray();
-                    break;
-                case "Document":
-                    newValue = new BsonDocument();
-                    break;
-                default:
-                    throw new Exception("Uknown value type.");
+                var newValue = GetFieldDefaultValue(menuItem.Header as string);
+
+                _currentDocument.Add(fieldName, newValue);
+
+                var newField = NewField(fieldName, false);
+                _customControls.Add(newField);
+                newField.EditControl.Focus();
+                ItemsField_SizeChanged(ListItems, null);
+                ListItems.ScrollIntoView(newField);
             }
 
-            _currentDocument.Add(fieldName, newValue);
-            var newField = NewField(fieldName, false);
-            _customControls.Add(newField);
-            newField.EditControl.Focus();
-            ItemsField_SizeChanged(ListItems, null);
-            ListItems.ScrollIntoView(newField);
+            
         }
 
         private bool _invalidatingSize;

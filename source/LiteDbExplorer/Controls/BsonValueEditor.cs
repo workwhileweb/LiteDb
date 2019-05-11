@@ -164,7 +164,7 @@ namespace LiteDbExplorer.Controls
                     TextAlignment = TextAlignment.Left,
                     IsReadOnly = readOnly,
                     VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 0, 0)
+                    Margin = new Thickness(0, 0, 0, 0),
                 };
 
                 datePicker.SetBinding(DateTimePicker.ValueProperty, binding);
