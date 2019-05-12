@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Interactivity;
 using LiteDB;
+using LiteDbExplorer.Framework;
+using LiteDbExplorer.Wpf.Behaviors;
 
 namespace LiteDbExplorer.Controls
 {
@@ -26,6 +31,20 @@ namespace LiteDbExplorer.Controls
     {
         private readonly WindowController _windowController;
 
+        public static readonly Dictionary<BsonType, Func<BsonValue>> FieldTypesMap = new Dictionary<BsonType, Func<BsonValue>>
+        {
+            {BsonType.String, () => new BsonValue(string.Empty)},
+            {BsonType.Boolean, () => new BsonValue(false)},
+            {BsonType.Double, () => new BsonValue((double) 0)},
+            {BsonType.Decimal, () => new BsonValue((decimal) 0.0m)},
+            {BsonType.Int32, () => new BsonValue(0)},
+            {BsonType.Int64, () => new BsonValue((long) 0)},
+            {BsonType.DateTime, () => new BsonValue(DateTime.Now)},
+            {BsonType.Guid, () => new BsonValue(Guid.Empty)},
+            {BsonType.Array, () => new BsonArray()},
+            {BsonType.Document, () => new BsonDocument()},
+        };
+
         public ObservableCollection<ArrayUIItem> Items
         {
             get; set;
@@ -44,10 +63,23 @@ namespace LiteDbExplorer.Controls
             _windowController = windowController;
 
             InitializeComponent();
-            
+
             IsReadOnly = readOnly;
 
             Items = new ObservableCollection<ArrayUIItem>();
+
+            AddNewFieldCommand = new RelayCommand<BsonType?>(async type => await AddNewFieldHandler(type));
+
+            foreach (var item in FieldTypesMap)
+            {
+                var menuItem = new MenuItem
+                {
+                    Header = item.Key,
+                    Command = AddNewFieldCommand,
+                    CommandParameter = item.Key
+                };
+                AddFieldsTypesPanel.Children.Add(menuItem);
+            }
 
             var index = 0;
             foreach (BsonValue item in array)
@@ -71,7 +103,9 @@ namespace LiteDbExplorer.Controls
                 ScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             }
         }
-        
+
+        public RelayCommand<BsonType?> AddNewFieldCommand { get; set; }
+
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
         {
             var value = (sender as Control).Tag as BsonValue;
@@ -132,66 +166,107 @@ namespace LiteDbExplorer.Controls
                 expandMode = OpenEditorMode.Window;
             }
 
-            var valueEdit = BsonValueEditor.GetBsonValueEditor(
-                openMode: expandMode, 
-                bindingPath: "Value", 
-                bindingValue: value, 
-                bindingSource: arrayItem, 
-                readOnly: IsReadOnly, 
-                keyName: keyName);
+            if (value.IsNull && index.HasValue)
+            {
+                arrayItem.Control = GetNullValueEditor(index.Value, IsReadOnly);
+            }
+            else
+            {
+                var valueEdit = BsonValueEditor.GetBsonValueEditor(
+                    openMode: expandMode, 
+                    bindingPath: @"Value", 
+                    bindingValue: value, 
+                    bindingSource: arrayItem,
+                    readOnly: IsReadOnly, 
+                    keyName: keyName);
 
-            arrayItem.Control = valueEdit;
+                arrayItem.Control = valueEdit;
+            }
 
             return arrayItem;
         }
 
-        private void NewFieldMenuItem_Click(object sender, RoutedEventArgs e)
+        private FrameworkElement GetNullValueEditor(int index, bool readOnly)
         {
-            var menuItem = sender as MenuItem;
-            BsonValue newValue;
+            var docTypePicker = new Button
+            {
+                Content = "[Null]",
+                ToolTip = "Select null field type",
+                Style = StyleKit.MaterialDesignEntryButtonStyle
+            };
+
+            if (readOnly)
+            {
+                return docTypePicker;
+            }
+
+            var fieldToggleMenuItems = new List<MenuItem>();
+            foreach (var bsonType in FieldTypesMap.Keys)
+            {
+                void ClickAction(BsonType? type)
+                {
+                    if (!type.HasValue)
+                    {
+                        return;
+                    }
+
+                    var value = GetFieldDefaultValue(type.Value);
+                    Items[index] = NewItem(value, index);
+                }
+
+                var menuItem = new MenuItem
+                {
+                    Header = bsonType.ToString(),
+                    Command = new RelayCommand<BsonType?>(ClickAction),
+                    CommandParameter = bsonType,
+                };
+                fieldToggleMenuItems.Add(menuItem);
+            }
+
+            var typeMenuPicker = new ContextMenu();
+            foreach (var menuItem in fieldToggleMenuItems)
+            {
+                typeMenuPicker.Items.Add(menuItem);
+            }
+
+            docTypePicker.ContextMenu = typeMenuPicker;
+            Interaction.GetBehaviors(docTypePicker).Add(new ButtonClickOpenMenuBehavior());
+
+            return docTypePicker;
+        }
+
+        private Task AddNewFieldHandler(BsonType? bsonType)
+        {
             ButtonAddItem.IsPopupOpen = false;
 
-            switch (menuItem.Header as string)
+            if (!bsonType.HasValue)
             {
-                case "String":
-                    newValue = new BsonValue(string.Empty);
-                    break;
-                case "Boolean":
-                    newValue = new BsonValue(false);
-                    break;
-                case "Double":
-                    newValue = new BsonValue((double)0);
-                    break;
-                case "Decimal":
-                    newValue = new BsonValue((decimal) 0.0m);
-                    break;
-                case "Int32":
-                    newValue = new BsonValue((int)0);
-                    break;
-                case "Int64":
-                    newValue = new BsonValue((long)0);
-                    break;
-                case "DateTime":
-                    newValue = new BsonValue(DateTime.MinValue);
-                    break;
-                case "Guid":
-                    newValue = new BsonValue(Guid.Empty);
-                    break;
-                case "Array":
-                    newValue = new BsonArray();
-                    break;
-                case "Document":
-                    newValue = new BsonDocument();
-                    break;
-                default:
-                    throw new Exception("Uknown value type.");
-
+                return Task.CompletedTask;
             }
+
+            var newValue = GetFieldDefaultValue(bsonType.Value);
 
             var newItem = NewItem(newValue, Items.Count);
             Items.Add(newItem);
             newItem.Control.Focus();
             newItem.Control.BringIntoView();
+
+            return Task.CompletedTask;
+        }
+
+        private BsonValue GetFieldDefaultValue(BsonType bsonType)
+        {
+            if (bsonType == BsonType.Null)
+            {
+                return new BsonValue();
+            }
+
+            if (!FieldTypesMap.ContainsKey(bsonType))
+            {
+                throw new Exception("Uknown value type.");
+            }
+
+            return FieldTypesMap[bsonType]();
         }
 
         protected virtual void OnCloseRequested()

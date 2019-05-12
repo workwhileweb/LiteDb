@@ -42,17 +42,8 @@
                         </StackPanel>
                     </ToggleButton>
                 </materialDesign:PopupBox.ToggleContent>
-                <StackPanel Margin="0" MinWidth="140">
-                    <MenuItem Header="String" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Boolean" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Double" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Decimal" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Int32" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Int64" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="DateTime" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Guid" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Array" Click="NewFieldMenuItem_Click" />
-                    <MenuItem Header="Document" Click="NewFieldMenuItem_Click" />
+                <StackPanel x:Name="AddFieldsTypesPanel" Margin="0" MinWidth="140">
+                    <!--Items created in code-->
                 </StackPanel>
             </materialDesign:PopupBox>
             <Canvas />
