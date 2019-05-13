@@ -20,7 +20,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <controls1:SplitContainer x:Name="splitContainer" 
-                                 Orientation="{Binding SplitOrientation, Mode=OneTime, FallbackValue=Vertical}"
+                                 Orientation="{Binding SplitOrientation, Mode=OneTime}"
                                  SecondChildIsCollapsed="{Binding HideFileInfo}">
             <controls1:SplitContainer.FirstChild>
                 <DockPanel>

@@ -1,19 +1,85 @@
-﻿using System.Windows;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace LiteDbExplorer.Wpf.Controls
 {
+    public enum SplitOrientation
+    {
+        [Display(Order = 0)]
+        Auto = 0,
+        /// <summary> Control or layout should be horizontally oriented. </summary>
+        [Display(Order = 1)]
+        Horizontal = 1,
+        /// <summary> Control or layout should be vertically oriented. </summary>
+        [Display(Order = 2)]
+        Vertical = 2,
+    }
+
+    public static class SplitOrientationExtensions
+    {
+        public static SplitOrientation ToSplitOrientation(this Orientation? orientation)
+        {
+            if (!orientation.HasValue)
+            {
+                return SplitOrientation.Auto;
+            }
+
+            return orientation == Orientation.Horizontal ? SplitOrientation.Horizontal : SplitOrientation.Vertical;
+        }
+
+        public static Orientation? ToOrientation(this SplitOrientation orientation)
+        {
+            if (orientation == SplitOrientation.Auto)
+            {
+                return null;
+            }
+
+            return orientation == SplitOrientation.Horizontal ? Orientation.Horizontal : Orientation.Vertical;
+        }
+    }
+
     public class SplitContainer : Control
     {
-        public Orientation Orientation
+        static SplitContainer()
         {
-            get => (Orientation) GetValue(OrientationProperty);
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(SplitContainer),
+                new FrameworkPropertyMetadata(typeof(SplitContainer)));
+        }
+
+        public SplitContainer()
+        {
+            SizeChanged += OnSizeChanged;
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+        }
+
+        private static readonly DependencyPropertyKey CurrentOrientationPropertyKey
+            = DependencyProperty.RegisterReadOnly(nameof(CurrentOrientation), typeof(Orientation), typeof(SplitContainer),
+                new FrameworkPropertyMetadata(System.Windows.Controls.Orientation.Horizontal,
+                    FrameworkPropertyMetadataOptions.None));
+
+        public static readonly DependencyProperty CurrentOrientationProperty
+            = CurrentOrientationPropertyKey.DependencyProperty;
+
+        public Orientation CurrentOrientation
+        {
+            get => (Orientation)GetValue(CurrentOrientationProperty);
+            protected set => SetValue(CurrentOrientationPropertyKey, value);
+        }
+
+        public Orientation? Orientation
+        {
+            get => (Orientation?) GetValue(OrientationProperty);
             set => SetValue(OrientationProperty, value);
         }
         
         public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register(nameof(Orientation), typeof(Orientation), typeof(SplitContainer),
-                new PropertyMetadata(Orientation.Horizontal));
+            DependencyProperty.Register(nameof(Orientation), typeof(Orientation?), typeof(SplitContainer),
+                new PropertyMetadata(null, OnOrientationPropertyChanged));
 
         public UIElement FirstChild
         {
@@ -35,16 +101,6 @@ namespace LiteDbExplorer.Wpf.Controls
             DependencyProperty.Register(nameof(SecondChild), typeof(UIElement), typeof(SplitContainer),
                 new PropertyMetadata(null));
 
-
-        /*public static readonly DependencyProperty FirstChildIsCollapsedProperty = DependencyProperty.Register(
-            nameof(FirstChildIsCollapsed), typeof(bool), typeof(SplitContainer), new PropertyMetadata(false));
-
-        public bool FirstChildIsCollapsed
-        {
-            get => (bool) GetValue(FirstChildIsCollapsedProperty);
-            set => SetValue(FirstChildIsCollapsedProperty, value);
-        }*/
-
         public static readonly DependencyProperty SecondChildIsCollapsedProperty = DependencyProperty.Register(
             nameof(SecondChildIsCollapsed), typeof(bool), typeof(SplitContainer), new PropertyMetadata(false));
 
@@ -54,15 +110,33 @@ namespace LiteDbExplorer.Wpf.Controls
             set => SetValue(SecondChildIsCollapsedProperty, value);
         }
 
-        static SplitContainer()
+        private static void OnOrientationPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(SplitContainer),
-                new FrameworkPropertyMetadata(typeof(SplitContainer)));
+            if (d is SplitContainer splitContainer)
+            {
+                splitContainer.UpdateCurrentOrientation();
+            }
         }
 
-        public override void OnApplyTemplate()
+        private void OnSizeChanged(object sender, SizeChangedEventArgs e)
         {
-            base.OnApplyTemplate();
+            UpdateCurrentOrientation();
+        }
+
+        protected void UpdateCurrentOrientation()
+        {
+            if (Orientation.HasValue)
+            {
+                CurrentOrientation = Orientation.Value;
+            }
+            else if (Parent is FrameworkElement frameworkElement)
+            {
+                // golden ratio based Width
+                var elementActualWidth = frameworkElement.ActualWidth / 1.61;
+                var elementActualHeight = frameworkElement.ActualHeight;
+
+                CurrentOrientation = elementActualWidth < elementActualHeight ? System.Windows.Controls.Orientation.Vertical : System.Windows.Controls.Orientation.Horizontal;
+            }
         }
     }
 }

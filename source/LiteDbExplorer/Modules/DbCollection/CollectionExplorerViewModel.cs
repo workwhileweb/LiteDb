@@ -71,7 +71,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         public int ContentMaxLength { get; }
         
-        public Orientation SplitOrientation { get; }
+        public Orientation? SplitOrientation { get; }
 
         public RelayCommand<DocumentReference> ItemDoubleClickCommand { get; }
 

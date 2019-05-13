@@ -56,8 +56,12 @@ namespace LiteDbExplorer.Modules
             var control = new DocumentEntryControl(document, windowController);
             var window = new DialogWindow(control, windowController)
             {
-                Height = 600
+                Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight)
             };
+            if (document.Collection.IsFilesOrChunks)
+            {
+                window.Width = Math.Min(1024, SystemParameters.VirtualScreenWidth);
+            }
             window.Owner = windowController.InferOwnerOf(window);
 
             return window.ShowDialog() == true;

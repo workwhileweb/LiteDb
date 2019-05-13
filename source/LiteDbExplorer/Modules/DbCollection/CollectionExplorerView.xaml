@@ -33,7 +33,7 @@
     <Grid>
         <controls1:SplitContainer x:Name="splitContainer" 
                                  SecondChildIsCollapsed="{Binding HideDocumentPreview, FallbackValue=True}"
-                                 Orientation="{Binding SplitOrientation, Mode=OneTime, FallbackValue=Horizontal}">
+                                 Orientation="{Binding SplitOrientation, Mode=OneTime}">
             <controls1:SplitContainer.FirstChild>
                 <DockPanel>
                     <ToolBarTray DockPanel.Dock="Top">

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.Composition;
-using System.Windows.Controls;
 using Caliburn.Micro;
+using LiteDbExplorer.Wpf.Controls;
 using LiteDbExplorer.Wpf.Modules.Settings;
 using PropertyTools.DataAnnotations;
 // ReSharper disable InconsistentNaming
@@ -13,7 +13,7 @@ namespace LiteDbExplorer.Modules.DbDocument
     {
         public DocumentPreviewSettingsViewModel()
         {
-            DocumentPreview_SplitOrientation = Properties.Settings.Default.DocumentPreview_SplitOrientation;
+            DocumentPreview_SplitOrientation = Properties.Settings.Default.DocumentPreview_SplitOrientation.ToSplitOrientation();
             DocumentPreview_ContentMaxLength = Properties.Settings.Default.DocumentPreview_ContentMaxLength;
         }
 
@@ -29,7 +29,7 @@ namespace LiteDbExplorer.Modules.DbDocument
 
         [Category("Document Preview")]
         [DisplayName("Split Orientation")]
-        public Orientation DocumentPreview_SplitOrientation { get; set; }
+        public SplitOrientation DocumentPreview_SplitOrientation { get; set; }
 
         [Category("Document Preview")]
         [DisplayName("Content Max Length")]
@@ -38,7 +38,7 @@ namespace LiteDbExplorer.Modules.DbDocument
 
         public void ApplyChanges()
         {
-            Properties.Settings.Default.DocumentPreview_SplitOrientation = DocumentPreview_SplitOrientation;
+            Properties.Settings.Default.DocumentPreview_SplitOrientation = DocumentPreview_SplitOrientation.ToOrientation();
             Properties.Settings.Default.DocumentPreview_ContentMaxLength = DocumentPreview_ContentMaxLength;
 
             Properties.Settings.Default.Save();

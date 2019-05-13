@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Controls;
 using Caliburn.Micro;
+using LiteDbExplorer.Wpf.Controls;
 using LiteDbExplorer.Wpf.Modules.Settings;
 using PropertyTools.DataAnnotations;
 // ReSharper disable InconsistentNaming
@@ -16,7 +17,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         {
             CollectionExplorer_FieldSortOrder = Settings.Current.FieldSortOrder;
 
-            CollectionExplorer_SplitOrientation = Properties.Settings.Default.CollectionExplorer_SplitOrientation;
+            CollectionExplorer_SplitOrientation = Properties.Settings.Default.CollectionExplorer_SplitOrientation.ToSplitOrientation();
             CollectionExplorer_ShowPreview = Properties.Settings.Default.CollectionExplorer_ShowPreview;
             CollectionExplorer_ContentMaxLength = Properties.Settings.Default.CollectionExplorer_ContentMaxLength;
             CollectionExplorer_DoubleClickAction = Properties.Settings.Default.CollectionExplorer_DoubleClickAction;
@@ -42,7 +43,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         [Category("Collection Explorer")]
         [DisplayName("Split Orientation")]
-        public Orientation CollectionExplorer_SplitOrientation { get; set; }
+        public SplitOrientation CollectionExplorer_SplitOrientation { get; set; }
         
         [Category("Collection Explorer")]
         [DisplayName("Show Preview")]
@@ -58,7 +59,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             Settings.Current.FieldSortOrder = CollectionExplorer_FieldSortOrder;
             Settings.Current.SaveSettings();
 
-            Properties.Settings.Default.CollectionExplorer_SplitOrientation = CollectionExplorer_SplitOrientation;
+            Properties.Settings.Default.CollectionExplorer_SplitOrientation = CollectionExplorer_SplitOrientation.ToOrientation();
             Properties.Settings.Default.CollectionExplorer_ShowPreview = CollectionExplorer_ShowPreview;
             Properties.Settings.Default.CollectionExplorer_ContentMaxLength = CollectionExplorer_ContentMaxLength;
             Properties.Settings.Default.CollectionExplorer_DoubleClickAction = CollectionExplorer_DoubleClickAction;

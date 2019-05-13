@@ -118,6 +118,8 @@ namespace LiteDbExplorer.Controls
                 AddFieldsTypesPanel.Children.Add(menuItem);
             }
 
+            AddExistingFieldsButton.IsEnabled = false;
+
             Interaction.GetBehaviors(AddExistingFieldsButton).Add(new ButtonClickOpenMenuBehavior());
         }
 
@@ -154,6 +156,7 @@ namespace LiteDbExplorer.Controls
 
             ButtonNext.Visibility = Visibility.Collapsed;
             ButtonPrev.Visibility = Visibility.Collapsed;
+            AddExistingFieldsButton.Visibility = Visibility.Collapsed;
 
             if (readOnly)
             {

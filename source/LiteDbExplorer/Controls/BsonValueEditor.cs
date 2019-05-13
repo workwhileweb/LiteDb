@@ -58,7 +58,7 @@ namespace LiteDbExplorer.Controls
                         var window = new DialogWindow(control, windowController)
                         {
                             Owner = Application.Current.MainWindow,
-                            Height = 600
+                            Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight)
                         };
 
                         if (window.ShowDialog() == true)
@@ -113,7 +113,7 @@ namespace LiteDbExplorer.Controls
                         var window = new DialogWindow(control, windowController)
                         {
                             Owner = Application.Current.MainWindow,
-                            Height = 600
+                            Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight)
                         };
 
                         window.ShowDialog();

@@ -48,7 +48,7 @@
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <Trigger Property="Orientation" Value="Vertical">
+                        <Trigger Property="CurrentOrientation" Value="Vertical">
                             <Setter TargetName="PART_FirstChildGrid" Property="Grid.Column" Value="0" />
                             <Setter TargetName="PART_FirstChildGrid" Property="Grid.Row" Value="0" />
                             <Setter TargetName="PART_FirstChildGrid" Property="Grid.ColumnSpan" Value="3" />
@@ -72,7 +72,7 @@
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="SecondChildIsCollapsed" Value="True"/>
-                                <Condition Property="Orientation" Value="Horizontal"/>
+                                <Condition Property="CurrentOrientation" Value="Horizontal"/>
                             </MultiTrigger.Conditions>
                             <Setter TargetName="PART_Splitter" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="PART_SecondChildGrid" Property="Visibility" Value="Collapsed"/>
@@ -82,7 +82,7 @@
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="SecondChildIsCollapsed" Value="True"/>
-                                <Condition Property="Orientation" Value="Vertical"/>
+                                <Condition Property="CurrentOrientation" Value="Vertical"/>
                             </MultiTrigger.Conditions>
                             <Setter TargetName="PART_Splitter" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="PART_SecondChildGrid" Property="Visibility" Value="Collapsed"/>

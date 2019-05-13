@@ -29,7 +29,7 @@ namespace LiteDbExplorer.Modules.DbDocument
 
         public int ContentMaxLength { get; }
 
-        public Orientation SplitOrientation { get; }
+        public Orientation? SplitOrientation { get; }
 
         public override object IconContent => new PackIcon { Kind = PackIconKind.Json, Height = 16 };
 

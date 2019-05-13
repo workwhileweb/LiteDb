@@ -44,7 +44,7 @@ namespace LiteDbExplorer.Controls
             _searchReplacePanel = SearchReplacePanel.Install(jsonEditor);
             _searchReplacePanel.IsFindOnly = true;
 
-            jsonEditor.TextArea.MaxWidth = 1024;
+            jsonEditor.TextArea.MaxWidth = SystemParameters.VirtualScreenWidth;
             jsonEditor.TextArea.IndentationStrategy = new DefaultIndentationStrategy();
             jsonEditor.TextArea.TextView.ElementGenerators.Add(new TruncateLongLines(LineMaxLength));
 
