@@ -49,7 +49,7 @@ namespace LiteDbExplorer.Modules
                     break;
 
                 case CmdlineCommands.Open:
-                    _databaseInteractions.OpenDatabase(args.Args);
+                    _databaseInteractions.OpenDatabase(args.Args).Wait();
                     RestoreWindow();
                     break;
 

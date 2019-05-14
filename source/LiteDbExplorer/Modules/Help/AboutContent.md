@@ -154,9 +154,17 @@ SOFTWARE.
 
 
 
+### [FastMember](https://github.com/mgravell/fast-member)
+[APACHE LICENSE, VERSION 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+
+
 ### [Fody](https://github.com/Fody/Fody)
 [MIT License](https://licenses.nuget.org/MIT).
 
+
+### [Forge.Forms](https://github.com/WPF-Forge/Forge.Forms)
+[MIT License](https://github.com/WPF-Forge/Forge.Forms/blob/master/LICENSE.md).
 
 
 ### [Humanizer](https://github.com/Humanizr/Humanizer)

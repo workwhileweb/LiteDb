@@ -5,6 +5,7 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Security;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -54,12 +55,12 @@ namespace LiteDbExplorer.Modules.DbCollection
 
             ItemDoubleClickCommand = new RelayCommand<DocumentReference>(OnItemDoubleClick);
 
-            AddDocumentCommand = new RelayCommand(_=> AddDocument(), o => CanAddDocument());
-            EditDocumentCommand = new RelayCommand(_=> EditDocument(), o => CanEditDocument());
-            RemoveDocumentCommand = new RelayCommand(_=> RemoveDocument(), o => CanRemoveDocument());
-            ExportDocumentCommand = new RelayCommand(_=> ExportDocument(), o => CanExportDocument());
-            CopyDocumentCommand = new RelayCommand(_=> CopyDocument(), o => CanCopyDocument());
-            PasteDocumentCommand = new RelayCommand(_=> PasteDocument(), o => CanPasteDocument());
+            AddDocumentCommand = new RelayCommand(async _=> await AddDocument(), o => CanAddDocument());
+            EditDocumentCommand = new RelayCommand(async _=> await EditDocument(), o => CanEditDocument());
+            RemoveDocumentCommand = new RelayCommand(async _=> await RemoveDocument(), o => CanRemoveDocument());
+            ExportDocumentCommand = new RelayCommand(async _=> await ExportDocument(), o => CanExportDocument());
+            CopyDocumentCommand = new RelayCommand(async _=> await CopyDocument(), o => CanCopyDocument());
+            PasteDocumentCommand = new RelayCommand(async _=> await PasteDocument(), o => CanPasteDocument());
             RefreshCollectionCommand = new RelayCommand(_=> RefreshCollection(), o => CanRefreshCollection());
             EditDbPropertiesCommand = new RelayCommand(_=> EditDbProperties(), o => CanEditDbProperties());
             FindCommand = new RelayCommand(_=> OpenFind(), o => CanOpenFind());
@@ -275,7 +276,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
         
-        protected void OnItemDoubleClick(DocumentReference documentReference)
+        protected async void OnItemDoubleClick(DocumentReference documentReference)
         {
             if(documentReference == null)
             {
@@ -285,7 +286,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             switch (DoubleClickAction)
             {
                 case CollectionItemDoubleClickAction.EditDocument:
-                    _databaseInteractions.OpenEditDocument(documentReference);
+                    await _databaseInteractions.OpenEditDocument(documentReference);
                     break;
                 case CollectionItemDoubleClickAction.OpenPreview:
                     IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReference>(documentReference);
@@ -300,9 +301,9 @@ namespace LiteDbExplorer.Modules.DbCollection
         #region Routed Commands
         
         [UsedImplicitly]
-        public void AddDocument()
+        public async Task AddDocument()
         {
-            _databaseInteractions.CreateItem(CollectionReference)
+            await _databaseInteractions.CreateItem(CollectionReference)
                 .OnSuccess(reference =>
                 {
                     _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
@@ -317,9 +318,9 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        public void EditDocument()
+        public async Task EditDocument()
         {
-            _databaseInteractions.OpenEditDocument(SelectedDocument);
+            await _databaseInteractions.OpenEditDocument(SelectedDocument);
         }
 
         [UsedImplicitly]
@@ -329,9 +330,9 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        public void RemoveDocument()
+        public async Task RemoveDocument()
         {
-            _databaseInteractions.RemoveDocuments(SelectedDocuments);
+            await _databaseInteractions.RemoveDocuments(SelectedDocuments);
         }
 
         [UsedImplicitly]
@@ -341,9 +342,9 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        public void ExportDocument()
+        public async Task ExportDocument()
         {
-            _databaseInteractions.ExportDocuments(SelectedDocuments.ToList());
+            await _databaseInteractions.ExportDocuments(SelectedDocuments.ToList());
         }
 
         [UsedImplicitly]
@@ -353,9 +354,9 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        public void CopyDocument()
+        public async Task CopyDocument()
         {
-            _databaseInteractions.CopyDocuments(SelectedDocuments);
+            await _databaseInteractions.CopyDocuments(SelectedDocuments);
         }
 
         [UsedImplicitly]
@@ -365,12 +366,11 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        [SecurityCritical]
-        public void PasteDocument()
+        public async Task PasteDocument()
         {
             var textData = Clipboard.GetText();
 
-            _databaseInteractions
+            await _databaseInteractions
                 .ImportDataFromText(CollectionReference, textData)
                 .OnSuccess(update => _eventAggregator.PublishOnUIThread(update));
         }

@@ -39,17 +39,17 @@ namespace LiteDbExplorer.Modules
                 }
             });
 
-            Add(ApplicationCommands.Open, (sender, args) =>
+            Add(ApplicationCommands.Open, async (sender, args) =>
             {
-                _databaseInteractions.OpenDatabase();
+                await _databaseInteractions.OpenDatabase();
             });
 
-            Add(ApplicationCommands.New, (sender, args) =>
+            Add(ApplicationCommands.New, async (sender, args) =>
             {
-                _databaseInteractions.CreateAndOpenDatabase();
+                await _databaseInteractions.CreateAndOpenDatabase();
             });
 
-            Add(Commands.FileDropped, (sender, args) =>
+            Add(Commands.FileDropped, async (sender, args) =>
             {
                 if (!(args.Parameter is IDataObject dataObject))
                 {
@@ -60,7 +60,7 @@ namespace LiteDbExplorer.Modules
                 {
                     if (dataObject.GetDataPresent(DataFormats.FileDrop) && dataObject.GetData(DataFormats.FileDrop, false) is string[] paths)
                     {
-                        _databaseInteractions.OpenDatabases(paths);
+                        await _databaseInteractions.OpenDatabases(paths);
                     }
                 }
                 catch (Exception exc)

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -28,17 +29,17 @@ namespace LiteDbExplorer.Modules.Database
 
             PathDefinitions = databaseInteractions.PathDefinitions;
 
-            OpenRecentItemCommand = new RelayCommand<RecentFileInfo>(OpenRecentItem);
+            OpenRecentItemCommand = new RelayCommand<RecentFileInfo>(async info => await OpenRecentItem(info));
             ItemDoubleClickCommand = new RelayCommand<CollectionReference>(NodeDoubleClick);
 
-            CloseDatabaseCommand = new RelayCommand(_ => CloseDatabase(), o => CanCloseDatabase());
-            AddFileCommand = new RelayCommand(_ => AddFile(), _ => CanAddFile());
-            AddCollectionCommand = new RelayCommand(_ => AddCollection(), _ => CanAddCollection());
+            CloseDatabaseCommand = new RelayCommand(async _ => await CloseDatabase(), o => CanCloseDatabase());
+            AddFileCommand = new RelayCommand(async _ => await AddFile(), _ => CanAddFile());
+            AddCollectionCommand = new RelayCommand(async _ => await AddCollection(), _ => CanAddCollection());
             RefreshDatabaseCommand = new RelayCommand(_ => RefreshDatabase(), _ => CanRefreshDatabase());
-            RevealInExplorerCommand = new RelayCommand(_ => RevealInExplorer(), _ => CanRevealInExplorer());
-            RenameCollectionCommand = new RelayCommand(_ => RenameCollection(), _ => CanRenameCollection());
-            DropCollectionCommand = new RelayCommand(_ => DropCollection(), _ => CanDropCollection());
-            ExportCollectionCommand = new RelayCommand(_ => ExportCollection(), _ => CanExportCollection());
+            RevealInExplorerCommand = new RelayCommand(async _ => await RevealInExplorer(), _ => CanRevealInExplorer());
+            RenameCollectionCommand = new RelayCommand(async _ => await RenameCollection(), _ => CanRenameCollection());
+            DropCollectionCommand = new RelayCommand(async _ => await DropCollection(), _ => CanDropCollection());
+            ExportCollectionCommand = new RelayCommand(async _ => await ExportCollection(), _ => CanExportCollection());
             EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), _ => CanEditDbProperties());
         }
 
@@ -67,26 +68,26 @@ namespace LiteDbExplorer.Modules.Database
         public ICommand EditDbPropertiesCommand { get; }
 
         [UsedImplicitly]
-        public void OpenDatabase()
+        public async Task OpenDatabase()
         {
-            _databaseInteractions.OpenDatabase();
+            await _databaseInteractions.OpenDatabase();
         }
 
         [UsedImplicitly]
-        public void OpenRecentItem(RecentFileInfo info)
+        public async Task OpenRecentItem(RecentFileInfo info)
         {
             if (info == null)
             {
                 return;
             }
 
-            _databaseInteractions.OpenDatabase(info.FullPath);
+            await _databaseInteractions.OpenDatabase(info.FullPath);
         }
 
         [UsedImplicitly]
-        public void OpenDatabases(IEnumerable<string> paths)
+        public async Task OpenDatabases(IEnumerable<string> paths)
         {
-            _databaseInteractions.OpenDatabases(paths);
+            await _databaseInteractions.OpenDatabases(paths);
         }
 
         public DatabaseReference SelectedDatabase { get; private set; }
@@ -138,9 +139,9 @@ namespace LiteDbExplorer.Modules.Database
         #region Routed Commands
 
         [UsedImplicitly]
-        public void CloseDatabase()
+        public async Task CloseDatabase()
         {
-            _databaseInteractions.CloseDatabase(SelectedDatabase);
+            await _databaseInteractions.CloseDatabase(SelectedDatabase);
 
             if (SelectedCollection?.Database == SelectedDatabase)
             {
@@ -157,9 +158,9 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void AddFile()
+        public async Task AddFile()
         {
-            _databaseInteractions.AddFileToDatabase(SelectedDatabase)
+            await _databaseInteractions.AddFileToDatabase(SelectedDatabase)
                 .OnSuccess(reference =>
                 {
                     _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
@@ -173,9 +174,9 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void AddCollection()
+        public async Task AddCollection()
         {
-            _databaseInteractions.AddCollection(SelectedDatabase)
+            await _databaseInteractions.AddCollection(SelectedDatabase)
                 .OnSuccess(reference => { _applicationInteraction.ActivateCollection(reference); });
         }
 
@@ -198,9 +199,9 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void RevealInExplorer()
+        public async Task RevealInExplorer()
         {
-            _databaseInteractions.RevealInExplorer(SelectedDatabase);
+            await _databaseInteractions.RevealInExplorer(SelectedDatabase);
         }
 
         [UsedImplicitly]
@@ -210,9 +211,9 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void RenameCollection()
+        public async Task RenameCollection()
         {
-            _databaseInteractions.RenameCollection(SelectedCollection);
+            await _databaseInteractions.RenameCollection(SelectedCollection);
         }
 
         [UsedImplicitly]
@@ -222,9 +223,9 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void DropCollection()
+        public async Task DropCollection()
         {
-            _databaseInteractions.DropCollection(SelectedCollection);
+            await _databaseInteractions.DropCollection(SelectedCollection);
 
             SelectedCollection = null;
         }
@@ -236,9 +237,9 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void ExportCollection()
+        public async Task ExportCollection()
         {
-            _databaseInteractions.ExportCollection(SelectedCollection);
+            await _databaseInteractions.ExportCollection(SelectedCollection);
         }
 
         [UsedImplicitly]

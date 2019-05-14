@@ -286,7 +286,7 @@ namespace LiteDbExplorer.Controls
         {
             var docTypePicker = new Button
             {
-                Content = "[Null]",
+                Content = "(Null)",
                 ToolTip = "Select null field type",
                 Style = StyleKit.MaterialDesignEntryButtonStyle
             };

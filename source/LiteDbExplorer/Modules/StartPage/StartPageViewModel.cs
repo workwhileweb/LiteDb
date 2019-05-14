@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 using JetBrains.Annotations;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Presentation;
@@ -61,13 +62,13 @@ namespace LiteDbExplorer.Modules.StartPage
         }
         
         [UsedImplicitly]
-        public void OpenDatabase()
+        public async Task OpenDatabase()
         {
-            _databaseInteractions.OpenDatabase();
+            await _databaseInteractions.OpenDatabase();
         }
 
         [UsedImplicitly]
-        public void OpenRecentItem(RecentFileInfo recentFileInfo)
+        public async Task OpenRecentItem(RecentFileInfo recentFileInfo)
         {
             if (recentFileInfo == null)
             {
@@ -84,7 +85,7 @@ namespace LiteDbExplorer.Modules.StartPage
                 return;
             }
 
-            _databaseInteractions.OpenDatabase(recentFileInfo.FullPath);
+            await _databaseInteractions.OpenDatabase(recentFileInfo.FullPath);
         }
         
         [UsedImplicitly]

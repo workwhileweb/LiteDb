@@ -71,6 +71,12 @@
     <Reference Include="Enterwell.Clients.Wpf.Notifications, Version=1.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Enterwell.Clients.Wpf.Notifications.1.4.2\lib\net451\Enterwell.Clients.Wpf.Notifications.dll</HintPath>
     </Reference>
+    <Reference Include="FastMember, Version=1.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\FastMember.1.4.1\lib\net461\FastMember.dll</HintPath>
+    </Reference>
+    <Reference Include="Forge.Forms, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Forge.Forms.1.1.0\lib\net461\Forge.Forms.dll</HintPath>
+    </Reference>
     <Reference Include="Humanizer, Version=2.6.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
       <HintPath>..\packages\Humanizer.Core.2.6.2\lib\netstandard2.0\Humanizer.dll</HintPath>
     </Reference>
@@ -254,12 +260,15 @@
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\Help\AboutViewModel.cs" />
+    <Compile Include="Modules\Help\IssueHelperView.xaml.cs">
+      <DependentUpon>IssueHelperView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Help\IssueHelperViewModel.cs" />
     <Compile Include="Modules\Help\ReleaseNotesView.xaml.cs">
       <DependentUpon>ReleaseNotesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\Help\ReleaseNotesViewModel.cs" />
     <Compile Include="Modules\IApplicationInteraction.cs" />
-    <Compile Include="Modules\InteractionEvents.cs" />
     <Compile Include="Modules\ApplicationInteraction.cs" />
     <Compile Include="Modules\Main\AutoSettingsView.xaml.cs">
       <DependentUpon>AutoSettingsView.xaml</DependentUpon>
@@ -377,6 +386,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Modules\Help\AboutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\Help\IssueHelperView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

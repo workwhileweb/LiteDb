@@ -17,5 +17,6 @@ namespace LiteDbExplorer.Modules
         void PutClipboardText(string text);
         void ShowAbout();
         void ShowReleaseNotes(Version version = null);
+        void ShowIssueHelper();
     }
 }

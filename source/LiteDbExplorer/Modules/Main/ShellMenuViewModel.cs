@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.Composition;
 using System.Diagnostics;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Framework.Shell;
-using LiteDbExplorer.Modules.Help;
 using LiteDbExplorer.Wpf.Modules.Settings;
 
 namespace LiteDbExplorer.Modules.Main
@@ -34,20 +34,21 @@ namespace LiteDbExplorer.Modules.Main
         public Paths PathDefinitions { get; }
         
         [UsedImplicitly]
-        public void OpenRecentItem(RecentFileInfo info)
+        public async Task OpenRecentItem(RecentFileInfo info)
         {
             if (info == null)
             {
                 return;
             }
 
-            _databaseInteractions.OpenDatabase(info.FullPath);
+            await _databaseInteractions.OpenDatabase(info.FullPath);
         }
 
         [UsedImplicitly]
         public void OpenIssuePage()
         {
-            Process.Start(Config.IssuesUrl);
+            // Process.Start(Config.IssuesUrl);
+            _applicationInteraction.ShowIssueHelper();
         }
 
         [UsedImplicitly]

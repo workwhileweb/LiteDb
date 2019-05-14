@@ -41,11 +41,16 @@ namespace LiteDbExplorer.Core
             return string.Join(" - ", documentReference.Collection?.Name, documentReference.LiteDocument["_id"].AsString);
         }
 
-        public static string ToDisplayValue(this BsonValue bsonValue, int? maxLength = null)
+        public static string ToDisplayValue(this BsonValue bsonValue, int? maxLength = null, CultureInfo cultureInfo = null)
         {
             if (bsonValue == null)
             {
                 return string.Empty;
+            }
+
+            if (cultureInfo == null)
+            {
+                cultureInfo = CultureInfo.InvariantCulture;
             }
 
             try
@@ -72,29 +77,37 @@ namespace LiteDbExplorer.Core
                 }
                 if (bsonValue.IsDateTime)
                 {
-                    return bsonValue.AsDateTime.ToString(CultureInfo.InvariantCulture);
+                    return bsonValue.AsDateTime.ToString(cultureInfo);
                 }
                 if (bsonValue.IsInt32)
                 {
-                    return bsonValue.AsInt32.ToString(CultureInfo.InvariantCulture);
+                    return bsonValue.AsInt32.ToString(cultureInfo);
                 }
                 if (bsonValue.IsInt64)
                 {
-                    return bsonValue.AsInt64.ToString(CultureInfo.InvariantCulture);
+                    return bsonValue.AsInt64.ToString(cultureInfo);
                 }
                 if (bsonValue.IsDouble)
                 {
-                    return bsonValue.AsDouble.ToString(CultureInfo.InvariantCulture);
+                    return bsonValue.AsDouble.ToString(cultureInfo);
                 }
                 if (bsonValue.IsDecimal)
                 {
-                    return bsonValue.AsDecimal.ToString(CultureInfo.InvariantCulture);
+                    return bsonValue.AsDecimal.ToString(cultureInfo);
                 }
                 if (bsonValue.IsGuid)
                 {
                     return bsonValue.AsGuid.ToString("D");
                 }
-                
+                if (bsonValue.IsMinValue)
+                {
+                    return "-∞";
+                }
+                if (bsonValue.IsMaxValue)
+                {
+                    return "+∞";
+                }
+
                 if (maxLength.HasValue)
                 {
                     return bsonValue.ToString().Truncate(maxLength.Value);

@@ -30,6 +30,28 @@ namespace LiteDbExplorer.Wpf.Framework.Windows
 
         public WindowState? WindowState { get; set; }
 
+        public static double GoldenHeight(double preferredSize)
+        {
+            var height = Math.Max(preferredSize, SystemParameters.VirtualScreenHeight / 1.66);
+            if (height > SystemParameters.VirtualScreenHeight)
+            {
+                height = SystemParameters.VirtualScreenHeight;
+            }
+
+            return height;
+        }
+
+        public static double GoldenWidth(double preferredSize)
+        {
+            var width = Math.Min(preferredSize, SystemParameters.VirtualScreenWidth / 1.66);
+            if (width > SystemParameters.VirtualScreenWidth)
+            {
+                width = SystemParameters.VirtualScreenWidth;
+            }
+
+            return width;
+        }
+
         public static WindowPosition FromWindow(Window window)
         {
             var windowPosition = new WindowPosition

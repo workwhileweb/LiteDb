@@ -170,5 +170,11 @@ namespace LiteDbExplorer.Modules
             viewModel.FilterVersion(version);
             _windowManager.ShowDialog(viewModel, null, ReleaseNotesViewModel.DefaultDialogOptions.Value);
         }
+
+        public void ShowIssueHelper()
+        {
+            var viewModel = IoC.Get<IssueHelperViewModel>();
+            _windowManager.ShowDialog(viewModel, null, IssueHelperViewModel.DefaultDialogOptions.Value);
+        }
     }
 }
