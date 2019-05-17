@@ -1,0 +1,12 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    >
+    <Style x:Key="WithoutHeader" TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+        <Setter Property="Visibility" Value="Collapsed" />
+    </Style>
+
+    <Style x:Key="TabControlWithoutHeader" TargetType="TabControl" BasedOn="{StaticResource {x:Type TabControl}}">
+        <Setter Property="ItemContainerStyle" Value="{StaticResource WithoutHeader}"/>
+    </Style>
+
+</ResourceDictionary>

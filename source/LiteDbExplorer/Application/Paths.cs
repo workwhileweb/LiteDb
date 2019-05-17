@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using Caliburn.Micro;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
@@ -65,32 +65,48 @@ namespace LiteDbExplorer
         private readonly Lazy<BindableCollection<RecentFileInfo>> _lazyRecentFiles = new Lazy<BindableCollection<RecentFileInfo>>(() =>
         {
             var list = new List<RecentFileInfo>();
+
             var recentFilesExists = File.Exists(RecentFilesPath);
             if (recentFilesExists)
             {
-                var value = File.ReadAllText(RecentFilesPath);
-                if (!string.IsNullOrEmpty(value))
+                try
                 {
-                    var recentFileInfos = JsonConvert.DeserializeObject<RecentFileInfo[]>(value, _jsonSerializerSettings);
-                    foreach (var recentFileInfo in recentFileInfos)
+                    var value = File.ReadAllText(RecentFilesPath);
+                    if (!string.IsNullOrEmpty(value))
                     {
-                        recentFileInfo.InvalidateInfo();
-                        list.Add(recentFileInfo);
+                        var recentFileInfos = JsonConvert.DeserializeObject<RecentFileInfo[]>(value, _jsonSerializerSettings);
+                        foreach (var recentFileInfo in recentFileInfos)
+                        {
+                            recentFileInfo.InvalidateInfo();
+                            list.Add(recentFileInfo);
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    SettingsFileReadErrorHandler(e, RecentFilesPath);
                 }
             }
 
             if (File.Exists(LegacyRecentFilesPath) && !recentFilesExists)
             {
-                var filesPaths = File.ReadLines(LegacyRecentFilesPath);
-                foreach (var filesPath in filesPaths)
+                try
                 {
-                    if (list.Any(p => p.FullPath.Equals(filesPath, StringComparison.OrdinalIgnoreCase)))
+                    var filesPaths = File.ReadLines(LegacyRecentFilesPath);
+                    foreach (var filesPath in filesPaths)
                     {
-                        continue;
-                    }
+                        if (list.Any(p => p.FullPath.Equals(filesPath, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            continue;
+                        }
 
-                    list.Add(new RecentFileInfo(filesPath));
+                        list.Add(new RecentFileInfo(filesPath));
+                    }
+                    File.Delete(LegacyRecentFilesPath);
+                }
+                catch (Exception e)
+                {
+                    SettingsFileReadErrorHandler(e, LegacyRecentFilesPath);
                 }
             }
             
@@ -167,6 +183,15 @@ namespace LiteDbExplorer
             target.AddRange(orderedItem);
         }
 
+        private static void SettingsFileReadErrorHandler(Exception e, string path)
+        {
+            App.ShowError(e, $"An error occurred while reading the configuration file: '{path}'.\n\nTo avoid this error again a new configuration will be created!");
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+        }
+
         private static void RecentFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (sender is IObservableCollection<RecentFileInfo> collection)
@@ -177,7 +202,8 @@ namespace LiteDbExplorer
 
                 if (File.Exists(LegacyRecentFilesPath))
                 {
-                    File.WriteAllLines(LegacyRecentFilesPath, collection.Select(p => p.FullPath));
+                    // File.WriteAllLines(LegacyRecentFilesPath, collection.Select(p => p.FullPath));
+                    File.Delete(LegacyRecentFilesPath);
                 }
             }
         }

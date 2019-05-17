@@ -7,6 +7,9 @@
              xmlns:forms="clr-namespace:Forge.Forms.Controls;assembly=Forge.Forms"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
+             xmlns:wpf="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -14,12 +17,8 @@
     </UserControl.Resources>
     <Grid>
         <TabControl SelectedIndex="{Binding SelectedStepIndex, Mode=OneWay}"
-                    IsSynchronizedWithCurrentItem="True" BorderThickness="0">
-            <TabControl.ItemContainerStyle>
-                <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
-                    <Setter Property="Visibility" Value="Collapsed" />
-                </Style>
-            </TabControl.ItemContainerStyle>
+                    IsSynchronizedWithCurrentItem="True" BorderThickness="0"
+                    Style="{StaticResource TabControlWithoutHeader}">
             <TabItem Header="General">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -31,7 +30,7 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <ScrollViewer Grid.Row="0" Grid.ColumnSpan="2" VerticalScrollBarVisibility="Auto">
-                        <forms:DynamicForm Model="{Binding FormModel}" Margin="10,15,10,15" />
+                        <forms:DynamicForm Model="{Binding FormModel}" Margin="25,15" />
                     </ScrollViewer>
                     
                     <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" BorderThickness="0,0,0,1"
@@ -51,26 +50,58 @@
             <TabItem Header="Preview">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Row="0" Grid.ColumnSpan="2" Text="{Binding IssueContentOutput, Mode=OneWay}"
-                             Margin="25"
-                             Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                             AcceptsReturn="True"
-                             TextWrapping="Wrap"
-                             VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch"
-                             HorizontalAlignment="Stretch" IsReadOnly="True" VerticalContentAlignment="Top" />
 
+                    <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Text="{Binding FormModel.Title}" 
+                               Margin="34,24,34,15"
+                               Style="{StaticResource MaterialDesignTitleTextBlock}"/>
 
-                    <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Height="1" BorderThickness="0,0,0,1"
+                    <ListBox Grid.Row="2" Grid.ColumnSpan="2" Grid.Column="0" x:Name="detailViewSelector"
+                             SelectedIndex="0" Margin="25,5,25,25"
+                             Style="{StaticResource MaterialDesignToolToggleFlatListBox}" HorizontalAlignment="Right">
+                        <i:Interaction.Behaviors>
+                            <behaviors:KeepSelectedItem/>
+                        </i:Interaction.Behaviors>
+                        <ListBoxItem ToolTip="Preview">
+                            <materialDesign:PackIcon Kind="Eye" Style="{StaticResource ToolPackIcon}"/>
+                        </ListBoxItem>
+                        <ListBoxItem ToolTip="Markdown Source">
+                            <materialDesign:PackIcon Kind="Markdown" Style="{StaticResource ToolPackIcon}"/>
+                        </ListBoxItem>
+                    </ListBox>
+
+                    <TabControl Grid.Row="1" Grid.ColumnSpan="2" Grid.Column="0"
+                                SelectedIndex="{Binding SelectedIndex, ElementName=detailViewSelector}"
+                                Style="{StaticResource TabControlWithoutHeader}">
+                        <TabItem Header="Preview">
+                            <Border Margin="25,0,25,0" Padding="0,15,15,15" 
+                                    BorderThickness="1" CornerRadius="4" BorderBrush="{DynamicResource MaterialDesignBody}">
+                                <wpf:MarkdownViewer x:Name="markdownViewer" Markdown="{Binding IssueContentOutput, Mode=OneWay}" />
+                            </Border>
+                        </TabItem>
+                        <TabItem Header="Source">
+                            <TextBox Text="{Binding IssueContentOutput, Mode=OneWay}"
+                                     Margin="25,0,25,0"
+                                     Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
+                                     AcceptsReturn="True"
+                                     TextWrapping="Wrap"
+                                     VerticalScrollBarVisibility="Auto" VerticalAlignment="Stretch"
+                                     HorizontalAlignment="Stretch" IsReadOnly="True" VerticalContentAlignment="Top" />
+                        </TabItem>
+                    </TabControl>
+
+                    <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Height="1" BorderThickness="0,0,0,1"
                             BorderBrush="{StaticResource MaterialDesignDivider}" VerticalAlignment="Top"/>
 
-                    <Button Grid.Row="1" Grid.Column="0"
+                    <Button Grid.Row="3" Grid.Column="0"
                             HorizontalAlignment="Left" Margin="25,15"
                             Command="{Binding GoToFormCommand}" 
                             Style="{StaticResource MaterialDesignFlatButton}">
@@ -80,7 +111,7 @@
                         </StackPanel>
                     </Button>
 
-                    <Button Grid.Row="1" Grid.Column="1" Content="Copy and Open Issue Page"
+                    <Button Grid.Row="3" Grid.Column="1" Content="Copy and Open Issue Page"
                             HorizontalAlignment="Right" Margin="25,15"
                             Command="{Binding ConfirmCommand}" />
                 </Grid>

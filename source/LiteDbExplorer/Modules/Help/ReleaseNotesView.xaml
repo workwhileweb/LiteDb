@@ -38,7 +38,7 @@
                                         </DataTrigger>
                                     </Style.Triggers>
                                 </Style>
-                            </TextBlock.Style>         
+                            </TextBlock.Style>
                         </TextBlock>
                         <TextBlock TextWrapping="WrapWithOverflow" Margin="1,4">
                             <Run Text="Version: "/>

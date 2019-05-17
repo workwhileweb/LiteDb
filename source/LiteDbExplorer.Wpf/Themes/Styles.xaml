@@ -20,6 +20,10 @@
             Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Fonts.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Flyout.xaml" />
+        
+        <!-- Material Design Extensions -->
+        <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml" />-->
+        <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />-->
 
         <ResourceDictionary Source="Generic.xaml"/>
 

@@ -99,10 +99,24 @@ namespace LiteDbExplorer
 
         private static Settings LoadSettings()
         {
-            if (File.Exists(Paths.SettingsFilePath))
+            try
             {
-                var value = File.ReadAllText(Paths.SettingsFilePath);
-                return JsonConvert.DeserializeObject<Settings>(value, _settings);
+                if (File.Exists(Paths.SettingsFilePath))
+                {
+                    var value = File.ReadAllText(Paths.SettingsFilePath);
+
+                    return JsonConvert.DeserializeObject<Settings>(value, _settings);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                App.ShowError(e, $"An error occurred while reading the configuration file: '{Paths.SettingsFilePath}'.\n\nTo avoid this error again a new configuration will be created!");
+                if (File.Exists(Paths.SettingsFilePath))
+                {
+                    File.Delete(Paths.SettingsFilePath);
+                    File.WriteAllText(Paths.SettingsFilePath, JsonConvert.SerializeObject(new Settings(DateTime.UtcNow)));
+                }
             }
 
             return new Settings(DateTime.UtcNow);

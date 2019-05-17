@@ -34,6 +34,7 @@
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.TimeSpanUpDown.xaml" />
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.DateTimePicker.xaml" />
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.ListView.xaml" />
+                <ResourceDictionary Source="Themes/MaterialDesignTheme.Tabs.xaml" />
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
                 <ResourceDictionary Source="Themes/Controls.ScrollBar.xaml" />
 

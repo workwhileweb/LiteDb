@@ -114,7 +114,15 @@ namespace LiteDbExplorer
                 message += "\nApplication will shutdown.\n";
             }
             
-            ShowError((Exception) e.ExceptionObject, message, "Unhandled Exception");
+            if(!_errorNotified)
+            {
+                ShowError((Exception) e.ExceptionObject, message, "Unhandled Exception");
+            }
+
+            if (e.IsTerminating)
+            {
+                _errorNotified = true;
+            }
             
             if (e.IsTerminating)
             {
@@ -132,23 +140,25 @@ namespace LiteDbExplorer
             {
                 message += $"\nAdditional information written into: {log.FileName}.\n";
             }
+
             if (!e.Handled)
             {
                 message += "\nApplication will shutdown.\n";
             }
 
-            ShowError(e.Exception, message, "Unhandled Exception");
+            if(!_errorNotified)
+            {
+                ShowError(e.Exception, message, "Unhandled Exception");
+            }
+
+            if (!e.Handled)
+            {
+                _errorNotified = true;
+            }
         }
 
-        public void ShowError(Exception exception, string message, string caption = "")
+        public static void ShowError(Exception exception, string message, string caption = "")
         {
-            if(_errorNotified)
-            {
-                return;
-            }
-            
-            _errorNotified = true;
-
             var exceptionViewer = new ExceptionViewer(message, exception);
             var baseDialogWindow = new BaseDialogWindow
             {
