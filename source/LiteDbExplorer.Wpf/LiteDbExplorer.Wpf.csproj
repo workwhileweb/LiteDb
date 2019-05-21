@@ -130,6 +130,7 @@
     <Compile Include="Converters\LeftMarginMultiplierConverter.cs" />
     <Compile Include="Converters\NegateConverter.cs" />
     <Compile Include="Converters\NullOrEmptyToVisibilityConverter.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\VisualTreeExtensions.cs" />
     <Compile Include="Framework\AppWindowManager.cs" />
     <Compile Include="Framework\Commands\CommandToCommandBindings.cs" />

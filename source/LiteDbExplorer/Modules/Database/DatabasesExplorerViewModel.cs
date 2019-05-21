@@ -5,10 +5,12 @@ using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
+using Enterwell.Clients.Wpf.Notifications;
 using JetBrains.Annotations;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.Main;
+using LiteDbExplorer.Presentation;
 
 namespace LiteDbExplorer.Modules.Database
 {
@@ -32,6 +34,7 @@ namespace LiteDbExplorer.Modules.Database
             OpenRecentItemCommand = new RelayCommand<RecentFileInfo>(async info => await OpenRecentItem(info));
             ItemDoubleClickCommand = new RelayCommand<CollectionReference>(NodeDoubleClick);
 
+            SaveDatabaseCopyAsCommand = new RelayCommand(async _ => await SaveDatabaseCopyAs(), o => CanSaveDatabaseCopyAs());
             CloseDatabaseCommand = new RelayCommand(async _ => await CloseDatabase(), o => CanCloseDatabase());
             AddFileCommand = new RelayCommand(async _ => await AddFile(), _ => CanAddFile());
             AddCollectionCommand = new RelayCommand(async _ => await AddCollection(), _ => CanAddCollection());
@@ -67,6 +70,12 @@ namespace LiteDbExplorer.Modules.Database
 
         public ICommand EditDbPropertiesCommand { get; }
 
+        public ICommand SaveDatabaseCopyAsCommand { get; }
+
+        public DatabaseReference SelectedDatabase { get; private set; }
+
+        public CollectionReference SelectedCollection { get; private set; }
+
         [UsedImplicitly]
         public async Task OpenDatabase()
         {
@@ -89,10 +98,6 @@ namespace LiteDbExplorer.Modules.Database
         {
             await _databaseInteractions.OpenDatabases(paths);
         }
-
-        public DatabaseReference SelectedDatabase { get; private set; }
-
-        public CollectionReference SelectedCollection { get; private set; }
 
         [UsedImplicitly]
         public void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
@@ -137,6 +142,32 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         #region Routed Commands
+
+        [UsedImplicitly]
+        public async Task SaveDatabaseCopyAs()
+        {
+            var newDatabasePath = await _databaseInteractions.SaveDatabaseCopyAs(SelectedDatabase);
+            if (newDatabasePath.HasValue)
+            {
+                NotificationInteraction.Default()
+                    .HasMessage($"Database copy saved in:\n{newDatabasePath.Value.ShrinkPath(128)}")
+                    .Dismiss().WithButton("Open", async button =>
+                    {
+                        await _databaseInteractions.OpenDatabase(newDatabasePath.Value).ConfigureAwait(false);
+                    })
+                    .WithButton("Reveal in Explorer", button =>
+                    {
+                        _applicationInteraction.RevealInExplorer(newDatabasePath.Value);
+                        })
+                    .Dismiss().WithButton("Close", button => { })
+                    .Queue();
+            }
+        }
+
+        public bool CanSaveDatabaseCopyAs()
+        {
+            return SelectedDatabase != null;
+        }
 
         [UsedImplicitly]
         public async Task CloseDatabase()

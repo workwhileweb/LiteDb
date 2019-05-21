@@ -571,7 +571,6 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\icon.ico" />
-    <Resource Include="Images\icon.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\copy.png" />
@@ -595,7 +594,9 @@
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\icon.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LiteDbExplorer.Core\LiteDbExplorer.Core.csproj">
       <Project>{f2dd619d-21da-4805-ab20-b2bbf4598a69}</Project>

@@ -93,6 +93,13 @@ namespace LiteDbExplorer
             typeof(Commands)
         );
 
+        public static readonly RoutedUICommand SaveCopyAs = new RoutedUICommand
+        (
+            "Save copy as...",
+            nameof(SaveCopyAs),
+            typeof(Commands)
+        );
+
         /*public static readonly RoutedUICommand Find = new RoutedUICommand
         (
             "Find...",

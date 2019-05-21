@@ -25,6 +25,7 @@ namespace LiteDbExplorer.Modules
         Task OpenDatabase(string path, string password = "");
         Task OpenDatabases(IEnumerable<string> paths);
         Task CloseDatabase(DatabaseReference database);
+        Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database);
         Task ExportCollection(CollectionReference collectionReference);
         Task ExportDocuments(ICollection<DocumentReference> documents);
         Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database);
@@ -172,7 +173,43 @@ namespace LiteDbExplorer.Modules
 
             return Task.CompletedTask;
         }
-        
+
+        public Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database)
+        {
+            var databaseLocation = database.Location;
+            var fileInfo = new FileInfo(databaseLocation);
+            if (fileInfo?.DirectoryName == null)
+            {
+                throw new FileNotFoundException(databaseLocation);
+            }
+
+            var fileCount = 0;
+            var newFileName = fileInfo.Name;
+            do
+            {
+                fileCount++;
+                newFileName = $"{Path.GetFileNameWithoutExtension(fileInfo.Name)} {(fileCount > 0 ? "(" + fileCount + ")" : "")}{Path.GetExtension(fileInfo.Name)}";
+            }
+            while (File.Exists(Path.Combine(fileInfo.DirectoryName, newFileName)));
+
+            var dialog = new SaveFileDialog
+            {
+                Filter = "All files|*.*",
+                OverwritePrompt = true,
+                InitialDirectory = fileInfo.DirectoryName ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                FileName = newFileName
+            };
+
+            if (dialog.ShowDialog() != true)
+            {
+                return Task.FromResult(Maybe<string>.None);
+            }
+
+            fileInfo.CopyTo(dialog.FileName, false);
+
+            return Task.FromResult(Maybe<string>.From(dialog.FileName));
+        }
+
         public Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database)
         {
             var dialog = new OpenFileDialog

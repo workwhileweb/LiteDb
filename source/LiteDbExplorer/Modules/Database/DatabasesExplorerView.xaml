@@ -31,6 +31,7 @@
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.DropCollection" TargetCommand="{Binding DropCollectionCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection" TargetCommand="{Binding ExportCollectionCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" TargetCommand="{Binding EditDbPropertiesCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" TargetCommand="{Binding SaveDatabaseCopyAsCommand}"/>
     </commands:CommandToCommand.Bindings>
     <UserControl.Style>
         <Style TargetType="UserControl">
@@ -132,6 +133,8 @@
                                 <MenuItem Command="liteDbExplorer:Commands.EditDbProperties" 
                                           CommandParameter="{Binding}"/>
                                 <Separator />
+                                <MenuItem Command="liteDbExplorer:Commands.SaveCopyAs" 
+                                          CommandParameter="{Binding}"/>
                                 <MenuItem Command="liteDbExplorer:Commands.RevealInExplorer" 
                                           CommandParameter="{Binding}"/>
                                 <MenuItem Command="Close" 
