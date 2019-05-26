@@ -26,6 +26,7 @@ namespace LiteDbExplorer.Modules
         Task OpenDatabases(IEnumerable<string> paths);
         Task CloseDatabase(DatabaseReference database);
         Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database);
+        Task ExportJson(IJsonSerializerProvider provider, string name = "");
         Task ExportCollection(CollectionReference collectionReference);
         Task ExportDocuments(ICollection<DocumentReference> documents);
         Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database);
@@ -460,6 +461,36 @@ namespace LiteDbExplorer.Modules
                             JsonSerializer.Serialize(data, writer, true, false);
                         }
                     }
+                }
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public Task ExportJson(IJsonSerializerProvider provider, string name = "")
+        {
+            var dialog = new SaveFileDialog
+            {
+                Filter = "Json File|*.json",
+                FileName = "export.json",
+                OverwritePrompt = true
+            };
+
+            if (!string.IsNullOrEmpty(name))
+            {
+                if (!name.EndsWith(".json"))
+                {
+                    name += ".json";
+                }
+
+                dialog.FileName = $"{name}";
+            }
+
+            if (dialog.ShowDialog() == true)
+            {
+                using (var writer = new StreamWriter(dialog.FileName))
+                {
+                    provider.Serialize(writer, true);
                 }
             }
 

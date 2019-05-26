@@ -4,6 +4,7 @@
 
     <!-- Document styles -->
     <Style TargetType="{x:Type FlowDocument}" x:Key="{x:Static markdig:Styles.DocumentStyleKey}">
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="FontFamily" Value="Calibri" />
         <Setter Property="TextAlignment" Value="Left" />
     </Style>
@@ -12,11 +13,11 @@
         <Setter Property="Padding" Value="0,0,0,0" />
     </Style>
     <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.CodeBlockStyleKey}">
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignBackground}" />
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
         <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
     </Style>
     <Style TargetType="{x:Type Run}" x:Key="{x:Static markdig:Styles.CodeStyleKey}">
-        <Setter Property="Background" Value="{DynamicResource MaterialDesignBackground}" />
+        <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}" />
         <Setter Property="FontFamily" Value="Consolas, Lucida Sans Typewriter, Courier New" />
     </Style>
     <Style TargetType="{x:Type Paragraph}" x:Key="{x:Static markdig:Styles.Heading1StyleKey}">

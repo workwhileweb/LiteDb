@@ -12,10 +12,9 @@ using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Indentation;
 using ICSharpCode.AvalonEdit.Rendering;
-using ICSharpCode.AvalonEdit.Search;
 using LiteDbExplorer.Controls.Editor;
 using LiteDbExplorer.Controls.JsonViewer;
-using LiteDbExplorer.Extensions;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Presentation;
 
 namespace LiteDbExplorer.Controls
@@ -59,13 +58,13 @@ namespace LiteDbExplorer.Controls
 
         public static readonly DependencyProperty DocumentSourceProperty = DependencyProperty.Register(
             nameof(DocumentSource),
-            typeof(DocumentReference),
+            typeof(object),
             typeof(DocumentJsonView),
             new PropertyMetadata(null, propertyChangedCallback: OnDocumentSourceChanged));
 
-        public DocumentReference DocumentSource
+        public object DocumentSource
         {
-            get => (DocumentReference) GetValue(DocumentSourceProperty);
+            get => (object) GetValue(DocumentSourceProperty);
             set => SetValue(DocumentSourceProperty, value);
         }
 
@@ -80,9 +79,9 @@ namespace LiteDbExplorer.Controls
 
         public void UpdateDocument()
         {
-            if (DocumentSource != null)
+            if (DocumentSource != null && DocumentSource is IJsonSerializerProvider provider)
             {
-                SetJson(DocumentSource);
+                SetJson(provider);
             }
             else
             {
@@ -146,23 +145,13 @@ namespace LiteDbExplorer.Controls
                 return;
             }
 
-            if (e.NewValue is DocumentReference documentReference)
-            {
-                documentJsonView.SetJson(documentReference);
-            }
-            else
-            {
-                documentJsonView.ResetJson();
-            }
+            documentJsonView.UpdateDocument();
         }
 
-        private void SetJson(DocumentReference documentReference)
+        private void SetJson(IJsonSerializerProvider provider)
         {
             ThreadPool.QueueUserWorkItem(o => {
-                var content = documentReference.LiteDocument.SerializeDecoded(true);
-                // var doc = new TextDocument(content);
-                // doc.SetOwnerThread(Application.Current.Dispatcher.Thread);
-                
+                var content = provider.Serialize(true);
                 
                 Dispatcher.BeginInvoke((Action) (() =>
                 {
@@ -171,7 +160,6 @@ namespace LiteDbExplorer.Controls
 
                 }), DispatcherPriority.Normal);
             });
-            
         }
 
         private void ResetJson()

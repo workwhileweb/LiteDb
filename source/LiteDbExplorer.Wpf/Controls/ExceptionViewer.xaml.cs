@@ -35,27 +35,37 @@ namespace LiteDbExplorer.Controls
         {
             InitializeComponent();
 
-            Loaded += (sender, args) =>
-            {
-                treeCol.Width = new GridLength(treeCol.ActualWidth, GridUnitType.Pixel);
-                _chromeWidth = ActualWidth - mainGrid.ActualWidth;
-                ToggleDetails();
-                CalcMaxTreeWidth();
-            };
+            Initialize(headerMessage, e);
+        }
 
-            if (DefaultPaneBrush != null)
+        public void Initialize(string headerMessage, Exception e)
+        {
+            if (!_initialized)
             {
-                treeView1.Background = DefaultPaneBrush;
+                Loaded += (sender, args) =>
+                {
+                    treeCol.Width = new GridLength(treeCol.ActualWidth, GridUnitType.Pixel);
+                    _chromeWidth = ActualWidth - mainGrid.ActualWidth;
+                    ToggleDetails();
+                    CalcMaxTreeWidth();
+                };
+
+                if (DefaultPaneBrush != null)
+                {
+                    treeView1.Background = DefaultPaneBrush;
+                }
+
+                docViewer.Background = treeView1.Background;
+
+                // We use three font sizes.  The smallest is based on whatever the "standard"
+                // size is for the current system/app, taken from an arbitrary control.
+
+                _small = treeView1.FontSize;
+                _med = _small * 1.1;
+                _large = _small * 1.2;
             }
 
-            docViewer.Background = treeView1.Background;
-
-            // We use three font sizes.  The smallest is based on whatever the "standard"
-            // size is for the current system/app, taken from an arbitrary control.
-
-            _small = treeView1.FontSize;
-            _med = _small * 1.1;
-            _large = _small * 1.2;
+            _initialized = true;
 
             BuildTree(e, headerMessage);
         }
@@ -185,13 +195,14 @@ namespace LiteDbExplorer.Controls
         static string _product;
 
         // Font sizes based on the "normal" size.
-        readonly double _small;
-        readonly double _med;
-        readonly double _large;
+        double _small;
+        double _med;
+        double _large;
 
         // This is used to dynamically calculate the mainGrid.MaxWidth when the Window is resized,
         // since I can't quite get the behavior I want without it.  See CalcMaxTreeWidth().
         double _chromeWidth;
+        private bool _initialized;
 
         // Initializes the Product property.
         static string GetProductName()

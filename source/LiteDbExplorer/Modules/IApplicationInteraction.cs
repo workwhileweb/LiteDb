@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using LiteDB;
+using LiteDbExplorer.Modules.DbQuery;
 
 namespace LiteDbExplorer.Modules
 {
@@ -8,6 +9,7 @@ namespace LiteDbExplorer.Modules
     {
         bool OpenDatabaseProperties(DatabaseReference database);
         bool OpenEditDocument(DocumentReference document);
+        bool OpenQuery(RunQueryContext queryContext);
         bool RevealInExplorer(string filePath);
         void ActivateDocument(DocumentReference document);
         void ActivateCollection(CollectionReference collection, IEnumerable<DocumentReference> selectedDocuments = null);

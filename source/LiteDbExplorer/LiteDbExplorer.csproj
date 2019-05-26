@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\PropertyChanged.Fody.3.0.0\build\PropertyChanged.Fody.props" Condition="Exists('..\packages\PropertyChanged.Fody.3.0.0\build\PropertyChanged.Fody.props')" />
+  <Import Project="..\packages\PropertyChanged.Fody.3.0.1\build\PropertyChanged.Fody.props" Condition="Exists('..\packages\PropertyChanged.Fody.3.0.1\build\PropertyChanged.Fody.props')" />
   <Import Project="..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props" Condition="Exists('..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -128,8 +128,8 @@
     <Reference Include="Onova, Version=2.4.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Onova.2.4.2\lib\net46\Onova.dll</HintPath>
     </Reference>
-    <Reference Include="PropertyChanged, Version=3.0.0.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
-      <HintPath>..\packages\PropertyChanged.Fody.3.0.0\lib\net452\PropertyChanged.dll</HintPath>
+    <Reference Include="PropertyChanged, Version=3.0.1.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
+      <HintPath>..\packages\PropertyChanged.Fody.3.0.1\lib\net452\PropertyChanged.dll</HintPath>
     </Reference>
     <Reference Include="PropertyTools, Version=2.0.1.0, Culture=neutral, PublicKeyToken=ea0c9f2b460934d0, processorArchitecture=MSIL">
       <HintPath>..\packages\PropertyTools.Wpf.2.0.1\lib\net45\PropertyTools.dll</HintPath>
@@ -190,6 +190,8 @@
     <Compile Include="Application\Settings\PerformanceSettings.cs" />
     <Compile Include="Application\CmdlineCommands.cs" />
     <Compile Include="AppBootstrapper.cs" />
+    <Compile Include="Controls\AvalonEditBehaviour.cs" />
+    <Compile Include="Controls\ExtendedTextEditor.cs" />
     <Compile Include="Controls\CollectionListView.xaml.cs">
       <DependentUpon>CollectionListView.xaml</DependentUpon>
     </Compile>
@@ -229,10 +231,6 @@
     </Compile>
     <Compile Include="Modules\DbCollection\CollectionExplorerViewModel.cs" />
     <Compile Include="Modules\DbCollection\CollectionItemDoubleClickAction.cs" />
-    <Compile Include="Modules\DbCollection\CollectionQueryView.xaml.cs">
-      <DependentUpon>CollectionQueryView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Modules\DbCollection\CollectionQueryViewModel.cs" />
     <Compile Include="Modules\DbCollection\CollectionSettingsViewModel.cs" />
     <Compile Include="Modules\DbCollection\ICollectionReferenceListView.cs" />
     <Compile Include="Modules\DbDocument\DocumentPreviewSettingsViewModel.cs" />
@@ -243,6 +241,15 @@
     <Compile Include="Modules\DbDocument\IDocumentDetailView.cs" />
     <Compile Include="Modules\DbDocument\IDocumentPreview.cs" />
     <Compile Include="Modules\DbDocument\JsonPreviewSettingsViewModel.cs" />
+    <Compile Include="Modules\DbQuery\QueryReference.cs" />
+    <Compile Include="Modules\DbQuery\QueryResultView.xaml.cs">
+      <DependentUpon>QueryResultView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\DbQuery\QueryResultViewModel.cs" />
+    <Compile Include="Modules\DbQuery\QueryView.xaml.cs">
+      <DependentUpon>QueryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\DbQuery\QueryViewModel.cs" />
     <Compile Include="Modules\DefaultCommandsHandler.cs" />
     <Compile Include="Modules\DatabaseInteractions.cs" />
     <Compile Include="Modules\Database\DatabasePropertiesView.xaml.cs">
@@ -267,12 +274,17 @@
       <DependentUpon>IssueHelperView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\Help\IssueHelperViewModel.cs" />
+    <Compile Include="Modules\Help\MarkdownDocView.xaml.cs">
+      <DependentUpon>MarkdownDocView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\Help\MarkdownDocViewModel.cs" />
     <Compile Include="Modules\Help\ReleaseNotesView.xaml.cs">
       <DependentUpon>ReleaseNotesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\Help\ReleaseNotesViewModel.cs" />
     <Compile Include="Modules\IApplicationInteraction.cs" />
     <Compile Include="Modules\ApplicationInteraction.cs" />
+    <Compile Include="Modules\IOwnerViewModelMessageHandler.cs" />
     <Compile Include="Modules\Main\AutoSettingsView.xaml.cs">
       <DependentUpon>AutoSettingsView.xaml</DependentUpon>
     </Compile>
@@ -368,10 +380,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Modules\DbCollection\CollectionQueryView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Modules\Database\DatabasePropertiesView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -388,11 +396,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Modules\DbQuery\QueryResultView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\DbQuery\QueryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\Help\AboutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Modules\Help\IssueHelperView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\Help\MarkdownDocView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -531,6 +551,8 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\SyntaxDefinitions\Json.dark.xshd" />
     <EmbeddedResource Include="Controls\SyntaxDefinitions\Json.xshd" />
+    <EmbeddedResource Include="Controls\SyntaxDefinitions\LiteDbCmd.dark.xshd" />
+    <EmbeddedResource Include="Controls\SyntaxDefinitions\LiteDbCmd.xshd" />
     <None Include="LiteDbExplorer.ruleset" />
     <EmbeddedResource Include="Modules\Help\AboutContent.md" />
     <None Include="packages.config" />
@@ -545,51 +567,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Images\close.png" />
-    <Resource Include="Images\opendb.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\database.png" />
-    <Resource Include="Images\table.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\files.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\dropdown.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\createitem.png" />
-    <Resource Include="Images\deleteitem.png" />
-    <Resource Include="Images\updateitem.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\addfield.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\export.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Resource Include="Images\icon.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\copy.png" />
-    <Resource Include="Images\cut.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\paste.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\newdatabase.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\uploadfile.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\refresh.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <Resource Include="Images\file-table.png" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="FodyWeavers.xml" />
@@ -607,16 +585,19 @@
       <Name>LiteDbExplorer.Wpf</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Modules\Shared\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="..\packages\Fody.5.0.5\build\Fody.targets" Condition="Exists('..\packages\Fody.5.0.5\build\Fody.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\Fody.5.0.5\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.5.0.5\build\Fody.targets'))" />
     <Error Condition="!Exists('..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Costura.Fody.4.0.0\build\Costura.Fody.props'))" />
-    <Error Condition="!Exists('..\packages\PropertyChanged.Fody.3.0.0\build\PropertyChanged.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PropertyChanged.Fody.3.0.0\build\PropertyChanged.Fody.props'))" />
+    <Error Condition="!Exists('..\packages\Fody.5.0.6\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Fody.5.0.6\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\packages\PropertyChanged.Fody.3.0.1\build\PropertyChanged.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\PropertyChanged.Fody.3.0.1\build\PropertyChanged.Fody.props'))" />
   </Target>
+  <Import Project="..\packages\Fody.5.0.6\build\Fody.targets" Condition="Exists('..\packages\Fody.5.0.6\build\Fody.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

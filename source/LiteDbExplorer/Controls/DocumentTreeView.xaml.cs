@@ -35,7 +35,7 @@ namespace LiteDbExplorer.Controls
 
         public static readonly DependencyProperty DocumentSourceProperty = DependencyProperty.Register(
             nameof(DocumentSource),
-            typeof(DocumentReference),
+            typeof(object),
             typeof(DocumentTreeView),
             new PropertyMetadata(null, propertyChangedCallback: OnDocumentSourceChanged));
 
@@ -46,19 +46,12 @@ namespace LiteDbExplorer.Controls
                 return;
             }
 
-            if (e.NewValue is DocumentReference documentReference)
-            {
-                documentTreeView.ItemsSource = new DocumentTreeItemsSource(documentReference);
-            }
-            else
-            {
-                documentTreeView.ItemsSource = null;
-            }
+            documentTreeView.UpdateDocument();
         }
 
-        public DocumentReference DocumentSource
+        public object DocumentSource
         {
-            get => (DocumentReference) GetValue(DocumentSourceProperty);
+            get => GetValue(DocumentSourceProperty);
             set => SetValue(DocumentSourceProperty, value);
         }
 
@@ -71,7 +64,7 @@ namespace LiteDbExplorer.Controls
         public void UpdateDocument()
         {
             ItemsSource = DocumentSource != null
-                ? new DocumentTreeItemsSource(DocumentSource) {ValueMaxLength = ContentMaxLength}
+                ? DocumentTreeItemsSource.Create(DocumentSource, ContentMaxLength)
                 : null;
         }
 
@@ -101,36 +94,104 @@ namespace LiteDbExplorer.Controls
             Nodes = GetNodes(document.LiteDocument);
         }
 
+        public DocumentTreeItemsSource(QueryResult queryResult)
+        {
+            InstanceId = queryResult.InstanceId;
+            Nodes = GetNodes(queryResult);
+        }
+
+        public DocumentTreeItemsSource(IEnumerable<BsonValue> values)
+        {
+            InstanceId = Guid.NewGuid().ToString("D");
+            Nodes = GetNodes(values);
+        }
+
+        public static DocumentTreeItemsSource Create(object source, int valueMaxLength = 1024)
+        {
+            switch (source)
+            {
+                case null:
+                    return null;
+                case DocumentReference document:
+                    return new DocumentTreeItemsSource(document) { ValueMaxLength = valueMaxLength };
+                case QueryResult queryResult:
+                    return new DocumentTreeItemsSource(queryResult) { ValueMaxLength = valueMaxLength };
+                case IEnumerable<BsonValue> values:
+                    return new DocumentTreeItemsSource(values) { ValueMaxLength = valueMaxLength };
+                default:
+                    return null;
+            }
+        }
+
         public string InstanceId { get; }
 
         public int ValueMaxLength { get; set; } = 1024;
 
         public ObservableCollection<DocumentFieldNode> Nodes { get; set; }
 
-        public ObservableCollection<DocumentFieldNode> GetNodes(BsonDocument document)
+        public ObservableCollection<DocumentFieldNode> GetNodes(QueryResult queryResult)
+        {
+            if (queryResult.IsDocument)
+            {
+                return GetNodes(queryResult.AsDocument);
+            }
+            
+            if (queryResult.IsArray)
+            {
+                return GetNodes(queryResult.AsArray);
+            }
+
+            return null;
+        }
+
+        public ObservableCollection<DocumentFieldNode> GetNodes(IEnumerable<BsonValue> values)
         {
             var nodes = new ObservableCollection<DocumentFieldNode>();
-            for (var i = 0; i < document.Keys.Count; i++)
+            var index = 0;
+
+            foreach (var bsonValue in values)
             {
-                var key = document.Keys.ElementAt(i);
-                var bsonValue = document[key];
-
-                Func<BsonDocument, ObservableCollection<DocumentFieldNode>> loadAction = null;
-
-                if (bsonValue != null && (bsonValue.IsArray || bsonValue.IsDocument))
-                {
-                    loadAction = GetNodes;
-                }
-
-                var fieldNode = new DocumentFieldNode(key, bsonValue, loadAction)
-                {
-                    ValueMaxLength = ValueMaxLength
-                };
+                var fieldNode = CreateFieldNode(index.ToString(), bsonValue);
 
                 nodes.Add(fieldNode);
+                index++;
             }
 
             return nodes;
+        }
+
+        public ObservableCollection<DocumentFieldNode> GetNodes(BsonDocument document)
+        {
+            var nodes = new ObservableCollection<DocumentFieldNode>();
+            if (document != null)
+            {
+                for (var i = 0; i < document.Keys.Count; i++)
+                {
+                    var key = document.Keys.ElementAt(i);
+                    var bsonValue = document[key];
+
+                    var fieldNode = CreateFieldNode(key, bsonValue);
+
+                    nodes.Add(fieldNode);
+                }
+            }
+
+            return nodes;
+        }
+
+        public DocumentFieldNode CreateFieldNode(string key, BsonValue bsonValue)
+        {
+            Func<BsonDocument, ObservableCollection<DocumentFieldNode>> loadAction = null;
+
+            if (bsonValue != null && (bsonValue.IsArray || bsonValue.IsDocument))
+            {
+                loadAction = GetNodes;
+            }
+
+            return new DocumentFieldNode(key, bsonValue, loadAction)
+            {
+                ValueMaxLength = ValueMaxLength
+            };
         }
 
         public void Invalidate(BsonDocument document)

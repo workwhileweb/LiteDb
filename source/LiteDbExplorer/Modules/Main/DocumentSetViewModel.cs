@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
@@ -23,16 +24,12 @@ namespace LiteDbExplorer.Modules.Main
         {
             DisplayName = $"LiteDB Explorer {Versions.CurrentVersion}";
 
-            NewDocumentFactory = NewDocumentFactoryHandler;
-
             CloseDocumentCommand = new RelayCommand<FrameworkElement>(CloseDocument);
         }
         
         public Guid Id { get; } = Guid.NewGuid();
 
         public string ContentId => Id.ToString();
-
-        public Func<IDocument> NewDocumentFactory { get; }
 
         public ICommand CloseDocumentCommand { get; }
         
@@ -61,11 +58,6 @@ namespace LiteDbExplorer.Modules.Main
             }
         }
 
-        private IDocument NewDocumentFactoryHandler()
-        {
-            return IoC.Get<IStartupDocument>();
-        }
-        
         public void OpenDocument(IDocument model)
         {
             ActivateItem(model);
@@ -135,6 +127,8 @@ namespace LiteDbExplorer.Modules.Main
             {
                 item.Activate();
                 item.IsSelected = true;
+                item.PropertyChanged += DocumentOnPropertyChanged;
+                item.UpdateGroupDisplayRequest += DocumentOnUpdateGroupDisplayRequest;
             }
             
             InvalidateDisplayGroup();
@@ -154,11 +148,18 @@ namespace LiteDbExplorer.Modules.Main
                 item?.Deactivate(false);
             }
 
+            if (item != null)
+            {
+                item.PropertyChanged -= DocumentOnPropertyChanged;
+                item.UpdateGroupDisplayRequest -= DocumentOnUpdateGroupDisplayRequest;
+            }
+
             base.DeactivateItem(item, close);
-            
+
             InvalidateDisplayGroup();
             
             RaiseActiveDocumentChanged();
+
         }
         
         protected override void OnActivationProcessed(IDocument item, bool success)
@@ -175,13 +176,34 @@ namespace LiteDbExplorer.Modules.Main
         {
             foreach (var document in Items)
             {
-                document.GroupDisplayNameIsVisible = Items
-                    .Where(p => p.GroupDisplayName != document.GroupDisplayName)
-                    .Any(p => p.DisplayName.Equals(document.DisplayName));
+                if (document.GroupDisplayVisibility == GroupDisplayVisibility.AlwaysVisible)
+                {
+                    document.GroupDisplayNameIsVisible = true;
+                }
+                else
+                {
+                    document.GroupDisplayNameIsVisible = Items
+                        .Where(p => p.GroupDisplayName != document.GroupDisplayName)
+                        .Any(p => p.DisplayName.Equals(document.DisplayName));        
+                }
 
                 document.GroupDisplayBackground =
                     GroupDisplayColor.GetDisplayColor(document.GroupId, Colors.Transparent);
             }
+        }
+
+        private static readonly string[] _displayGroupProperties = {nameof(IDocument.DisplayName), nameof(IDocument.GroupDisplayName), nameof(IDocument.GroupId)};
+        private void DocumentOnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (!string.IsNullOrEmpty(e.PropertyName) && _displayGroupProperties.Contains(e.PropertyName))
+            {
+                InvalidateDisplayGroup();
+            }
+        }
+
+        private void DocumentOnUpdateGroupDisplayRequest(object sender, EventArgs e)
+        {
+            InvalidateDisplayGroup();
         }
 
         private void RaiseActiveDocumentChanging()

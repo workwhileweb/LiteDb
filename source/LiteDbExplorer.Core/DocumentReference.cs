@@ -1,6 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.IO;
 using LiteDB;
+using LiteDbExplorer.Core;
+using LiteDbExplorer.Extensions;
 
 namespace LiteDbExplorer
 {
@@ -17,7 +19,7 @@ namespace LiteDbExplorer
         File = 1
     }
 
-    public class DocumentReference : ReferenceNode<DocumentReference>, IDisposable
+    public class DocumentReference : ReferenceNode<DocumentReference>, IDisposable, IJsonSerializerProvider
     {
         private BsonDocument _liteDocument;
         private CollectionReference _collection;
@@ -73,6 +75,16 @@ namespace LiteDbExplorer
         {
             LiteDocument = null;
             Collection = null;
+        }
+
+        public string Serialize(bool pretty = false, bool decoded = true)
+        {
+            return decoded ? LiteDocument.SerializeDecoded(true) : JsonSerializer.Serialize(LiteDocument, pretty, false);
+        }
+
+        public void Serialize(TextWriter writer, bool pretty = false)
+        {
+            JsonSerializer.Serialize(LiteDocument, writer, pretty, false);
         }
     }
 }

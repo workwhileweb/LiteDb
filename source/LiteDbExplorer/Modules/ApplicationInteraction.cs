@@ -8,6 +8,7 @@ using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Modules.Database;
 using LiteDbExplorer.Modules.DbCollection;
+using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Help;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Windows;
@@ -67,6 +68,14 @@ namespace LiteDbExplorer.Modules
             return window.ShowDialog() == true;
 
             // TODO: Handle UpdateGridColumns(document.Value.LiteDocument) and UpdateDocumentPreview();
+        }
+
+        public bool OpenQuery(RunQueryContext queryContext)
+        {
+            var documentSet = IoC.Get<IDocumentSet>();
+            var vm = documentSet.OpenDocument<QueryViewModel, RunQueryContext>(queryContext);
+
+            return true;
         }
 
 

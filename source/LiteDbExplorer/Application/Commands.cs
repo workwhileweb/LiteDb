@@ -159,5 +159,27 @@ namespace LiteDbExplorer
             "File Dropped",
             typeof(Commands)
         );
+
+        public static readonly RoutedUICommand Run = new RoutedUICommand
+        (
+            "Run",
+            nameof(Run),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.F5)
+            }
+        );
+
+        public static readonly RoutedUICommand RunSelected = new RoutedUICommand
+        (
+            "Run Selected",
+            nameof(Run),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.F5, ModifierKeys.Shift)
+            }
+        );
     }
 }

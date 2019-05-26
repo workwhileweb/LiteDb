@@ -9,6 +9,7 @@ using Enterwell.Clients.Wpf.Notifications;
 using JetBrains.Annotations;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbCollection;
+using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Presentation;
 
@@ -139,6 +140,28 @@ namespace LiteDbExplorer.Modules.Database
         {
             var documentSet = IoC.Get<IDocumentSet>();
             documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReference>(value);
+        }
+
+        [UsedImplicitly]
+        public void NewQuery(object item)
+        {
+            switch (item)
+            {
+                case DatabaseReference databaseReference:
+                    _applicationInteraction.OpenQuery(new RunQueryContext(databaseReference));
+                    break;
+                case CollectionReference collectionReference:
+                    _applicationInteraction.OpenQuery(new RunQueryContext(collectionReference.Database, QueryReference.Find(collectionReference)));
+                    break;
+            }
+        }
+
+        [UsedImplicitly]
+        public void NewFindQuery(CollectionReference item, int? skip = null, int? limit = null)
+        {
+            var queryReference = QueryReference.Find(item, skip, limit);
+
+            _applicationInteraction.OpenQuery(new RunQueryContext(item.Database, queryReference) { RunOnStart = true });
         }
 
         #region Routed Commands

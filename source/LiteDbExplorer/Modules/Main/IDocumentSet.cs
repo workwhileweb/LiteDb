@@ -8,7 +8,6 @@ namespace LiteDbExplorer.Modules.Main
     {
         Guid Id { get; }
         string ContentId { get; }
-        Func<IDocument> NewDocumentFactory { get; }
         IObservableCollection<IDocument> Documents { get; }
         void OpenDocument(IDocument model);
         void CloseDocument(IDocument document);

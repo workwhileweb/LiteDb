@@ -120,7 +120,6 @@ namespace LiteDbExplorer.Modules.DbCollection
             
             IconContent = value is FileCollectionReference ? new PackIcon { Kind = PackIconKind.FileMultiple } : new PackIcon { Kind = PackIconKind.TableLarge, Height = 16 };
             
-
             CollectionReference = value;
         }
 
