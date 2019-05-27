@@ -127,7 +127,7 @@ namespace LiteDbExplorer.Modules.Help
 
         public string ResolveLink(string uri)
         {
-            if (!uri.StartsWith("http"))
+            if (!string.IsNullOrEmpty(uri) && !uri.StartsWith("http"))
             {
                 uri = $"{RootUrl.TrimEnd('/')}/{uri}";
             }

@@ -4,8 +4,10 @@ using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Windows;
+using System.Windows.Shell;
 using System.Windows.Threading;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework.Windows;
@@ -54,6 +56,7 @@ namespace LiteDbExplorer
         {
             ThemeManager.InitColorTheme(Settings.ColorTheme);
 
+            CreateJumpList();
 
             Settings.PropertyChanged -= Settings_PropertyChanged;
             Settings.PropertyChanged += Settings_PropertyChanged;
@@ -90,6 +93,35 @@ namespace LiteDbExplorer
         private void SetColorTheme()
         {
             ThemeManager.SetColorTheme(Settings.ColorTheme);
+        }
+
+        private void CreateJumpList()
+        {
+            var applicationPath = Assembly.GetEntryAssembly().Location;
+
+            var jumpList = new JumpList();
+
+            JumpList.SetJumpList(Application.Current, jumpList);
+
+            var openDatabaseTask = new JumpTask
+            {
+                Title = "Open database",
+                Description = "Open LiteDB v4 database file",
+                ApplicationPath = applicationPath,
+                Arguments = "open"
+            };
+            jumpList.JumpItems.Add(openDatabaseTask);
+
+            var newDatabaseTask = new JumpTask
+            {
+                Title = "New database",
+                Description = "Create and open new LiteDB v4 database",
+                ApplicationPath = applicationPath,
+                Arguments = "new"
+            };
+            jumpList.JumpItems.Add(newDatabaseTask);
+
+            jumpList.Apply();
         }
 
         private void Application_Exit(object sender, ExitEventArgs e)

@@ -115,6 +115,7 @@
     <Compile Include="Behaviors\FocusActiveGroup.cs" />
     <Compile Include="Behaviors\KeepSelectedItem.cs" />
     <Compile Include="Behaviors\MouseDoubleClick.cs" />
+    <Compile Include="Behaviors\ScrollViewerHelper.cs" />
     <Compile Include="Behaviors\TreeViewHelper.cs" />
     <Compile Include="Behaviors\WindowOptionsBehavior.cs" />
     <Compile Include="Controls\ExceptionViewer.xaml.cs">

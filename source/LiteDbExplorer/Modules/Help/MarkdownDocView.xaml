@@ -47,7 +47,8 @@
         </controls:ToolDockPanel>
 
         <Border Grid.Row="1">
-            <wpf:MarkdownViewer x:Name="markdownViewer" Markdown="{Binding MarkdownContent, Mode=OneWay}" />
+            <wpf:MarkdownViewer x:Name="markdownViewer" 
+                                Markdown="{Binding MarkdownContent, Mode=OneWay}" />
         </Border>
 
         <materialDesign:Card Grid.Row="0" Grid.RowSpan="3" UniformCornerRadius="14" Padding="4" HorizontalAlignment="Center" Margin="50"

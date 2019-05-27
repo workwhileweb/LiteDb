@@ -1,5 +1,7 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Diagnostics.Eventing.Reader;
+using System.Linq;
 using System.Windows;
 using NLog;
 
@@ -11,6 +13,8 @@ namespace LiteDbExplorer.Modules
     {
         private readonly IDatabaseInteractions _databaseInteractions;
         private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+
+        private static readonly string[] _commands = {CmdlineCommands.Open, CmdlineCommands.New, CmdlineCommands.Focus};
 
         private PipeService _pipeService;
         private PipeServer _pipeServer;
@@ -31,7 +35,7 @@ namespace LiteDbExplorer.Modules
                 _pipeServer.StartServer(_pipeService);
 
                 var args = Environment.GetCommandLineArgs();
-                if (args.Length > 1)
+                if (args.Length > 1 && !_commands.Contains(args[1], StringComparer.OrdinalIgnoreCase))
                 {
                     PipeService_CommandExecuted(this, new CommandExecutedEventArgs(CmdlineCommands.Open, args[1]));
                 }
@@ -45,17 +49,49 @@ namespace LiteDbExplorer.Modules
             switch (args.Command)
             {
                 case CmdlineCommands.Focus:
+                {
                     RestoreWindow();
                     break;
+                }
+
+                case CmdlineCommands.New:
+                {
+                    _databaseInteractions.CreateAndOpenDatabase().Wait();
+                    RestoreWindow();
+                    break;
+                }
 
                 case CmdlineCommands.Open:
-                    _databaseInteractions.OpenDatabase(args.Args).Wait();
+                {
+                    if (!string.IsNullOrEmpty(args.Args))
+                    {
+                        if (args.Args.Equals("new", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _databaseInteractions.CreateAndOpenDatabase().Wait();
+                        }
+                        else if (args.Args.Equals("open", StringComparison.OrdinalIgnoreCase))
+                        {
+                            _databaseInteractions.OpenDatabase().Wait();
+                        }
+                        else
+                        {
+                            _databaseInteractions.OpenDatabase(args.Args).Wait();
+                        }
+                    }
+                    else
+                    {
+                        _databaseInteractions.OpenDatabase().Wait();    
+                    }
+
                     RestoreWindow();
                     break;
+                }
 
                 default:
+                {
                     Logger.Warn("Unknown command received");
                     break;
+                }
             }
         }
 

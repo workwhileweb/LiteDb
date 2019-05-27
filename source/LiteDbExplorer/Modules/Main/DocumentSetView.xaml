@@ -107,6 +107,6 @@
                                  Style="{StaticResource DocSetTabablzControlStyle}"
                                  ItemsSource="{Binding Items, Mode=OneWay}"
                                  SelectedItem="{Binding ActiveLayoutItem}"
-                                 behaviors:TabablzControlAssist.CloseItemCommand="{Binding CloseDocumentCommand}" />
+                                 behaviors:TabablzControlAssist.CloseItemCommand="{Binding CloseDocumentCommand}"/>
     </DockPanel>
 </UserControl>

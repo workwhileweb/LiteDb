@@ -5,7 +5,8 @@
                     xmlns:converters1="clr-namespace:Dragablz.Converters;assembly=Dragablz"
                     xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
                     xmlns:dockablz="http://dragablz.net/winfx/xaml/dockablz"
-                    xmlns:behaviors="clr-namespace:LiteDbExplorer.Presentation.Behaviors">
+                    xmlns:behaviors="clr-namespace:LiteDbExplorer.Presentation.Behaviors"
+                    xmlns:behaviors1="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf">
 
     <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     <converters1:EqualityToVisibilityConverter x:Key="EqualityToVisibilityConverter" />
@@ -565,6 +566,9 @@
         </Style.Triggers>
     </Style>
 
+    <Style x:Key="TabablzScrollBarStyle" TargetType="ScrollBar" BasedOn="{StaticResource MaterialDesignScrollBar}">
+    </Style>
+
     <ControlTemplate x:Key="TabablzScrollViewerControlTemplate" TargetType="{x:Type ScrollViewer}">
         <Grid x:Name="Grid" Background="{TemplateBinding Background}">
             <Grid.ColumnDefinitions>
@@ -580,19 +584,21 @@
                                     CanVerticallyScroll="False" ContentTemplate="{TemplateBinding ContentTemplate}"
                                     Content="{TemplateBinding Content}" Grid.Column="0"
                                     Margin="{TemplateBinding Padding}" Grid.Row="0" />
-            <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar"
+            <ScrollBar x:Name="PART_VerticalScrollBar" Style="{StaticResource TabablzScrollBarStyle}"
+                       AutomationProperties.AutomationId="VerticalScrollBar"
                        Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0"
                        Grid.Row="1" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
                        Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
                        ViewportSize="{TemplateBinding ViewportHeight}"
-                       Margin="0 1 0 0" />
-            <ScrollBar x:Name="PART_HorizontalScrollBar" AutomationProperties.AutomationId="HorizontalScrollBar"
+                       Margin="0 1 0 0"/>
+            <ScrollBar x:Name="PART_HorizontalScrollBar" Style="{StaticResource TabablzScrollBarStyle}"
+                       AutomationProperties.AutomationId="HorizontalScrollBar"
                        Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0"
                        Orientation="Horizontal" Grid.Row="0"
                        Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
                        Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
                        ViewportSize="{TemplateBinding ViewportWidth}"
-                       Margin="1 0 0 0" />
+                       Margin="1 0 0 0" Height="45"/>
         </Grid>
     </ControlTemplate>
 
@@ -621,7 +627,8 @@
                                             HorizontalAlignment="Left"
                                             VerticalAlignment="Top"
                                             Width="{TemplateBinding ItemsPresenterWidth}"
-                                            Height="{TemplateBinding ItemsPresenterHeight}" />
+                                            Height="{TemplateBinding ItemsPresenterHeight}" 
+                                            />
                         </ScrollViewer>
                     </Border>
                 </ControlTemplate>
@@ -712,7 +719,8 @@
                                                            ItemsOrganiser="{TemplateBinding HeaderItemsOrganiser}"
                                                            KeyboardNavigation.TabIndex="1" Panel.ZIndex="1"
                                                            ItemTemplate="{TemplateBinding HeaderItemTemplate}"
-                                                           Style="{StaticResource TabablzDragablzItemsControlStyle}">
+                                                           Style="{StaticResource TabablzDragablzItemsControlStyle}"
+                                                           behaviors1:ScrollViewerHelper.UseHorizontalScrolling="True">
                                 <dragablz:DragablzItemsControl.MaxWidth>
                                     <MultiBinding>
                                         <MultiBinding.Converter>
