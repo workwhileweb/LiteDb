@@ -8,7 +8,7 @@
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
+    <!--<UserControl.Resources>
         <modules:AppUpdateManager x:Key="AppUpdateManager" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
@@ -46,5 +46,5 @@
                         Click="UpdatePanelButtonOnClick" />
             </StackPanel>
         </materialDesign:PopupBox>
-    </Border>
+    </Border>-->
 </UserControl>

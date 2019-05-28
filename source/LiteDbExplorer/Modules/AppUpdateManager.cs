@@ -7,17 +7,22 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Threading;
 using Caliburn.Micro;
 using Enterwell.Clients.Wpf.Notifications;
 using JetBrains.Annotations;
+using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework;
 using Onova;
 using Onova.Services;
+using Action = System.Action;
 
 namespace LiteDbExplorer.Modules
 {
-    public class AppUpdateManager : Freezable
+    public class AppUpdateManager : Freezable, INotifyPropertyChanged
     {
         private readonly UpdateManager _updateManager;
         private bool _hasUpdate;
@@ -81,6 +86,7 @@ namespace LiteDbExplorer.Modules
             HasUpdate = false;
             UpdateMessage = string.Empty;
             LastVersion = null;
+
             try
             {
                 // Check for updates
@@ -97,20 +103,16 @@ namespace LiteDbExplorer.Modules
                 if (result.CanUpdate)
                 {
                     HasUpdate = true;
+
                     UpdateMessage = $"A new version {result.LastVersion} is available for update.";
 
                     LastVersion = result.LastVersion;
 
-                    NotificationInteraction.Default()
-                        .HasMessage(UpdateMessage)
-                        .Dismiss().WithButton("Download and install", async button => { await DoUpdate(); })
-                        .WithButton("Release notes",
-                            button => { IoC.Get<IApplicationInteraction>().ShowReleaseNotes(result.LastVersion); })
-                        .Dismiss().WithButton("Later", button => { })
-                        .Queue();
-                }
+                    IsUpdatePrepared = _updateManager.IsUpdatePrepared(LastVersion);
 
-                if (userInitiated)
+                    ShowUpdateNotification();
+                }
+                else if (userInitiated)
                 {
                     NotificationInteraction.Alert("There are currently no updates available.");
                 }
@@ -155,18 +157,14 @@ namespace LiteDbExplorer.Modules
             {
                 var cancellationTokenSource = new CancellationTokenSource();
 
+                UpdateMessage = "Downloading...";
                 UpdateActionText = "Downloading...";
+
+                ShowDownloadNotification();
 
                 // Prepare an update so it can be applied later
                 // (supports optional progress reporting and cancellation)
-                await _updateManager.PrepareUpdateAsync(LastVersion,
-                    new Progress<double>(val =>
-                    {
-                        var progress = val > 90 ? "Preparing" : "Downloading";
-                        UpdateMessage = $"{progress}... {val:P0}";
-                        UpdateProgress = val;
-                    }),
-                    cancellationTokenSource.Token);
+                await _updateManager.PrepareUpdateAsync(LastVersion, new Progress<double>(SetUpdateProgress), cancellationTokenSource.Token);
 
                 IsUpdatePrepared = _updateManager.IsUpdatePrepared(LastVersion);
 
@@ -188,11 +186,100 @@ namespace LiteDbExplorer.Modules
                 );
             }
 
+            ShowUpdateNotification();
+
             IsBusy = false;
+        }
+
+        private INotificationMessage _updateNotificationMessage;
+
+        private void SetUpdateProgress(double value)
+        {
+            Dispatcher.BeginInvoke((Action) (() =>
+            {
+                            
+                var progress = value > 90 ? "Preparing" : "Downloading";
+                UpdateMessage = $"{progress}... {value:P0}";
+                UpdateProgress = value * 100;
+
+                if (_downloadNotification != null)
+                {
+                    _downloadNotification.Message = UpdateMessage;
+                    if (_downloadNotification.OverlayContent is ProgressBar progressBar)
+                    {
+                        progressBar.IsIndeterminate = false;
+                        progressBar.Value = UpdateProgress;
+                    }
+                }
+
+            }), DispatcherPriority.Normal);
+        }
+
+        private void ShowUpdateNotification()
+        {
+            Dispatcher.BeginInvoke((Action) (() =>
+            {
+                if (_downloadNotification != null)
+                {
+                    NotificationInteraction.Manager.Dismiss(_downloadNotification);
+                }
+
+                if (_updateNotificationMessage != null)
+                {
+                    NotificationInteraction.Manager.Dismiss(_updateNotificationMessage);
+                }
+
+                _updateNotificationMessage = NotificationInteraction.Default()
+                    .HasBadge("Update")
+                    .HasMessage(UpdateMessage)
+                    .Dismiss().WithButton(IsUpdatePrepared ? "Restart to install" : "Download",
+                        async button => { await DoUpdate(); })
+                    .WithButton("Release notes",
+                        button => { IoC.Get<IApplicationInteraction>().ShowReleaseNotes(LastVersion); })
+                    .Dismiss().WithButton("Later", button => { })
+                    .Queue();
+                
+            }), DispatcherPriority.Normal);
+
+        }
+
+        private INotificationMessage _downloadNotification;
+
+        private void ShowDownloadNotification()
+        {
+            Dispatcher.BeginInvoke((Action) (() =>
+            {
+                if (_updateNotificationMessage != null)
+                {
+                    NotificationInteraction.Manager.Dismiss(_updateNotificationMessage);
+                }
+
+                var progressBar = new ProgressBar
+                {
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    Height = 4,
+                    Minimum = 0,
+                    Maximum = 100,
+                    BorderThickness = new Thickness(0),
+                    Foreground = StyleKit.AccentColorBrush,
+                    Background = Brushes.Transparent,
+                    IsIndeterminate = true,
+                    IsHitTestVisible = false
+                };
+
+                _downloadNotification = NotificationInteraction.Default()
+                    .HasBadge("Update")
+                    .HasMessage(UpdateMessage)
+                    .WithOverlay(progressBar)
+                    .Queue();
+
+            }), DispatcherPriority.Normal);
         }
         
         public event PropertyChangedEventHandler PropertyChanged;
 
+        [UsedImplicitly]
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

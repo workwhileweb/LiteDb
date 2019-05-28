@@ -91,17 +91,20 @@ namespace LiteDbExplorer
             DisplayRootViewFor<IShell>();
             RegisterApplicationCommandHandlers();
 
-#if (!DEBUG)
-
-            Task.Factory.StartNew(() =>
-            {
-                AppUpdateManager.Current.CheckForUpdates(false).ConfigureAwait(false);
-            });
-#endif
-
             var pipeServiceBootstrapper = _container.GetExportedValueOrDefault<PipeServiceBootstrapper>();
             
             pipeServiceBootstrapper?.Init();
+
+#if (!DEBUG)
+
+            Task.Factory.StartNew(async () =>
+            {
+                await Task.Delay(2000);
+                await AppUpdateManager.Current.CheckForUpdates(false);
+
+            }).ConfigureAwait(false);
+#endif
+
         }
 
         protected override IEnumerable<Assembly> SelectAssemblies()

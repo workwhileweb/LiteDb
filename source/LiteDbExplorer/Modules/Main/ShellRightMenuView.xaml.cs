@@ -13,9 +13,9 @@ namespace LiteDbExplorer.Modules.Main
             InitializeComponent();
         }
 
-        private void UpdatePanelButtonOnClick(object sender, RoutedEventArgs e)
+        /*private void UpdatePanelButtonOnClick(object sender, RoutedEventArgs e)
         {
             DropNewUpdatePanel.IsPopupOpen = true;
-        }
+        }*/
     }
 }
