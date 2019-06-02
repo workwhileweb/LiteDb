@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using LiteDbExplorer.Wpf.Modules.Settings;
+using PropertyTools.DataAnnotations;
 
 namespace LiteDbExplorer
 {
@@ -17,12 +18,13 @@ namespace LiteDbExplorer
 
         public string SettingsPagePath => Properties.Resources.SettingsPageEnvironment;
 
-        public int EditorDisplayOrder => 20;
+        public int EditorDisplayOrder => 100;
 
         public string GroupDisplayName => "Performance";
 
         public object AutoGenContext => this;
 
+        [DisplayName("Use Deferred Scrolling")]
         public bool DeferredScrolling { get; set; }
 
         public void ApplyChanges()

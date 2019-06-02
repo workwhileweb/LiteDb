@@ -120,7 +120,7 @@
       <HintPath>..\packages\Newtonsoft.Json.12.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLog.4.6.3\lib\net45\NLog.dll</HintPath>
+      <HintPath>..\packages\NLog.4.6.4\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="Octokit, Version=0.32.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Octokit.0.32.0\lib\net45\Octokit.dll</HintPath>
@@ -187,7 +187,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppConstants.cs" />
-    <Compile Include="Application\Settings\PerformanceSettings.cs" />
+    <Compile Include="Modules\Shared\PerformanceSettings.cs" />
     <Compile Include="Application\CmdlineCommands.cs" />
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Controls\AvalonEditBehaviour.cs" />
@@ -225,7 +225,7 @@
     <Compile Include="Controls\ContentExpander.xaml.cs">
       <DependentUpon>ContentExpander.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Modules\AppUpdateManager.cs" />
+    <Compile Include="Modules\Update\AppUpdateManager.cs" />
     <Compile Include="Modules\DbCollection\CollectionExplorerView.xaml.cs">
       <DependentUpon>CollectionExplorerView.xaml</DependentUpon>
     </Compile>
@@ -297,6 +297,7 @@
     <Compile Include="Modules\Main\MainSettingsViewModel.cs" />
     <Compile Include="Modules\NotificationInteraction.cs" />
     <Compile Include="Modules\StartPage\StartPageSettingsViewModel.cs" />
+    <Compile Include="Modules\Update\UpdateSettingsViewModel.cs" />
     <Compile Include="Presentation\Behaviors\InterTabClient.cs" />
     <Compile Include="Modules\Main\ShellMenuView.xaml.cs">
       <DependentUpon>ShellMenuView.xaml</DependentUpon>
@@ -589,9 +590,7 @@
       <Name>LiteDbExplorer.Wpf</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Modules\Shared\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>

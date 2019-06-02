@@ -45,9 +45,18 @@
                     <ColumnDefinition Width="3*" MaxWidth="600" MinWidth="450"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <enterwell:NotificationMessageContainer Grid.Column="1" 
+                <!--<enterwell:NotificationMessageContainer Grid.Column="1" 
                                                         x:Name="notificationMessageContainer" 
-                                                        Manager="{Binding Path=Manager, Source={StaticResource NotificationInteractionProxy}}"/>
+                                                        Manager="{Binding Path=Manager, Source={StaticResource NotificationInteractionProxy}}"/>-->
+
+                <Canvas Grid.Column="0" Grid.ColumnSpan="3">
+                    <!--<Rectangle Canvas.Right="5" Canvas.Bottom="5" Panel.ZIndex="2" Fill="Yellow" Width="120" Height="30" />-->
+
+                    <enterwell:NotificationMessageContainer Canvas.Right="0" Canvas.Bottom="0"
+                                                            x:Name="notificationMessageContainer" 
+                                                            Manager="{Binding Path=Manager, Source={StaticResource NotificationInteractionProxy}}"/>
+                </Canvas>
+
             </Grid>
 
         </Grid>

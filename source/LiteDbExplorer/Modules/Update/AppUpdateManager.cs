@@ -82,6 +82,18 @@ namespace LiteDbExplorer.Modules
         
         public async Task CheckForUpdates(bool userInitiated)
         {
+            if (!userInitiated && !Properties.Settings.Default.UpdateManager_CheckUpdateOnStartup)
+            {
+                return;
+            }
+
+            // Limit request per hour
+            if (!userInitiated && Properties.Settings.Default.UpdateManager_LastCheck.HasValue &&
+                Properties.Settings.Default.UpdateManager_LastCheck.Value.AddHours(1) < DateTime.UtcNow)
+            {
+                return;
+            }
+
             IsBusy = true;
             HasUpdate = false;
             UpdateMessage = string.Empty;
@@ -114,7 +126,7 @@ namespace LiteDbExplorer.Modules
                 }
                 else if (userInitiated)
                 {
-                    NotificationInteraction.Alert("There are currently no updates available.");
+                    NotificationInteraction.Alert("There are currently no updates available.", UINotificationType.Info);
                 }
             }
             catch (Exception exception)
@@ -122,7 +134,7 @@ namespace LiteDbExplorer.Modules
                 Console.WriteLine(exception);
                 if (userInitiated)
                 {
-                    NotificationInteraction.Alert("Unable to check for updates.");
+                    NotificationInteraction.Alert("Unable to check for updates.", UINotificationType.Error);
                 }
             }
             finally

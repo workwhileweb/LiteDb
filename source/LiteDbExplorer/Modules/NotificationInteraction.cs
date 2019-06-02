@@ -2,11 +2,21 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media;
 using Enterwell.Clients.Wpf.Notifications;
 using LiteDbExplorer.Controls;
+using MaterialDesignThemes.Wpf;
 
 namespace LiteDbExplorer.Modules
 {
+    public enum UINotificationType
+    {
+        None,
+        Info,
+        Warning,
+        Error
+    }
+
     public class NotificationInteraction
     {
         private static readonly Lazy<NotificationInteraction> _instance =
@@ -25,21 +35,17 @@ namespace LiteDbExplorer.Modules
         {
             var builder = Manager
                 .CreateMessage()
-                .Animates(true)
-                .Accent(StyleKit.PrimaryHueDarkBrush)
-                .Background(StyleKit.MaterialDesignCardBackground)
-                ;
-
-            builder.SetForeground(StyleKit.MaterialDesignBody);
+                .Animates(true);
 
             return builder;
         }
 
-        public static void Alert(string message, Action closeAction = null)
+        public static INotificationMessage Alert(string message, UINotificationType type = UINotificationType.None, Action closeAction = null)
         {
-            Default()
+            return Default()
                 .HasMessage(message)
                 .Dismiss().WithButton("Close", button => { closeAction?.Invoke(); })
+                .WithBadgeType(type)
                 .Queue();
         }
 
@@ -65,6 +71,33 @@ namespace LiteDbExplorer.Modules
             builder.Queue();
 
             return taskCompletionSource.Task;
+        }
+    }
+
+    public static class NotificationInteractionExtensions
+    {
+        public static NotificationMessageBuilder WithBadgeType(this NotificationMessageBuilder builder, UINotificationType type)
+        {
+            switch (type)
+            {
+                case UINotificationType.Info:
+                    builder.SetBadge("Info");
+                    builder.Message.BadgeAccentBrush =
+                        new SolidColorBrush(Color.FromRgb(2,160,229));
+                    break;
+                case UINotificationType.Warning:
+                    builder.SetBadge("Warn");
+                    builder.Message.BadgeAccentBrush =
+                        new SolidColorBrush(Color.FromRgb(224,160,48));
+                    break;
+                case UINotificationType.Error:
+                    builder.SetBadge("Error");
+                    builder.Message.BadgeAccentBrush =
+                        new SolidColorBrush(Color.FromRgb(232,13,0));
+                    break;
+            }
+
+            return builder;
         }
     }
 

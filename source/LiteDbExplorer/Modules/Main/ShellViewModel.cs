@@ -37,7 +37,7 @@ namespace LiteDbExplorer.Modules.Main
                 }
             };
         }
-        
+
         public object WindowMenu { get; }
 
         public object WindowRightMenu { get; }
