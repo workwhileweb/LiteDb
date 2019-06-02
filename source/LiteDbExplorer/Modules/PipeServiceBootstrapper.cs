@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ComponentModel.Composition;
-using System.Diagnostics.Eventing.Reader;
 using System.Linq;
 using System.Windows;
 using NLog;

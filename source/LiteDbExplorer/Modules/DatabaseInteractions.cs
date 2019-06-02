@@ -65,6 +65,7 @@ namespace LiteDbExplorer.Modules
         {
             var dialog = new SaveFileDialog
             {
+                Title = "New Database",
                 Filter = "All files|*.*",
                 OverwritePrompt = true
             };
@@ -86,6 +87,7 @@ namespace LiteDbExplorer.Modules
         {
             var dialog = new OpenFileDialog
             {
+                Title = "Open Database",
                 Filter = "All files|*.*",
                 Multiselect = false
             };
@@ -195,6 +197,7 @@ namespace LiteDbExplorer.Modules
 
             var dialog = new SaveFileDialog
             {
+                Title = "Save database as...",
                 Filter = "All files|*.*",
                 OverwritePrompt = true,
                 InitialDirectory = fileInfo.DirectoryName ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
@@ -215,6 +218,7 @@ namespace LiteDbExplorer.Modules
         {
             var dialog = new OpenFileDialog
             {
+                Title = "Add file to database",
                 Filter = "All files|*.*",
                 Multiselect = false
             };
@@ -363,6 +367,7 @@ namespace LiteDbExplorer.Modules
             {
                 var dialog = new SaveFileDialog
                 {
+                    Title = "Save Json export",
                     Filter = "Json File|*.json",
                     FileName = $"{collectionReference.Name}_export.json",
                     OverwritePrompt = true
@@ -438,6 +443,7 @@ namespace LiteDbExplorer.Modules
             {
                 var dialog = new SaveFileDialog
                 {
+                    Title = "Save Json export",
                     Filter = "Json File|*.json",
                     FileName = "export.json",
                     OverwritePrompt = true
@@ -471,6 +477,7 @@ namespace LiteDbExplorer.Modules
         {
             var dialog = new SaveFileDialog
             {
+                Title = "Save Json export",
                 Filter = "Json File|*.json",
                 FileName = "export.json",
                 OverwritePrompt = true

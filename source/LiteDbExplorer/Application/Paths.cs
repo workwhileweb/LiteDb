@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
 using Caliburn.Micro;
 using JetBrains.Annotations;
 using Newtonsoft.Json;

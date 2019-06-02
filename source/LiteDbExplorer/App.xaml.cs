@@ -12,6 +12,8 @@ using System.Windows.Threading;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Presentation;
+using Microsoft.WindowsAPICodePack.Taskbar;
+using JumpList = System.Windows.Shell.JumpList;
 
 namespace LiteDbExplorer
 {
@@ -26,7 +28,7 @@ namespace LiteDbExplorer
         private bool _errorNotified;
 
         public bool OriginalInstance { get; private set; }
-        
+
         public static Settings Settings => Settings.Current;
 
         public App()
@@ -39,6 +41,28 @@ namespace LiteDbExplorer
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            if (e.Args?.Any() == true)
+            {
+                Properties["ArbitraryArgName"] = e.Args[0];
+            }
+
+            // For now we want to allow multiple instances if app is started without args
+            if (Mutex.TryOpenExisting(_instanceMuxet, out var mutex))
+            {
+                var client = new PipeClient(Config.PipeEndpoint);
+
+                if (e.Args.Any())
+                {
+                    client.InvokeCommand(CmdlineCommands.Open, e.Args[0]);
+                    Shutdown();
+                    return;
+                }
+            }
+            else
+            {
+                _appMutex = new Mutex(true, _instanceMuxet);
+                OriginalInstance = true;
+            }
 
             if (Resources["bootstrapper"] == null)
             {
@@ -60,26 +84,8 @@ namespace LiteDbExplorer
 
             Settings.PropertyChanged -= Settings_PropertyChanged;
             Settings.PropertyChanged += Settings_PropertyChanged;
-            
-            // For now we want to allow multiple instances if app is started without args
-            if (Mutex.TryOpenExisting(_instanceMuxet, out var mutex))
-            {
-                var client = new PipeClient(Config.PipeEndpoint);
-
-                if (e.Args.Any())
-                {
-                    client.InvokeCommand(CmdlineCommands.Open, e.Args[0]);
-                    Shutdown();
-                    return;
-                }
-            }
-            else
-            {
-                _appMutex = new Mutex(true, _instanceMuxet);
-                OriginalInstance = true;
-            }
         }
-        
+
         private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             switch (e.PropertyName)
@@ -97,6 +103,11 @@ namespace LiteDbExplorer
 
         private void CreateJumpList()
         {
+            if (!TaskbarManager.IsPlatformSupported)
+            {
+                return;
+            }
+
             var applicationPath = Assembly.GetEntryAssembly().Location;
 
             var jumpList = new JumpList();
@@ -141,12 +152,13 @@ namespace LiteDbExplorer
             {
                 message += $"\nAdditional information written into: {log.FileName}.\n";
             }
+
             if (e.IsTerminating)
             {
                 message += "\nApplication will shutdown.\n";
             }
-            
-            if(!_errorNotified)
+
+            if (!_errorNotified)
             {
                 ShowError((Exception) e.ExceptionObject, message, "Unhandled Exception");
             }
@@ -155,7 +167,7 @@ namespace LiteDbExplorer
             {
                 _errorNotified = true;
             }
-            
+
             if (e.IsTerminating)
             {
                 Process.GetCurrentProcess().Kill();
@@ -178,7 +190,7 @@ namespace LiteDbExplorer
                 message += "\nApplication will shutdown.\n";
             }
 
-            if(!_errorNotified)
+            if (!_errorNotified)
             {
                 ShowError(e.Exception, message, "Unhandled Exception");
             }

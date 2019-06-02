@@ -1,5 +1,7 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
 using System.Linq;
+using System.Windows;
 using Caliburn.Micro;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Framework.Shell;
@@ -36,6 +38,37 @@ namespace LiteDbExplorer.Modules.Main
                     MainContent.OpenDocument<IStartupDocument>();
                 }
             };
+        }
+
+        protected override void OnViewReady(object view)
+        {
+            try
+            {
+                if (Application.Current.Properties["ArbitraryArgName"] != null)
+                {
+                    var arg = Application.Current.Properties["ArbitraryArgName"].ToString();
+                    switch (arg)
+                    {
+                        case CmdlineCommands.New:
+                        {
+                            IoC.Get<IDatabaseInteractions>().CreateAndOpenDatabase().Wait();
+                            break;
+                        }
+                        case CmdlineCommands.Open:
+                        {
+                            IoC.Get<IDatabaseInteractions>().OpenDatabase().Wait();
+                            break;
+                        }
+                    }
+
+                    Application.Current.Properties["ArbitraryArgName"] = null;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
         }
 
         public object WindowMenu { get; }
