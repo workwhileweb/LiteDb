@@ -5,10 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
-             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
+             xmlns:localControls="clr-namespace:LiteDbExplorer.Controls"
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
-             xmlns:controls1="clr-namespace:LiteDbExplorer.Wpf.Controls;assembly=LiteDbExplorer.Wpf"
+             xmlns:controls="clr-namespace:LiteDbExplorer.Wpf.Controls;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="400">
     <UserControl.Resources>
@@ -19,12 +19,12 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <controls1:SplitContainer x:Name="splitContainer" 
+        <controls:SplitContainer x:Name="splitContainer" 
                                  Orientation="{Binding SplitOrientation, Mode=OneTime}"
                                  SecondChildIsCollapsed="{Binding HideFileInfo}">
-            <controls1:SplitContainer.FirstChild>
+            <controls:SplitContainer.FirstChild>
                 <DockPanel>
-                    <controls1:ToolDockPanel DockPanel.Dock="Top">
+                    <controls:ToolDockPanel DockPanel.Dock="Top">
                         
                         <ListBox DockPanel.Dock="Right" x:Name="detailViewSelector"
                                  SelectedIndex="0">
@@ -47,39 +47,51 @@
 
 
                         <TextBlock Text="Document Preview" Style="{StaticResource ToolPanelTitle}"/>
-                    </controls1:ToolDockPanel>
+                    </controls:ToolDockPanel>
                     
                     <TabControl DockPanel.Dock="Top"
                                 SelectedIndex="{Binding SelectedIndex, ElementName=detailViewSelector}">
                         <TabControl.ItemContainerStyle>
                             <Style TargetType="{x:Type TabItem}">
                                 <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Content" Value="{Binding Path=(behaviors:DeferredContent.Content), RelativeSource={RelativeSource Self}}"/>
+                                    </Trigger>
+                                    <Trigger Property="IsSelected" Value="False">
+                                        <Setter Property="Content" Value="{Binding Content, RelativeSource={RelativeSource Self}}"/>
+                                    </Trigger>
+                                </Style.Triggers>
                             </Style>
                         </TabControl.ItemContainerStyle>
                         <TabItem>
-                            <controls:DocumentTreeView x:Name="documentTreeView"
-                                                       DocumentSource="{Binding Path=Document, Mode=OneWay}" 
-                                                       ContentMaxLength="{Binding ContentMaxLength, Mode=OneWay}"/>
+                            <behaviors:DeferredContent.Content>
+                                <localControls:DocumentTreeView x:Name="documentTreeView"
+                                                           DocumentSource="{Binding Path=Document, Mode=OneWay}" 
+                                                           ContentMaxLength="{Binding ContentMaxLength, Mode=OneWay}"/>
+                            </behaviors:DeferredContent.Content>
                         </TabItem>
                         <TabItem>
-                            <controls:DocumentJsonView x:Name="documentJsonView"
-                                                       DocumentSource="{Binding Path=Document, Mode=OneWay}" 
-                                                       LineMaxLength="{Binding ContentMaxLength, Mode=OneWay}"/>
+                            <behaviors:DeferredContent.Content>
+                                <localControls:DocumentJsonView x:Name="documentJsonView"
+                                                           DocumentSource="{Binding Path=Document, Mode=OneWay}" 
+                                                           LineMaxLength="{Binding ContentMaxLength, Mode=OneWay}"/>
+                            </behaviors:DeferredContent.Content>
                         </TabItem>
                     </TabControl>
                 </DockPanel>
-            </controls1:SplitContainer.FirstChild>
-            <controls1:SplitContainer.SecondChild>
+            </controls:SplitContainer.FirstChild>
+            <controls:SplitContainer.SecondChild>
                 <DockPanel>
-                    <controls1:ToolDockPanel DockPanel.Dock="Top">
+                    <controls:ToolDockPanel DockPanel.Dock="Top">
                         <TextBlock Text="File Preview" Style="{StaticResource ToolPanelTitle}"/>
-                    </controls1:ToolDockPanel>
-                    <controls:FileView x:Name="FilePreview" FileSource="{Binding FileInfo}" />
+                    </controls:ToolDockPanel>
+                    <localControls:FileView x:Name="FilePreview" FileSource="{Binding FileInfo}" />
                 </DockPanel>
-            </controls1:SplitContainer.SecondChild>
-        </controls1:SplitContainer>
+            </controls:SplitContainer.SecondChild>
+        </controls:SplitContainer>
 
-        <controls1:ToolDockPanel Grid.Row="1" Style="{StaticResource ToolDockPanelCompact}">
+        <controls:ToolDockPanel Grid.Row="1" Style="{StaticResource ToolDockPanelCompact}">
 
             <ListBox DockPanel.Dock="Right" 
                      x:Name="splitOrientationSelector"
@@ -104,7 +116,7 @@
 
             <ContentPresenter />
 
-        </controls1:ToolDockPanel>
+        </controls:ToolDockPanel>
 
     </Grid>
 </UserControl>

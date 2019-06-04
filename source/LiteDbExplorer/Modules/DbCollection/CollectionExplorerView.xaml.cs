@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
@@ -34,6 +33,15 @@ namespace LiteDbExplorer.Modules.DbCollection
                     });
                 }
             };
+
+            CollectionListView.Loaded += CollectionListViewOnLoaded;
+        }
+
+        public Action CollectionLoadedAction { get; set; }
+
+        private void CollectionListViewOnLoaded(object sender, RoutedEventArgs e)
+        {
+            CollectionLoadedAction?.Invoke();
         }
 
         public void ScrollIntoItem(object item)
@@ -65,5 +73,11 @@ namespace LiteDbExplorer.Modules.DbCollection
         {
             CollectionListView.FindPrevious(text, matchCase);
         }
+
+        public void FocusListView()
+        {
+            CollectionListView.ListCollectionData.Focus();
+        }
+
     }
 }

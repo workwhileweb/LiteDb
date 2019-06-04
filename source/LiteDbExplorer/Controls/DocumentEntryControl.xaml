@@ -7,6 +7,7 @@
              xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
+             xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
 
@@ -15,52 +16,58 @@
     </UserControl.Resources>
 
     <UserControl.CommandBindings>
-        <CommandBinding Command="local:DocumentEntryControl.PreviousItem" Executed="PreviousItemCommand_Executed"
+        <CommandBinding Command="local:DocumentEntryControl.PreviousItem" 
+                        Executed="PreviousItemCommand_Executed"
                         CanExecute="PreviousItemCommand_CanExecute" />
-        <CommandBinding Command="local:DocumentEntryControl.NextItem" Executed="NextItemCommand_Executed"
+        <CommandBinding Command="local:DocumentEntryControl.NextItem" 
+                        Executed="NextItemCommand_Executed"
                         CanExecute="NextItemCommand_CanExecute" />
+        <CommandBinding Command="local:DocumentEntryControl.OkCommand"
+                        Executed="OkCommand_OnExecuted"
+                        CanExecute="ReadOnly_CanNotExecute"/>
+        <CommandBinding Command="local:DocumentEntryControl.CancelCommand"
+                        Executed="CancelCommand_OnExecuted"/>
+        <CommandBinding Command="local:DocumentEntryControl.NewCommand"
+                        Executed="NewCommand_OnExecuted"
+                        CanExecute="ReadOnly_CanNotExecute"/>
     </UserControl.CommandBindings>
     <materialDesign:DialogHost
-        Identifier="DocumentEntryDialogHost"
+        x:Name="dialogHost"
         DialogTheme="Inherit">
 
         <DockPanel>
             <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
 
                 <Button Name="ButtonClose" Content="Close" IsCancel="True"
-                        Click="ButtonCancel_Click" Visibility="Collapsed"
+                        Command="local:DocumentEntryControl.OkCommand"
+                        Visibility="Collapsed"
                         DockPanel.Dock="Right" Width="60" Margin="10" />
 
                 <Button Name="ButtonCancel" Content="CANCEL" IsCancel="True"
-                        Click="ButtonCancel_Click"
+                        Command="local:DocumentEntryControl.CancelCommand"
                         DockPanel.Dock="Right" Margin="10"
                         MinWidth="85"
-                        Style="{StaticResource MaterialDesignFlatButton}" />
+                        Style="{StaticResource MaterialDesignFlatButton}" 
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
 
-                <Button Name="ButtonOK" Content="OK"
-                        Click="ButtonOK_Click"
+                <Button Name="ButtonOK" Content="OK" IsDefault="True"
+                        Command="local:DocumentEntryControl.OkCommand"
                         DockPanel.Dock="Right" Margin="10"
                         MinWidth="85"
-                        Style="{StaticResource MaterialDesignFlatButton}" />
+                        Style="{StaticResource MaterialDesignFlatButton}" 
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
 
-                <materialDesign:PopupBox Margin="10" DockPanel.Dock="Left"
-                                         x:Name="DropNewField"
-                                         materialDesign:RippleAssist.IsDisabled="True">
-                    <materialDesign:PopupBox.ToggleContent>
-                        <ToggleButton Style="{StaticResource MaterialDesignFlatToggleButtonFull}"
-                                      IsChecked="{Binding ElementName=DropNewField, Path=IsPopupOpen, Mode=TwoWay}"
-                                      materialDesign:RippleAssist.IsDisabled="False">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Source="/Images/addfield.png" Width="16" VerticalAlignment="Center" />
-                                <TextBlock Text="ADD FIELD" Margin="6,0,0,0" FontSize="14" FontWeight="Medium"
-                                           VerticalAlignment="Center" />
-                            </StackPanel>
-                        </ToggleButton>
-                    </materialDesign:PopupBox.ToggleContent>
-                    <StackPanel x:Name="AddFieldsTypesPanel" Margin="0" MinWidth="140">
-                        <!--Items created in code-->
+                <Button x:Name="DropNewField"
+                        Margin="10" DockPanel.Dock="Left"
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        behaviors:RoutedCommandToolTip.ShowToolTipForCommand="local:DocumentEntryControl.NewCommand">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="PlaylistAdd" />
+                        <TextBlock Text="ADD FIELD" Margin="6,0,0,0" FontSize="14" FontWeight="Medium"
+                                   VerticalAlignment="Center" />
                     </StackPanel>
-                </materialDesign:PopupBox>
+                </Button>
+
                 <Canvas />
                 <Button x:Name="AddExistingFieldsButton"
                         Style="{StaticResource MaterialDesignFlatButton}" Content="ADD EXISTING FIELD" />
@@ -79,12 +86,14 @@
 
                 <Button Name="ButtonPrev" Grid.Column="0" Grid.Row="0" Margin="20"
                         Command="local:DocumentEntryControl.PreviousItem"
-                        Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
+                        Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True">
                     <materialDesign:PackIcon Kind="ArrowLeft" />
                 </Button>
                 <Button Name="ButtonNext" Grid.Column="2" Grid.Row="0" Margin="20"
                         Command="local:DocumentEntryControl.NextItem"
-                        Style="{StaticResource MaterialDesignFloatingActionMiniButton}">
+                        Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True">
                     <materialDesign:PackIcon Kind="ArrowRight" />
                 </Button>
 
@@ -97,7 +106,8 @@
                     <ListView Name="ListItems" Grid.Column="0"
                               SizeChanged="ItemsField_SizeChanged"
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                              BorderThickness="0">
+                              BorderThickness="0"
+                              FocusVisualStyle="{x:Null}">
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem"
                                    BasedOn="{StaticResource MaterialDesignGridViewItemNoBorder}">

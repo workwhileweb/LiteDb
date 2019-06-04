@@ -49,6 +49,10 @@
                 <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
             </Style>-->
 
+            <Style x:Key="PagesTreeViewItemStyle" TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
+                <Setter Property="IsExpanded" Value="True" />
+            </Style>
+
         </ResourceDictionary>
 
     </Window.Resources>
@@ -77,7 +81,7 @@
         <TreeView x:Name="TreeView" ItemsSource="{Binding Pages}" SelectedValuePath="Editors"
                   Background="Transparent" BorderThickness="1"
                   BorderBrush="{x:Static SystemColors.ActiveBorderBrush}"
-                  ItemContainerStyle="{StaticResource MaterialDesignTreeViewItemFullRow}"
+                  ItemContainerStyle="{StaticResource PagesTreeViewItemStyle}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <i:Interaction.Behaviors>
                 <behaviors:BindableTreeViewSelectedItemBehavior SelectedItem="{Binding SelectedPage, Mode=TwoWay}" />

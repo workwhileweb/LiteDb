@@ -172,6 +172,7 @@ namespace LiteDbExplorer.Modules
         public Task CloseDatabase(DatabaseReference database)
         {
             _eventAggregator.PublishOnUIThread(new DatabaseChangeEventArgs(ReferenceNodeChangeAction.Remove, database));
+
             Store.Current.CloseDatabase(database);
 
             return Task.CompletedTask;

@@ -17,6 +17,7 @@ using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbDocument;
 using LiteDbExplorer.Modules.Main;
 using MaterialDesignThemes.Wpf;
+using Action = System.Action;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
@@ -28,11 +29,10 @@ namespace LiteDbExplorer.Modules.DbCollection
         private readonly IApplicationInteraction _applicationInteraction;
         private readonly IDatabaseInteractions _databaseInteractions;
         private DocumentReference _selectedDocument;
-        private IList<DocumentReference> _selectedDocuments;
         private ICollectionReferenceListView _view;
         private bool _showDocumentPreview = true;
         private CollectionReference _collectionReference;
-        
+
         [ImportingConstructor]
         public CollectionExplorerViewModel(
             IEventAggregator eventAggregator, 
@@ -53,7 +53,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
             FindTextModel = new FindTextModel();
 
-            ItemDoubleClickCommand = new RelayCommand<DocumentReference>(OnItemDoubleClick);
+            ItemDoubleClickCommand = new RelayCommand<DocumentReference>(async doc=> await OnItemDoubleClick(doc));
 
             AddDocumentCommand = new RelayCommand(async _=> await AddDocument(), o => CanAddDocument());
             EditDocumentCommand = new RelayCommand(async _=> await EditDocument(), o => CanEditDocument());
@@ -100,29 +100,6 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         public FindTextModel FindTextModel { get; }
 
-        public override void Init(CollectionReference value)
-        {
-            if (value == null)
-            {
-                TryClose(false);
-                return;
-            }
-
-            InstanceId = value.InstanceId;
-
-            DisplayName = value.Name;
-
-            if (value.Database != null)
-            {
-                GroupId = value.Database.InstanceId;
-                GroupDisplayName = value.Database.Name;
-            }
-            
-            IconContent = value is FileCollectionReference ? new PackIcon { Kind = PackIconKind.FileMultiple } : new PackIcon { Kind = PackIconKind.TableLarge, Height = 16 };
-            
-            CollectionReference = value;
-        }
-
         [UsedImplicitly]
         public CollectionReference CollectionReference
         {
@@ -150,7 +127,6 @@ namespace LiteDbExplorer.Modules.DbCollection
             set
             {
                 _selectedDocument = value;
-                Store.Current.SelectDocument(_selectedDocument);
                 if (_showDocumentPreview)
                 {
                     DocumentPreview?.ActivateDocument(_selectedDocument);
@@ -159,15 +135,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        public IList<DocumentReference> SelectedDocuments
-        {
-            get => _selectedDocuments;
-            set
-            {
-                _selectedDocuments = value;
-                Store.Current.SelectedDocuments = _selectedDocuments;
-            }
-        }
+        public IList<DocumentReference> SelectedDocuments { get; set; }
 
         public IDocumentPreview DocumentPreview { get; private set; }
         
@@ -218,16 +186,49 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
 
+        public override void Init(CollectionReference value)
+        {
+            if (value == null)
+            {
+                TryClose(false);
+                return;
+            }
+
+            InstanceId = value.InstanceId;
+
+            DisplayName = value.Name;
+
+            if (value.Database != null)
+            {
+                GroupId = value.Database.InstanceId;
+                GroupDisplayName = value.Database.Name;
+            }
+            
+            IconContent = value is FileCollectionReference ? new PackIcon { Kind = PackIconKind.FileMultiple } : new PackIcon { Kind = PackIconKind.TableLarge, Height = 16 };
+            
+            CollectionReference = value;
+        }
+
         protected override void OnViewLoaded(object view)
         {
             _view = view as ICollectionReferenceListView;
+
+            if (_view != null)
+            {
+                _view.CollectionLoadedAction = () =>
+                {
+                    if (SelectedDocument != null)
+                    {
+                        _view?.ScrollIntoItem(SelectedDocument);
+                    }
+
+                    _view?.FocusListView();
+                };
+            }
         }
         
         protected override void OnDeactivate(bool close)
         {
-            Store.Current.SelectDocument(null);
-            Store.Current.SelectedDocuments = null;
-            
             if (close)
             {
                 DocumentPreview?.TryClose();
@@ -238,13 +239,6 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
         
-        
-
-        public void ScrollIntoSelectedDocument()
-        {
-            _view?.ScrollIntoItem(SelectedDocument);
-        }
-
         #region Handles
 
         private void OnCollectionReferenceChanged(object sender, ReferenceChangedEventArgs<CollectionReference> e)
@@ -275,7 +269,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
         
-        protected async void OnItemDoubleClick(DocumentReference documentReference)
+        protected async Task OnItemDoubleClick(DocumentReference documentReference)
         {
             if(documentReference == null)
             {
@@ -288,7 +282,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                     await _databaseInteractions.OpenEditDocument(documentReference);
                     break;
                 case CollectionItemDoubleClickAction.OpenPreview:
-                    IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReference>(documentReference);
+                    await IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReference>(documentReference);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -303,9 +297,9 @@ namespace LiteDbExplorer.Modules.DbCollection
         public async Task AddDocument()
         {
             await _databaseInteractions.CreateItem(CollectionReference)
-                .OnSuccess(reference =>
+                .OnSuccess(async reference =>
                 {
-                    _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
+                    await _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
                     _eventAggregator.PublishOnUIThread(reference);
                 });
         }

@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
+using CSharpFunctionalExtensions;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Modules.Database;
@@ -70,12 +72,12 @@ namespace LiteDbExplorer.Modules
             // TODO: Handle UpdateGridColumns(document.Value.LiteDocument) and UpdateDocumentPreview();
         }
 
-        public bool OpenQuery(RunQueryContext queryContext)
+        public async Task<Result> OpenQuery(RunQueryContext queryContext)
         {
             var documentSet = IoC.Get<IDocumentSet>();
-            var vm = documentSet.OpenDocument<QueryViewModel, RunQueryContext>(queryContext);
+            await documentSet.OpenDocument<QueryViewModel, RunQueryContext>(queryContext);
 
-            return true;
+            return Result.Ok();
         }
 
 
@@ -93,36 +95,38 @@ namespace LiteDbExplorer.Modules
             return true;
         }
 
-        public void ActivateCollection(CollectionReference collection, IEnumerable<DocumentReference> selectedDocuments = null)
+        public async Task<Result> ActivateCollection(CollectionReference collection, IEnumerable<DocumentReference> selectedDocuments = null)
         {
             if (collection == null)
             {
-                return;
+                return Result.Ok();
             }
 
             var documentSet = IoC.Get<IDocumentSet>();
-            var vm = documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReference>(collection);
+            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReference>(collection);
             if (vm != null)
             {
                 vm.SelectedDocument = selectedDocuments?.FirstOrDefault();
-                vm.ScrollIntoSelectedDocument();
             }
+
+            return Result.Ok();
         }
 
-        public void ActivateDocument(DocumentReference document)
+        public async Task<Result> ActivateDocument(DocumentReference document)
         {
             if (document == null)
             {
-                return;
+                return Result.Ok();
             }
 
             var documentSet = IoC.Get<IDocumentSet>();
-            var vm = documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReference>(document.Collection);
+            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReference>(document.Collection);
             if (vm != null)
             {
                 vm.SelectedDocument = document;
-                vm.ScrollIntoSelectedDocument();
             }
+
+            return Result.Ok();
         }
         
         public void PutClipboardText(string text)

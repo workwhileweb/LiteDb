@@ -17,7 +17,6 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Focusable="True">
     <UserControl.Resources>
-        <controls:StoreContext x:Key="StoreContext"/>
         <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}"/>
         <converters:GroupDisplayColorToForegroundConverter x:Key="GroupDisplayColorToForegroundConverter"/>
     </UserControl.Resources>
@@ -96,7 +95,7 @@
         </ToolBarTray>
 
         <TreeView Name="TreeDatabase" DockPanel.Dock="Top"
-                  ItemsSource="{Binding Current.Databases, Source={StaticResource StoreContext}}"
+                  ItemsSource="{Binding Databases}"
                   Focusable="True"
                   HorizontalContentAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"

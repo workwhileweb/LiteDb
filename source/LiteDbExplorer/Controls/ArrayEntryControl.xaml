@@ -6,8 +6,20 @@
              xmlns:local="clr-namespace:LiteDbExplorer.Controls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
+             xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
+
+    <UserControl.CommandBindings>
+        <CommandBinding Command="local:ArrayEntryControl.OkCommand"
+                        Executed="OkCommand_OnExecuted"
+                        CanExecute="ReadOnly_CanNotExecute"/>
+        <CommandBinding Command="local:ArrayEntryControl.CancelCommand"
+                        Executed="CancelCommand_OnExecuted"/>
+        <CommandBinding Command="local:ArrayEntryControl.NewCommand"
+                        Executed="NewCommand_OnExecuted"
+                        CanExecute="ReadOnly_CanNotExecute"/>
+    </UserControl.CommandBindings>
 
     <UserControl.Resources>
         <converters:InvertableBooleanToVisibilityConverter x:Key="InvertableBooleanToVisibilityConverter" />
@@ -16,36 +28,34 @@
     <DockPanel>
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
             <Button Name="ButtonClose" Content="CLOSE" IsCancel="True"
-                    Click="ButtonCancel_Click" Visibility="Collapsed"
+                    Visibility="Collapsed"
                     DockPanel.Dock="Right" MinWidth="80" Margin="10"
-                    Style="{StaticResource MaterialDesignFlatButton}" />
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Command="local:ArrayEntryControl.CancelCommand"
+                    behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
+
             <Button Name="ButtonCancel" Content="CANCEL" IsCancel="True"
-                    Click="ButtonCancel_Click"
                     DockPanel.Dock="Right" MinWidth="80" Margin="10"
-                    Style="{StaticResource MaterialDesignFlatButton}" />
+                    Style="{StaticResource MaterialDesignFlatButton}" 
+                    Command="local:ArrayEntryControl.CancelCommand"
+                    behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
+
             <Button Name="ButtonOK" Content="OK"
-                    Click="ButtonOK_Click"
                     DockPanel.Dock="Right" MinWidth="80" Margin="10"
-                    Style="{StaticResource MaterialDesignFlatButton}" />
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    Command="local:ArrayEntryControl.OkCommand"
+                    behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
 
-
-            <materialDesign:PopupBox Margin="10" DockPanel.Dock="Left" x:Name="ButtonAddItem"
-                                     materialDesign:RippleAssist.IsDisabled="True">
-                <materialDesign:PopupBox.ToggleContent>
-                    <ToggleButton Style="{StaticResource MaterialDesignFlatToggleButtonFull}"
-                                  IsChecked="{Binding ElementName=ButtonAddItem, Path=IsPopupOpen, Mode=TwoWay}"
-                                  materialDesign:RippleAssist.IsDisabled="False">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="/Images/addfield.png" Width="16" VerticalAlignment="Center" />
-                            <TextBlock Text="ADD ITEM" Margin="6,0,0,0" FontSize="14" FontWeight="Medium"
-                                       VerticalAlignment="Center" />
-                        </StackPanel>
-                    </ToggleButton>
-                </materialDesign:PopupBox.ToggleContent>
-                <StackPanel x:Name="AddFieldsTypesPanel" Margin="0" MinWidth="140">
-                    <!--Items created in code-->
+            <Button x:Name="ButtonAddItem"
+                    Margin="10" DockPanel.Dock="Left"
+                    Style="{StaticResource MaterialDesignFlatButton}"
+                    behaviors:RoutedCommandToolTip.ShowToolTipForCommand="local:ArrayEntryControl.NewCommand">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="PlaylistAdd" />
+                    <TextBlock Text="ADD ITEM" Margin="6,0,0,0" FontSize="14" FontWeight="Medium"
+                               VerticalAlignment="Center" />
                 </StackPanel>
-            </materialDesign:PopupBox>
+            </Button>
             <Canvas />
         </DockPanel>
 
@@ -55,7 +65,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ScrollViewer x:Name="ScrollViewer" Padding="5" VerticalScrollBarVisibility="Disabled">
-                <ItemsControl Name="ItemsItems" Margin="15,0,80,0">
+                <ItemsControl Name="ItemsItems" Margin="15,0,80,0" FocusVisualStyle="{x:Null}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="5">

@@ -58,9 +58,9 @@ namespace LiteDbExplorer.Modules.Main
         }
 
         [UsedImplicitly]
-        public void OpenStartupDocument()
+        public async Task OpenStartupDocument()
         {
-            IoC.Get<IDocumentSet>().OpenDocument<IStartupDocument>();
+            await IoC.Get<IDocumentSet>().OpenDocument<IStartupDocument>();
         }
 
         [UsedImplicitly]

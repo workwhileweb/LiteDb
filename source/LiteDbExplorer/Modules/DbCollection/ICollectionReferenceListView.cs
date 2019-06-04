@@ -1,4 +1,5 @@
-﻿using LiteDbExplorer.Framework.Services;
+﻿using System;
+using LiteDbExplorer.Framework.Services;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
@@ -8,5 +9,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         void UpdateView(DocumentReference documentReference);
         void Find(string text, bool matchCase);
         void FindPrevious(string text, bool matchCase);
+        void FocusListView();
+        Action CollectionLoadedAction { get; set; }
     }
 }

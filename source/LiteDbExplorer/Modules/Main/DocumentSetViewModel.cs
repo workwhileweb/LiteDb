@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -64,13 +65,15 @@ namespace LiteDbExplorer.Modules.Main
             model.IsSelected = true;
         }
 
-        public void OpenDocument<TDoc>() where TDoc : IDocument
+        public Task OpenDocument<TDoc>() where TDoc : IDocument
         {
             var doc = IoC.Get<TDoc>();
             OpenDocument(doc);
+
+            return Task.CompletedTask;
         }
 
-        public TDoc OpenDocument<TDoc, TNode>(TDoc model, TNode init)
+        public Task<TDoc> OpenDocument<TDoc, TNode>(TDoc model, TNode init)
             where TDoc : IDocument<TNode> where TNode : IReferenceNode
         {
             if (!string.IsNullOrEmpty(init.InstanceId))
@@ -79,7 +82,7 @@ namespace LiteDbExplorer.Modules.Main
                 if (instance != null)
                 {
                     ActiveItem = instance;
-                    return instance;
+                    return Task.FromResult(instance);
                 }
             }
             
@@ -87,13 +90,13 @@ namespace LiteDbExplorer.Modules.Main
 
             OpenDocument(model);
 
-            return model;
+            return Task.FromResult(model);
         }
 
-        public TDoc OpenDocument<TDoc, TNode>(TNode init) where TDoc : IDocument<TNode> where TNode : IReferenceNode
+        public async Task<TDoc> OpenDocument<TDoc, TNode>(TNode init) where TDoc : IDocument<TNode> where TNode : IReferenceNode
         {
             var model = IoC.Get<TDoc>();
-            OpenDocument(model, init);
+            await OpenDocument(model, init);
             return model;
         }
 

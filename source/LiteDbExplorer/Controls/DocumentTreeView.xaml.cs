@@ -7,10 +7,12 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Presentation.Behaviors;
 using LiteDB;
+using LiteDbExplorer.Presentation;
 
 namespace LiteDbExplorer.Controls
 {
@@ -19,6 +21,20 @@ namespace LiteDbExplorer.Controls
     /// </summary>
     public partial class DocumentTreeView : UserControl
     {
+        public static readonly RoutedUICommand ExpandToLevel = new RoutedUICommand
+        (
+            "Expand to Level",
+            nameof(ExpandToLevel),
+            typeof(Commands)
+        );
+
+        public static readonly RoutedUICommand CollapseAll = new RoutedUICommand
+        (
+            "Collapse All",
+            nameof(CollapseAll),
+            typeof(Commands)
+        );
+
         public DocumentTreeView()
         {
             InitializeComponent();
@@ -83,6 +99,46 @@ namespace LiteDbExplorer.Controls
         private void OnCurrentThemeChanged(object sender, EventArgs e)
         {
             InvalidateItemsSource(null);
+        }
+
+        private void ExpandCommand_OnCanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = ItemsSource is DocumentTreeItemsSource;
+            e.Handled = true;
+        }
+
+        private void ExpandTreeToLevel_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            var depth = 1;
+            if (e.Parameter is int paramDepth)
+            {
+                depth = paramDepth;
+            }
+
+            if (ItemsSource is DocumentTreeItemsSource documentTreeItemsSource)
+            {
+                documentTreeItemsSource.SetIsExpandToLevel(depth);
+            }
+            else
+            {
+                DocumentTree.ExpandToTreeLevel(depth);    
+            }
+
+            e.Handled = true;
+        }
+
+        private void CollapseAll_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (ItemsSource is DocumentTreeItemsSource documentTreeItemsSource)
+            {
+                documentTreeItemsSource.CollapseAll();
+            }
+            else
+            {
+                DocumentTree.CollapseAll();    
+            }
+
+            e.Handled = true;
         }
     }
 
@@ -199,9 +255,31 @@ namespace LiteDbExplorer.Controls
             Nodes = GetNodes(document);
         }
 
+        public void SetIsExpandToLevel(int level)
+        {
+            SetIsExpandToLevel(Nodes, level, true);
+        }
+
+        public void CollapseAll()
+        {
+            SetIsExpandToLevel(Nodes, -1, false);
+        }
+
         public IEnumerator<DocumentFieldNode> GetEnumerator()
         {
             return Nodes.GetEnumerator();
+        }
+
+        private void SetIsExpandToLevel(IEnumerable<DocumentFieldNode> nodes, int level, bool isExpanded)
+        {
+            if (level != 0 && nodes != null)
+            {
+                foreach (var node in nodes)
+                {
+                    node.IsExpanded = isExpanded;
+                    SetIsExpandToLevel(node.Nodes, level - 1, isExpanded);
+                }
+            }
         }
 
         IEnumerator IEnumerable.GetEnumerator()

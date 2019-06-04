@@ -106,15 +106,6 @@
                         <materialDesign:PackIcon Kind="Home" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Field sort order">
-                    <MenuItem.Icon>
-                        <materialDesign:PackIcon Kind="Sort" />
-                    </MenuItem.Icon>
-                    <MenuItem Header="Alphabetical" IsCheckable="True"
-                              IsChecked="{Binding Path=Settings.FieldSortOrder, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static liteDbExplorerCore:FieldSortOrder.Alphabetical}, Source={x:Static Application.Current}}" />
-                    <MenuItem Header="Original" IsCheckable="True"
-                              IsChecked="{Binding Path=Settings.FieldSortOrder, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static liteDbExplorerCore:FieldSortOrder.Original}, Source={x:Static Application.Current}}" />
-                </MenuItem>
                 <MenuItem Header="Theme">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="InvertColors" />

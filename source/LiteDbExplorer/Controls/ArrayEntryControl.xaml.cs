@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Interactivity;
 using LiteDB;
 using LiteDbExplorer.Framework;
@@ -29,34 +30,57 @@ namespace LiteDbExplorer.Controls
     /// </summary>
     public partial class ArrayEntryControl : UserControl
     {
+        public static readonly Dictionary<BsonType, Func<BsonValue>> FieldTypesMap =
+            new Dictionary<BsonType, Func<BsonValue>>
+            {
+                {BsonType.String, () => new BsonValue(string.Empty)},
+                {BsonType.Boolean, () => new BsonValue(false)},
+                {BsonType.Double, () => new BsonValue((double) 0)},
+                {BsonType.Decimal, () => new BsonValue((decimal) 0.0m)},
+                {BsonType.Int32, () => new BsonValue(0)},
+                {BsonType.Int64, () => new BsonValue((long) 0)},
+                {BsonType.DateTime, () => new BsonValue(DateTime.Now)},
+                {BsonType.Guid, () => new BsonValue(Guid.Empty)},
+                {BsonType.Array, () => new BsonArray()},
+                {BsonType.Document, () => new BsonDocument()},
+            };
+
+        public static readonly RoutedUICommand OkCommand = new RoutedUICommand
+        (
+            "Save",
+            nameof(OkCommand),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.S, ModifierKeys.Control)
+            }
+        );
+
+        public static readonly RoutedUICommand CancelCommand = new RoutedUICommand
+        (
+            "Cancel",
+            nameof(CancelCommand),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.Escape)
+            }
+        );
+
+        public static readonly RoutedUICommand NewCommand = new RoutedUICommand
+        (
+            "New Field",
+            nameof(NewCommand),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.N, ModifierKeys.Control)
+            }
+        );
+
         private readonly WindowController _windowController;
 
-        public static readonly Dictionary<BsonType, Func<BsonValue>> FieldTypesMap = new Dictionary<BsonType, Func<BsonValue>>
-        {
-            {BsonType.String, () => new BsonValue(string.Empty)},
-            {BsonType.Boolean, () => new BsonValue(false)},
-            {BsonType.Double, () => new BsonValue((double) 0)},
-            {BsonType.Decimal, () => new BsonValue((decimal) 0.0m)},
-            {BsonType.Int32, () => new BsonValue(0)},
-            {BsonType.Int64, () => new BsonValue((long) 0)},
-            {BsonType.DateTime, () => new BsonValue(DateTime.Now)},
-            {BsonType.Guid, () => new BsonValue(Guid.Empty)},
-            {BsonType.Array, () => new BsonArray()},
-            {BsonType.Document, () => new BsonDocument()},
-        };
-
-        public ObservableCollection<ArrayUIItem> Items
-        {
-            get; set;
-        }
-
         public BsonArray EditedItems;
-
-        public bool IsReadOnly { get; } = false;
-
-        public bool DialogResult { get; set; }
-
-        public event EventHandler CloseRequested;
 
         public ArrayEntryControl(BsonArray array, bool readOnly, WindowController windowController = null)
         {
@@ -70,17 +94,6 @@ namespace LiteDbExplorer.Controls
 
             AddNewFieldCommand = new RelayCommand<BsonType?>(async type => await AddNewFieldHandler(type));
 
-            foreach (var item in FieldTypesMap)
-            {
-                var menuItem = new MenuItem
-                {
-                    Header = item.Key,
-                    Command = AddNewFieldCommand,
-                    CommandParameter = item.Key
-                };
-                AddFieldsTypesPanel.Children.Add(menuItem);
-            }
-
             var index = 0;
             foreach (BsonValue item in array)
             {
@@ -89,6 +102,10 @@ namespace LiteDbExplorer.Controls
             }
 
             ItemsItems.ItemsSource = Items;
+
+            LoadNewFieldsPicker();
+
+            Interaction.GetBehaviors(ButtonAddItem).Add(new ButtonClickOpenMenuBehavior());
 
             if (readOnly)
             {
@@ -102,23 +119,94 @@ namespace LiteDbExplorer.Controls
             {
                 ScrollViewer.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             }
+
+            Loaded += (sender, args) =>
+            {
+                ItemsItems.Focus();
+            };
         }
 
+
+        public ObservableCollection<ArrayUIItem> Items { get; set; }
+
+        public bool IsReadOnly { get; } = false;
+
+        public bool DialogResult { get; set; }
+
         public RelayCommand<BsonType?> AddNewFieldCommand { get; set; }
+
+        public event EventHandler CloseRequested;
+
+        private void LoadNewFieldsPicker()
+        {
+            var addNewFieldContextMenu = new ContextMenu
+            {
+                MinWidth = 160
+            };
+
+            if (Items != null)
+            {
+                var topBsonTypes = Items
+                    .Where(p => p.Value != null)
+                    .Select(p => p.Value.Type)
+                    .GroupBy(_ => _)
+                    .OrderByDescending(p => p.Count())
+                    .Select(p => p.First())
+                    .ToList();
+
+                foreach (var topBsonType in topBsonTypes)
+                {
+                    var menuItem = new MenuItem
+                    {
+                        Header = topBsonType,
+                        Command = AddNewFieldCommand,
+                        CommandParameter = topBsonType
+                    };
+                    addNewFieldContextMenu.Items.Add(menuItem);
+                }
+            }
+
+            if (addNewFieldContextMenu.Items.Count > 0)
+            {
+                addNewFieldContextMenu.Items.Add(new Separator());
+            }
+
+            foreach (var item in FieldTypesMap)
+            {
+                if (addNewFieldContextMenu.Items
+                    .OfType<MenuItem>()
+                    .Any(p => p.Header.ToString() == item.Key.ToString()))
+                {
+                    continue;
+                }
+
+                var menuItem = new MenuItem
+                {
+                    Header = item.Key,
+                    Command = AddNewFieldCommand,
+                    CommandParameter = item.Key
+                };
+                addNewFieldContextMenu.Items.Add(menuItem);
+            }
+
+            ButtonAddItem.ContextMenu = addNewFieldContextMenu;
+        }
 
         private void ButtonRemove_Click(object sender, RoutedEventArgs e)
         {
             var value = (sender as Control).Tag as BsonValue;
             Items.Remove(Items.First(a => a.Value == value));
+
+            LoadNewFieldsPicker();
         }
 
-        private void ButtonCancel_Click(object sender, RoutedEventArgs e)
+        private void CancelCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             DialogResult = false;
             Close();
         }
-        
-        private void ButtonOK_Click(object sender, RoutedEventArgs e)
+
+        private void OkCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
             //TODO make array and document types use this as well
             foreach (var control in Items.Select(a => a.Control))
@@ -141,6 +229,21 @@ namespace LiteDbExplorer.Controls
             DialogResult = true;
             EditedItems = new BsonArray(Items.Select(a => a.Value));
             Close();
+        }
+
+        private void ReadOnly_CanNotExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !IsReadOnly;
+        }
+
+        private void NewCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (ButtonAddItem.ContextMenu != null)
+            {
+                ButtonAddItem.ContextMenu.IsOpen = true;
+                ButtonAddItem.ContextMenu.Focus();
+                ButtonAddItem.ContextMenu.Items.OfType<MenuItem>().FirstOrDefault()?.Focus();
+            }
         }
 
         private void Close()
@@ -173,11 +276,11 @@ namespace LiteDbExplorer.Controls
             else
             {
                 var valueEdit = BsonValueEditor.GetBsonValueEditor(
-                    openMode: expandMode, 
-                    bindingPath: @"Value", 
-                    bindingValue: value, 
+                    openMode: expandMode,
+                    bindingPath: @"Value",
+                    bindingValue: value,
                     bindingSource: arrayItem,
-                    readOnly: IsReadOnly, 
+                    readOnly: IsReadOnly,
                     keyName: keyName);
 
                 arrayItem.Control = valueEdit;
@@ -235,23 +338,24 @@ namespace LiteDbExplorer.Controls
             return docTypePicker;
         }
 
-        private Task AddNewFieldHandler(BsonType? bsonType)
+        private async Task AddNewFieldHandler(BsonType? bsonType)
         {
-            ButtonAddItem.IsPopupOpen = false;
-
             if (!bsonType.HasValue)
             {
-                return Task.CompletedTask;
+                return;
             }
 
             var newValue = GetFieldDefaultValue(bsonType.Value);
 
             var newItem = NewItem(newValue, Items.Count);
             Items.Add(newItem);
+
+            LoadNewFieldsPicker();
+
+            await Task.Delay(150);
+
             newItem.Control.Focus();
             newItem.Control.BringIntoView();
-
-            return Task.CompletedTask;
         }
 
         private BsonValue GetFieldDefaultValue(BsonType bsonType)

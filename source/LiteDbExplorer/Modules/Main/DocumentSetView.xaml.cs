@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows.Controls;
 using Dragablz;
-using LiteDbExplorer.Framework.Services;
 
 namespace LiteDbExplorer.Modules.Main
 {

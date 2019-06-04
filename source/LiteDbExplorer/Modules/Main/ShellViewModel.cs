@@ -26,16 +26,11 @@ namespace LiteDbExplorer.Modules.Main
 
             MainContent = IoC.Get<IDocumentSet>();
 
-            if (Properties.Settings.Default.ShowStartPageOnOpen)
-            {
-                MainContent.OpenDocument<IStartupDocument>();
-            }
-
-            MainContent.ActiveDocumentChanged += (sender, args) =>
+            MainContent.ActiveDocumentChanged += async (sender, args) =>
             {
                 if (!MainContent.Documents.Any() && Properties.Settings.Default.ShowStartOnCloseAll)
                 {
-                    MainContent.OpenDocument<IStartupDocument>();
+                    await MainContent.OpenDocument<IStartupDocument>();
                 }
             };
         }
@@ -68,6 +63,14 @@ namespace LiteDbExplorer.Modules.Main
             {
                 Console.WriteLine(e);
                 throw;
+            }
+        }
+
+        protected override async void OnViewLoaded(object view)
+        {
+            if (Properties.Settings.Default.ShowStartPageOnOpen)
+            {
+                await MainContent.OpenDocument<IStartupDocument>();
             }
         }
 

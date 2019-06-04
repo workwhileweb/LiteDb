@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
@@ -7,7 +8,6 @@ using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
-using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.Help;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Wpf.Modules.Exception;
@@ -46,6 +46,34 @@ namespace LiteDbExplorer.Modules.DbQuery
             RunSelectedQueryCommand = new RelayCommand(_=> RunSelectedQuery(), _=> CanRunSelectedQuery);
         }
 
+        public ICommand RunQueryCommand { get; set; }
+
+        public ICommand RunSelectedQueryCommand { get; set; }
+
+        [UsedImplicitly]
+        public ObservableCollection<DatabaseReference> Databases => Store.Current.Databases;
+
+        public RunQueryContext InitialQueryContext { get; set; }
+
+        public DatabaseReference CurrentDatabase { get; set; }
+
+        public QueryReference QueryReference { get; set; }
+
+        public string RawQuery { get; set; } = string.Empty;
+
+        public string RawQuerySelected { get; set; } = string.Empty;
+
+        [UsedImplicitly]
+        public bool CanRunQuery => CurrentDatabase != null && !string.IsNullOrWhiteSpace(RawQuery);
+
+        [UsedImplicitly]
+        public bool CanRunSelectedQuery => CurrentDatabase != null && 
+                                           !string.IsNullOrWhiteSpace(RawQuerySelected) &&
+                                           RawQuerySelected.Trim().StartsWith("db.", StringComparison.OrdinalIgnoreCase);
+
+        [UsedImplicitly]
+        public bool CanExportResult => false;
+
         public override void Init(RunQueryContext item)
         {
             if (item == null)
@@ -83,31 +111,6 @@ namespace LiteDbExplorer.Modules.DbQuery
             }
         }
 
-        public ICommand RunQueryCommand { get; set; }
-
-        public ICommand RunSelectedQueryCommand { get; set; }
-
-        public RunQueryContext InitialQueryContext { get; set; }
-
-        public DatabaseReference CurrentDatabase { get; set; }
-
-        public QueryReference QueryReference { get; set; }
-
-        public string RawQuery { get; set; } = string.Empty;
-
-        public string RawQuerySelected { get; set; } = string.Empty;
-
-        [UsedImplicitly]
-        public bool CanRunQuery => CurrentDatabase != null && !string.IsNullOrWhiteSpace(RawQuery);
-
-        [UsedImplicitly]
-        public bool CanRunSelectedQuery => CurrentDatabase != null && 
-                                           !string.IsNullOrWhiteSpace(RawQuerySelected) &&
-                                           RawQuerySelected.Trim().StartsWith("db.", StringComparison.OrdinalIgnoreCase);
-
-        [UsedImplicitly]
-        public bool CanExportResult => false;
-
         private void SetDisplay(DatabaseReference databaseReference)
         {
             GroupId = databaseReference?.InstanceId;
@@ -116,9 +119,9 @@ namespace LiteDbExplorer.Modules.DbQuery
         }
 
         [UsedImplicitly]
-        public void NewQuery()
+        public async Task NewQuery()
         {
-            _applicationInteraction.OpenQuery(new RunQueryContext(CurrentDatabase, QueryReference));
+            await _applicationInteraction.OpenQuery(new RunQueryContext(CurrentDatabase, QueryReference));
         }
 
         [UsedImplicitly]

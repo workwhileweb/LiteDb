@@ -9,11 +9,17 @@
              xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             x:Name="DocumentTreeViewControl">
+             x:Name="DocumentTreeViewControl"
+             FocusManager.IsFocusScope="true">
+    <UserControl.CommandBindings>
+        <CommandBinding Command="local:DocumentTreeView.ExpandToLevel"
+                        Executed="ExpandTreeToLevel_OnExecuted"
+                        CanExecute="ExpandCommand_OnCanExecute"/>
+        <CommandBinding Command="local:DocumentTreeView.CollapseAll"
+                        Executed="CollapseAll_OnExecuted"
+                        CanExecute="ExpandCommand_OnCanExecute"/>
+    </UserControl.CommandBindings>
     <UserControl.Resources>
-        <!--<converters:BsonValueToStringConverter x:Key="BsonValueToStringConverter"/>-->
-        <!--<converters:BsonValueToForegroundConverter x:Key="BsonValueToForegroundConverter" />-->
-
         <HierarchicalDataTemplate x:Key="FieldNodeTemplate" 
                                   DataType="{x:Type local:DocumentFieldNode}" 
                                   ItemsSource="{Binding Path=Nodes}">
@@ -27,8 +33,6 @@
                     <Run Text=": " FontWeight="Medium"/>
                     <Run Text="{Binding DisplayValue}" 
                          Foreground="{Binding Foreground}"/>
-                    <!--<Run Text="{Binding Value, Converter={StaticResource BsonValueToStringConverter}}" 
-                               Foreground="{Binding Value, Converter={StaticResource BsonValueToForegroundConverter}}"/>-->
                     <Run Text="{Binding NodesCountText}" Foreground="#707070"/>
                 </TextBlock>
                 <TextBlock Grid.Column="1" Text="{Binding Path=ValueType, FallbackValue=''}" 
@@ -41,17 +45,6 @@
             <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
             <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
             <Setter Property="FontWeight" Value="Normal" />
-            <Setter Property="ContextMenu">
-                <Setter.Value>
-                    <ContextMenu>
-                        <MenuItem Command="Copy" CommandTarget="{Binding}">
-                            <MenuItem.Icon>
-                                <materialDesign:PackIcon Kind="ContentCopy" />
-                            </MenuItem.Icon>
-                        </MenuItem>
-                    </ContextMenu>
-                </Setter.Value>
-            </Setter>
             <Style.Triggers>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="FontWeight" Value="Medium" />
@@ -59,6 +52,22 @@
             </Style.Triggers>
         </Style>
     </UserControl.Resources>
+
+    <UserControl.ContextMenu>
+        <ContextMenu>
+            <!--<MenuItem Command="Copy" CommandTarget="{Binding}">
+                        <MenuItem.Icon>
+                            <materialDesign:PackIcon Kind="ContentCopy" />
+                        </MenuItem.Icon>
+                    </MenuItem>
+                    <Separator />-->
+            <MenuItem Command="local:DocumentTreeView.ExpandToLevel" 
+                      Header="Expand 1 Level"
+                      CommandTarget="{Binding Path=PlacementTarget,RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+            <MenuItem Command="local:DocumentTreeView.CollapseAll" 
+                      CommandTarget="{Binding Path=PlacementTarget,RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
+        </ContextMenu>
+    </UserControl.ContextMenu>
 
     <Grid>
         <TreeView x:Name="DocumentTree" 
@@ -68,6 +77,6 @@
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Standard"
                   ScrollViewer.IsDeferredScrollingEnabled="{Binding Source={x:Static properties:Settings.Default},Path=DeferredScrolling}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
     </Grid>
 </UserControl>

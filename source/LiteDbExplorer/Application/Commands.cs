@@ -9,7 +9,7 @@ namespace LiteDbExplorer
             "Exit",
             nameof(Exit),
             typeof(Commands),
-            new InputGestureCollection()
+            new InputGestureCollection
             {
                 new KeyGesture(Key.F4, ModifierKeys.Alt)
             }
@@ -20,7 +20,7 @@ namespace LiteDbExplorer
             "Add...",
             "Add",
             typeof(Commands),
-            new InputGestureCollection()
+            new InputGestureCollection
             {
                 new KeyGesture(Key.Insert)
             }
@@ -30,7 +30,11 @@ namespace LiteDbExplorer
         (
             "Edit...",
             nameof(Edit),
-            typeof(Commands)
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.F2)
+            }
         );
 
         public static readonly RoutedUICommand Remove = new RoutedUICommand
@@ -38,7 +42,7 @@ namespace LiteDbExplorer
             "Remove",
             nameof(Remove),
             typeof(Commands),
-            new InputGestureCollection()
+            new InputGestureCollection
             {
                 new KeyGesture(Key.Delete)
             }
@@ -137,7 +141,11 @@ namespace LiteDbExplorer
         (
             "Refresh Collection",
             nameof(RefreshCollection),
-            typeof(Commands)
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.F5)
+            }
         );
 
         public static readonly RoutedUICommand RefreshDatabase = new RoutedUICommand

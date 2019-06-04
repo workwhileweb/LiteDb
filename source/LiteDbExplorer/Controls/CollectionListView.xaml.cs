@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using LiteDbExplorer.Presentation.Converters;
 using LiteDB;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Controls
 {
@@ -71,26 +72,14 @@ namespace LiteDbExplorer.Controls
 
             ListCollectionData.MouseDoubleClick += ListCollectionDataOnMouseDoubleClick;
             ListCollectionData.SelectionChanged += OnListViewSelectionChanged;
-            
+            ListCollectionData.Loaded += ListCollectionDataOnLoaded;
+
             ListCollectionData.SetBinding(Selector.SelectedItemProperty, new Binding
             {
                 Source = this,
                 Path = new PropertyPath(nameof(SelectedItem)),
                 Mode = BindingMode.TwoWay
             });
-
-            ListCollectionData.Loaded += (sender, args) =>
-            {
-                Dispatcher.BeginInvoke(DispatcherPriority.Render, (Action) (() =>
-                {
-                    var maxWidth = Math.Max(600, ListCollectionData.ActualWidth) / Math.Min(3, GridCollectionData.Columns.Count + 1);
-                    foreach (var col in GridCollectionData.Columns)
-                    {
-                        col.Width = col.ActualWidth > maxWidth ? maxWidth : Math.Max(100, col.ActualWidth);
-                    }
-                }));
-                _listLoaded = true;
-            };
         }
 
         public CollectionReference CollectionReference
@@ -147,6 +136,19 @@ namespace LiteDbExplorer.Controls
 
                 return 0;
             }
+        }
+
+        private void ListCollectionDataOnLoaded(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.BeginInvoke(DispatcherPriority.Render, (Action) (() =>
+            {
+                var maxWidth = Math.Max(600, ListCollectionData.ActualWidth) / Math.Min(3, GridCollectionData.Columns.Count + 1);
+                foreach (var col in GridCollectionData.Columns)
+                {
+                    col.Width = col.ActualWidth > maxWidth ? maxWidth : Math.Max(100, col.ActualWidth);
+                }
+            }));
+            _listLoaded = true;
         }
 
         private static void OnCollectionReferenceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -450,49 +452,5 @@ namespace LiteDbExplorer.Controls
             var dataView =  (ListCollectionView)CollectionViewSource.GetDefaultView(ListCollectionData.ItemsSource);
             dataView.CustomSort = new SortBsonValue(sortBy, direction == ListSortDirection.Descending);
         }
-        
-        public class SortBsonValue : IComparer
-        {
-            private readonly string _key;
-            private readonly bool _reverse;
-
-            public SortBsonValue(string key, bool reverse)
-            {
-                _key = key;
-                _reverse = reverse;
-            }
-
-            public int Compare(object x, object y)
-            {
-                var doc1 = x as DocumentReference;
-                var doc2 = y as DocumentReference;
-
-                if(doc1 == null && doc2 == null)
-                {
-                    return 0;
-                }
-
-                if(doc1 == null)
-                {
-                    return _reverse ? 1 : -1;
-                }
-
-                if(doc2 == null)
-                {
-                    return _reverse ? -1 : 1;
-                }
-
-                var bsonValue1 = doc1.LiteDocument[_key];
-                var bsonValue2 = doc2.LiteDocument[_key];
-
-                if (_reverse)
-                {
-                    return bsonValue2.CompareTo(bsonValue1);
-                }
-
-                return bsonValue1.CompareTo(bsonValue2);
-            }
-        }
-        
     }
 }

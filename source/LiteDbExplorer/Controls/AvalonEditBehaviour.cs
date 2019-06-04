@@ -2,7 +2,6 @@
 using System.Windows;
 using System.Windows.Interactivity;
 using ICSharpCode.AvalonEdit;
-using ICSharpCode.AvalonEdit.Editing;
 
 namespace LiteDbExplorer.Controls
 {

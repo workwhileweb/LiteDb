@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using LiteDbExplorer.Framework;
 
@@ -13,11 +14,11 @@ namespace LiteDbExplorer.Modules.Main
         void CloseDocument(IDocument document);
         void ActivateItem(IDocument item);
         void DeactivateItem(IDocument item, bool close);
-        void OpenDocument<TDoc>() where TDoc : IDocument;
+        Task OpenDocument<TDoc>() where TDoc : IDocument;
 
-        TDoc OpenDocument<TDoc, TNode>(TDoc model, TNode init)
+        Task<TDoc> OpenDocument<TDoc, TNode>(TDoc model, TNode init)
             where TDoc : IDocument<TNode> where TNode : IReferenceNode;
-        TDoc OpenDocument<TDoc, TNode>(TNode init) where TDoc : IDocument<TNode> where TNode : IReferenceNode;
+        Task<TDoc> OpenDocument<TDoc, TNode>(TNode init) where TDoc : IDocument<TNode> where TNode : IReferenceNode;
         
         event EventHandler ActiveDocumentChanging;
         event EventHandler ActiveDocumentChanged;

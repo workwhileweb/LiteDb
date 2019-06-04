@@ -39,28 +39,32 @@
                     <ToolBarTray DockPanel.Dock="Top">
                         <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}">
                             <Button Command="liteDbExplorer:Commands.Add"
-                                    CommandParameter="{Binding CollectionReference}">
+                                    CommandParameter="{Binding CollectionReference}"
+                                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="TableRowPlusAfter" />
                                     <TextBlock Text="Add" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
                             <Button Command="liteDbExplorer:Commands.Edit"
-                                    CommandParameter="{Binding SelectedDocument}">
+                                    CommandParameter="{Binding SelectedDocument}"
+                                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="TableEdit" />
                                     <TextBlock Text="Edit" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
                             <Button Command="liteDbExplorer:Commands.Remove"
-                                    CommandParameter="{Binding SelectedDocuments}">
+                                    CommandParameter="{Binding SelectedDocuments}"
+                                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="TableRowRemove" />
                                     <TextBlock Text="Delete" VerticalAlignment="Center" />
                                 </StackPanel>
                             </Button>
                             <Button Command="liteDbExplorer:Commands.Export"
-                                    CommandParameter="{Binding SelectedDocuments}">
+                                    CommandParameter="{Binding SelectedDocuments}"
+                                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="FileExport" />
                                     <TextBlock Text="Export" VerticalAlignment="Center" />
@@ -68,7 +72,8 @@
                             </Button>
                             <Separator />
                             <Button Command="liteDbExplorer:Commands.RefreshCollection"
-                                    CommandParameter="{Binding CollectionReference}">
+                                    CommandParameter="{Binding CollectionReference}"
+                                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
                                 <StackPanel Orientation="Horizontal">
                                     <materialDesign:PackIcon Kind="Refresh" />
                                     <TextBlock Text="Refresh" VerticalAlignment="Center" />

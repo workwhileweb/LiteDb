@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Threading.Tasks;
 using System.Windows;
@@ -73,6 +74,9 @@ namespace LiteDbExplorer.Modules.Database
 
         public ICommand SaveDatabaseCopyAsCommand { get; }
 
+        [UsedImplicitly]
+        public ObservableCollection<DatabaseReference> Databases => Store.Current.Databases;
+
         public DatabaseReference SelectedDatabase { get; private set; }
 
         public CollectionReference SelectedCollection { get; private set; }
@@ -131,9 +135,6 @@ namespace LiteDbExplorer.Modules.Database
                     SelectedCollection = null;
                     break;
             }
-
-            Store.Current.SelectDatabase(SelectedDatabase);
-            Store.Current.SelectCollection(SelectedCollection);
         }
 
         public void NodeDoubleClick(CollectionReference value)
@@ -143,15 +144,15 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void NewQuery(object item)
+        public async Task NewQuery(object item)
         {
             switch (item)
             {
                 case DatabaseReference databaseReference:
-                    _applicationInteraction.OpenQuery(new RunQueryContext(databaseReference));
+                    await _applicationInteraction.OpenQuery(new RunQueryContext(databaseReference));
                     break;
                 case CollectionReference collectionReference:
-                    _applicationInteraction.OpenQuery(new RunQueryContext(collectionReference.Database, QueryReference.Find(collectionReference)));
+                    await _applicationInteraction.OpenQuery(new RunQueryContext(collectionReference.Database, QueryReference.Find(collectionReference)));
                     break;
             }
         }
@@ -215,9 +216,9 @@ namespace LiteDbExplorer.Modules.Database
         public async Task AddFile()
         {
             await _databaseInteractions.AddFileToDatabase(SelectedDatabase)
-                .OnSuccess(reference =>
+                .OnSuccess(async reference =>
                 {
-                    _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
+                    await _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
                 });
         }
 
@@ -231,7 +232,10 @@ namespace LiteDbExplorer.Modules.Database
         public async Task AddCollection()
         {
             await _databaseInteractions.AddCollection(SelectedDatabase)
-                .OnSuccess(reference => { _applicationInteraction.ActivateCollection(reference); });
+                .OnSuccess(async reference =>
+                {
+                    await _applicationInteraction.ActivateCollection(reference);
+                });
         }
 
         [UsedImplicitly]
