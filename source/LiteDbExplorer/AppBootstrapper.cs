@@ -18,6 +18,7 @@ using LiteDbExplorer.Framework.Services;
 using LiteDbExplorer.Framework.Shell;
 using LiteDbExplorer.Modules;
 using LiteDbExplorer.Modules.Main;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf;
 using LiteDbExplorer.Wpf.Modules.Settings;
 
@@ -129,12 +130,22 @@ namespace LiteDbExplorer
         private void AddCustomViewLocator()
         {
             _originalLocateForModel = ViewLocator.LocateForModel;
+
             ViewLocator.LocateForModel = (model, displayLocation, context) =>
             {
-                var element = _originalLocateForModel(model, displayLocation, context);
-                if ((element == null || element is TextBlock) && model is IAutoGenSettingsView)
+                UIElement element;
+
+                switch (model)
                 {
-                    element = new AutoSettingsView();
+                    case IOwnerViewLocator ownerViewLocator:
+                        element = ownerViewLocator.GetView(context);
+                        break;
+                    case IAutoGenSettingsView _:
+                        element = new AutoSettingsView();
+                        break;
+                    default:
+                        element = _originalLocateForModel(model, displayLocation, context);
+                        break;
                 }
 
                 return element;

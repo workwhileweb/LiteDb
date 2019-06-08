@@ -16,6 +16,7 @@ using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbDocument;
 using LiteDbExplorer.Modules.Main;
+using LiteDbExplorer.Modules.Shared;
 using MaterialDesignThemes.Wpf;
 using Action = System.Action;
 

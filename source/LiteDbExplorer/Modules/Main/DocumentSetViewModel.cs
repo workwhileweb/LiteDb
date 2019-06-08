@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Caliburn.Micro;
 using LiteDbExplorer.Framework;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework;
 

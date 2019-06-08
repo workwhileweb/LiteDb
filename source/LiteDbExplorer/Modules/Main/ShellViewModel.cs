@@ -1,10 +1,13 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Framework.Shell;
+using LiteDbExplorer.Modules.Diagnostics;
+using LiteDbExplorer.Modules.Shared;
 
 namespace LiteDbExplorer.Modules.Main
 {
@@ -26,14 +29,20 @@ namespace LiteDbExplorer.Modules.Main
 
             MainContent = IoC.Get<IDocumentSet>();
 
-            MainContent.ActiveDocumentChanged += async (sender, args) =>
-            {
-                if (!MainContent.Documents.Any() && Properties.Settings.Default.ShowStartOnCloseAll)
-                {
-                    await MainContent.OpenDocument<IStartupDocument>();
-                }
-            };
+            MainContent.ActiveDocumentChanged += MainContentOnActiveDocumentChanged;
+
+            Properties.Settings.Default.PropertyChanged += OnSettingsPropertyChanged;
         }
+
+        public object WindowMenu { get; }
+
+        public object WindowRightMenu { get; }
+
+        public object LeftContent { get; }
+
+        public IShellStatusBar StatusBarContent { get; set; }
+
+        public IDocumentSet MainContent { get; }
 
         protected override void OnViewReady(object view)
         {
@@ -72,16 +81,35 @@ namespace LiteDbExplorer.Modules.Main
             {
                 await MainContent.OpenDocument<IStartupDocument>();
             }
+
+            if (Properties.Settings.Default.Diagnostics_ShowManagedMemory)
+            {
+                StatusBarContent.ActivateContent(new MemoryUsageStatusButton().Start(), StatusBarContentLocation.Right);
+            }
         }
 
-        public object WindowMenu { get; }
+        private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(Properties.Settings.Default.Diagnostics_ShowManagedMemory))
+            {
+                if (Properties.Settings.Default.Diagnostics_ShowManagedMemory)
+                {
+                    var usageStatusButton = StatusBarContent.ActivateContent(new MemoryUsageStatusButton(), StatusBarContentLocation.Right) as MemoryUsageStatusButton;
+                    usageStatusButton?.Start();
+                }
+                else
+                {
+                    StatusBarContent.DeactivateContent(MemoryUsageStatusButton.ContentIdTag);
+                }
+            }
+        }
 
-        public object WindowRightMenu { get; }
-
-        public object StatusBarContent { get; set; }
-
-        public object LeftContent { get; }
-
-        public IDocumentSet MainContent { get; }
+        private async void MainContentOnActiveDocumentChanged(object sender, EventArgs e)
+        {
+            if (!MainContent.Documents.Any() && Properties.Settings.Default.ShowStartOnCloseAll)
+            {
+                await MainContent.OpenDocument<IStartupDocument>();
+            }            
+        }
     }
 }

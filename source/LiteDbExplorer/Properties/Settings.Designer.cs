@@ -162,5 +162,17 @@ namespace LiteDbExplorer.Properties {
                 this["UpdateManager_CheckUpdateOnStartup"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool Diagnostics_ShowManagedMemory {
+            get {
+                return ((bool)(this["Diagnostics_ShowManagedMemory"]));
+            }
+            set {
+                this["Diagnostics_ShowManagedMemory"] = value;
+            }
+        }
     }
 }

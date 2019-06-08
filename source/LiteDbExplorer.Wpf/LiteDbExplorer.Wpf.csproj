@@ -138,6 +138,7 @@
     <Compile Include="Converters\NegateConverter.cs" />
     <Compile Include="Converters\NullOrEmptyToVisibilityConverter.cs" />
     <Compile Include="Converters\RoutedCommandToInputGestureTextConverter.cs" />
+    <Compile Include="Extensions\ListExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TreeViewExtensions.cs" />
     <Compile Include="Extensions\VisualTreeExtensions.cs" />
@@ -151,10 +152,15 @@
     <Compile Include="Framework\Services\IApplicationCommandHandler.cs" />
     <Compile Include="Framework\Services\IFileDropProvider.cs" />
     <Compile Include="Framework\Services\IListViewInteractionProvider.cs" />
+    <Compile Include="Framework\Shell\DisplayOrderComparer.cs" />
+    <Compile Include="Framework\Shell\IHaveContentId.cs" />
+    <Compile Include="Framework\Shell\IHaveDisplayOrder.cs" />
     <Compile Include="Framework\Shell\IShell.cs" />
     <Compile Include="Framework\Shell\IShellMenu.cs" />
     <Compile Include="Framework\Shell\IShellRightMenu.cs" />
     <Compile Include="Framework\Shell\IShellStatusBar.cs" />
+    <Compile Include="Framework\Shell\IStatusBarContent.cs" />
+    <Compile Include="Framework\Shell\StatusBarContentLocation.cs" />
     <Compile Include="Framework\Win32\NativeMethods.cs" />
     <Compile Include="Framework\WindowBase.cs" />
     <Compile Include="Framework\Windows\BaseDialogWindow.xaml.cs">

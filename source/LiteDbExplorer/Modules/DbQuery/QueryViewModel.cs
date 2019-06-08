@@ -10,6 +10,7 @@ using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Help;
 using LiteDbExplorer.Modules.Main;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Modules.Exception;
 using MaterialDesignThemes.Wpf;
 

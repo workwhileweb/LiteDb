@@ -12,7 +12,7 @@ using LiteDbExplorer.Modules.Database;
 using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Help;
-using LiteDbExplorer.Modules.Main;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Windows;
 
 namespace LiteDbExplorer.Modules

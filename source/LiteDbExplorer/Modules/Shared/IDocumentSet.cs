@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Caliburn.Micro;
 using LiteDbExplorer.Framework;
 
-namespace LiteDbExplorer.Modules.Main
+namespace LiteDbExplorer.Modules.Shared
 {
     public interface IDocumentSet : IScreen, IHaveActiveItem
     {

@@ -15,6 +15,17 @@
     </UserControl.Resources>
     <StatusBar DockPanel.Dock="Bottom" Background="{DynamicResource AccentColorBrush}" MinHeight="24"
                HorizontalAlignment="Stretch" Padding="15,0,15,0">
+        <StatusBar.Resources>
+            <Style TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
+                <Setter Property="Height" Value="20"/>
+                <Setter Property="Padding" Value="10,0"/>
+                <Setter Property="Margin" Value="5,0"/>
+                <Setter Property="FontSize" Value="12"/>
+                <Setter Property="FontWeight" Value="Medium"/>
+                <Setter Property="Foreground" Value="{DynamicResource PrimaryHueDarkForegroundBrush}"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+            </Style>
+        </StatusBar.Resources>
         <StatusBarItem Padding="10,0" DockPanel.Dock="Right">
             <Border ToolTip="Version" Background="{DynamicResource AccentColorBrush2}" BorderThickness="1" Padding="4,0" CornerRadius="2">
                 <TextBlock Text="{Binding CurrentVersion}" HorizontalAlignment="Center"/>
@@ -37,8 +48,23 @@
                 </ComboBox>
             </StackPanel>
         </StatusBarItem>
+        <StatusBarItem DockPanel.Dock="Right">
+            <ItemsControl x:Name="RightContentCollection">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </StatusBarItem>
         <StatusBarItem Padding="10,0">
-
+            <ItemsControl x:Name="LeftContentCollection">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
         </StatusBarItem>
     </StatusBar>
 </UserControl>

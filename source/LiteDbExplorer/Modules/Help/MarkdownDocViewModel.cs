@@ -9,6 +9,7 @@ using CSharpFunctionalExtensions;
 using Humanizer;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Main;
+using LiteDbExplorer.Modules.Shared;
 using MaterialDesignThemes.Wpf;
 
 namespace LiteDbExplorer.Modules.Help

@@ -5,6 +5,7 @@ using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Framework.Shell;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Modules.Settings;
 
 namespace LiteDbExplorer.Modules.Main

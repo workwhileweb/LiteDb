@@ -190,6 +190,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Modules\Diagnostics\DiagnosticsSettings.cs" />
+    <Compile Include="Modules\Diagnostics\MemoryUsageStatusButton.cs" />
+    <Compile Include="Modules\Shared\IDocumentExplorer.cs" />
+    <Compile Include="Modules\Shared\IDocumentSet.cs" />
+    <Compile Include="Modules\Shared\IOwnerViewLocator.cs" />
     <Compile Include="Modules\Shared\PerformanceSettings.cs" />
     <Compile Include="Application\CmdlineCommands.cs" />
     <Compile Include="AppBootstrapper.cs" />
@@ -227,6 +232,8 @@
     <Compile Include="Controls\ContentExpander.xaml.cs">
       <DependentUpon>ContentExpander.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Modules\Shared\ShellStatusBarButtonViewModel.cs" />
+    <Compile Include="Modules\Shared\ShellStatusBarLabelViewModel.cs" />
     <Compile Include="Modules\Update\AppUpdateManager.cs" />
     <Compile Include="Modules\DbCollection\CollectionExplorerView.xaml.cs">
       <DependentUpon>CollectionExplorerView.xaml</DependentUpon>
@@ -294,8 +301,6 @@
       <DependentUpon>DocumentSetView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\Main\DocumentSetViewModel.cs" />
-    <Compile Include="Modules\Main\IDocumentExplorer.cs" />
-    <Compile Include="Modules\Main\IDocumentSet.cs" />
     <Compile Include="Modules\Main\MainSettingsViewModel.cs" />
     <Compile Include="Modules\NotificationInteraction.cs" />
     <Compile Include="Modules\StartPage\StartPageSettingsViewModel.cs" />

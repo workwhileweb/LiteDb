@@ -6,6 +6,8 @@ namespace LiteDbExplorer.Wpf.Behaviors
 {
     public class ButtonClickOpenMenuBehavior : Behavior<ButtonBase>
     {
+        public PlacementMode? PlacementMode { get; set; }
+
         protected override void OnAttached()
         {
             base.OnAttached();
@@ -23,7 +25,7 @@ namespace LiteDbExplorer.Wpf.Behaviors
             if (sender is ButtonBase button && button.ContextMenu != null)
             {
                 button.ContextMenu.PlacementTarget = button;
-                button.ContextMenu.Placement = PlacementMode.Bottom;
+                button.ContextMenu.Placement = PlacementMode ?? System.Windows.Controls.Primitives.PlacementMode.Bottom;
                 button.ContextMenu.IsOpen = true;
             }
         }

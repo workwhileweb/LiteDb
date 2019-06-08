@@ -12,6 +12,7 @@ using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Main;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Presentation;
 
 namespace LiteDbExplorer.Modules.Database

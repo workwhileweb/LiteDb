@@ -6,6 +6,7 @@ using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Main;
 using LiteDB;
+using LiteDbExplorer.Modules.Shared;
 using MaterialDesignThemes.Wpf;
 
 namespace LiteDbExplorer.Modules.DbDocument
