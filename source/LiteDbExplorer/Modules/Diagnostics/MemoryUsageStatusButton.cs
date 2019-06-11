@@ -61,6 +61,7 @@ namespace LiteDbExplorer.Modules.Diagnostics
         {
             GC.Collect();
             GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         public void UpdateStatus()
@@ -92,7 +93,7 @@ namespace LiteDbExplorer.Modules.Diagnostics
                 {
                     new MenuItem
                     {
-                        Header = "GC Collect",
+                        Header = "Force GC Collect",
                         Icon = new PackIcon { Kind = PackIconKind.TrashCircle },
                         Command = new RelayCommand(_ => CollectGc())
                     },

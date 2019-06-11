@@ -11,6 +11,7 @@ using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework;
+using LiteDbExplorer.Wpf.Framework.Shell;
 
 namespace LiteDbExplorer.Modules.Main
 {
@@ -24,7 +25,7 @@ namespace LiteDbExplorer.Modules.Main
         
         public DocumentSetViewModel()
         {
-            DisplayName = $"LiteDB Explorer {Versions.CurrentVersion}";
+            DisplayName = $"LiteDB Explorer {AppConstants.Versions.CurrentVersion}";
 
             CloseDocumentCommand = new RelayCommand<FrameworkElement>(CloseDocument);
         }
@@ -66,20 +67,20 @@ namespace LiteDbExplorer.Modules.Main
             model.IsSelected = true;
         }
 
-        public Task OpenDocument<TDoc>() where TDoc : IDocument
+        public Task OpenDocument<TDocument>() where TDocument : IDocument
         {
-            var doc = IoC.Get<TDoc>();
+            var doc = IoC.Get<TDocument>();
+
             OpenDocument(doc);
 
             return Task.CompletedTask;
         }
 
-        public Task<TDoc> OpenDocument<TDoc, TNode>(TDoc model, TNode init)
-            where TDoc : IDocument<TNode> where TNode : IReferenceNode
+        public Task<TDocument> OpenDocument<TDocument, TNode>(TDocument document, TNode initPayload) where TDocument : IDocument<TNode> where TNode : IReferenceId
         {
-            if (!string.IsNullOrEmpty(init.InstanceId))
+            if (!string.IsNullOrEmpty(initPayload.InstanceId))
             {
-                var instance = Items.OfType<TDoc>().FirstOrDefault(p => !string.IsNullOrEmpty(p.InstanceId) && p.InstanceId.Equals(init.InstanceId));
+                var instance = Items.OfType<TDocument>().FirstOrDefault(p => !string.IsNullOrEmpty(p.InstanceId) && p.InstanceId.Equals(initPayload.InstanceId));
                 if (instance != null)
                 {
                     ActiveItem = instance;
@@ -87,17 +88,17 @@ namespace LiteDbExplorer.Modules.Main
                 }
             }
             
-            model.Init(init);
+            document.Init(initPayload);
 
-            OpenDocument(model);
+            OpenDocument(document);
 
-            return Task.FromResult(model);
+            return Task.FromResult(document);
         }
 
-        public async Task<TDoc> OpenDocument<TDoc, TNode>(TNode init) where TDoc : IDocument<TNode> where TNode : IReferenceNode
+        public async Task<TDocument> OpenDocument<TDocument, TNode>(TNode initPayload) where TDocument : IDocument<TNode> where TNode : IReferenceId
         {
-            var model = IoC.Get<TDoc>();
-            await OpenDocument(model, init);
+            var model = IoC.Get<TDocument>();
+            await OpenDocument(model, initPayload);
             return model;
         }
 

@@ -19,35 +19,13 @@
         <ResourceDictionary>
 
             <ResourceDictionary.MergedDictionaries>
-                <!--force windows style-->
-                <!--<ResourceDictionary
-                    Source="/PresentationFramework.Aero2, 
-                    Version=4.0.0.0, Culture=neutral, 
-                    PublicKeyToken=31bf3856ad364e35, 
-                    ProcessorArchitecture=MSIL;component/themes/aero2.normalcolor.xaml" />-->
-                
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
                 <ResourceDictionary Source="../../Themes/MaterialDesignTheme.TreeViewFullRow.xaml" />
-                <!--<ResourceDictionary Source="../../Themes/Aero2.TreeViewFullRow.xaml" />-->
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="Control" BasedOn="{StaticResource {x:Type Control}}">
                 <Setter Property="Background" Value="White"/>
             </Style>
-
-            <!--
-            <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="Black"/>
-            <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="Black"/>
-            -->
-            
-            <!--
-            <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-            </Style>
-
-            <Style TargetType="ButtonBase" BasedOn="{StaticResource {x:Type ButtonBase}}">
-                <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}"/>
-            </Style>-->
 
             <Style x:Key="PagesTreeViewItemStyle" TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
                 <Setter Property="IsExpanded" Value="True" />

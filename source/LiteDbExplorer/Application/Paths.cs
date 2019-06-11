@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Caliburn.Micro;
+using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
 
@@ -43,6 +44,24 @@ namespace LiteDbExplorer
         public static string RecentFilesPath => Path.Combine(AppDataPath, "recentfiles.json");
 
         public static string SettingsFilePath => Path.Combine(AppDataPath, "settings.json");
+
+        public static string ErrorLogsFilePath => Path.Combine(AppDataPath, "errors.log");
+
+        public static Maybe<string> GetLastErrorLogPath()
+        {
+            var directoryInfo = new DirectoryInfo(ErrorLogsFilePath);
+            
+            if (!directoryInfo.Exists)
+            {
+                return null;
+            }
+
+            var lastLogFile = directoryInfo.GetFiles("*.log", SearchOption.TopDirectoryOnly)
+                .OrderByDescending(p => p.LastWriteTime)
+                .FirstOrDefault(p => p.Name.StartsWith("errors"));
+
+            return lastLogFile?.FullName;
+        }
 
         public static string TempPath
         {

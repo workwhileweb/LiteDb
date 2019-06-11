@@ -18,8 +18,6 @@
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.Dragablz.xaml"/>
 
                 <!-- Local Styles -->
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.Window.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.AppToolBar.xaml" />
                 
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.Button.xaml" />
                 <ResourceDictionary Source="Themes/Controls.Wpf.Notifications.xaml" />
@@ -34,8 +32,6 @@
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.TimePicker.xaml" />
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.TimeSpanUpDown.xaml" />
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.DateTimePicker.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.ListView.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.Tabs.xaml" />
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
                 <ResourceDictionary Source="Themes/Controls.ScrollBar.xaml" />
 

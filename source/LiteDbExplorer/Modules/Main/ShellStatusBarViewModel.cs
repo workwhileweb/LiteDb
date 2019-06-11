@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using Caliburn.Micro;
-using LiteDbExplorer.Framework.Shell;
 using LiteDbExplorer.Presentation;
+using LiteDbExplorer.Wpf.Framework.Shell;
 
 namespace LiteDbExplorer.Modules.Main
 {
@@ -18,7 +18,7 @@ namespace LiteDbExplorer.Modules.Main
 
             RightContentCollection = new BindableCollection<IStatusBarContent>();
 
-            CurrentVersion = Versions.CurrentVersion;
+            CurrentVersion = AppConstants.Versions.CurrentVersion;
         }
 
         public Version CurrentVersion { get; }

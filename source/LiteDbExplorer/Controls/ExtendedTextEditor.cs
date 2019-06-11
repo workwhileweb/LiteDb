@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Media;
@@ -22,8 +23,14 @@ namespace LiteDbExplorer.Controls
             _searchReplacePanel = SearchReplacePanel.Install(this);
 
             SetTheme();
-            
-            ThemeManager.CurrentThemeChanged += (sender, args) => { SetTheme(); };
+
+            Loaded += (sender, args) => ThemeManager.CurrentThemeChanged += ThemeManagerOnCurrentThemeChanged;
+            Unloaded += (sender, args) => ThemeManager.CurrentThemeChanged -= ThemeManagerOnCurrentThemeChanged;
+        }
+
+        private void ThemeManagerOnCurrentThemeChanged(object sender, EventArgs e)
+        {
+            SetTheme();
         }
 
         public static readonly DependencyProperty SyntaxHighlightingSrcProperty = DependencyProperty.Register(

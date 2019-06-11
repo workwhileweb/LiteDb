@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Caliburn.Micro;
-using LiteDbExplorer.Framework.Shell;
+using LiteDbExplorer.Wpf.Framework.Shell;
 
 namespace LiteDbExplorer.Modules.Main
 {

@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Data;
 using Caliburn.Micro;
-using LiteDbExplorer.Framework.Shell;
+using LiteDbExplorer.Wpf.Framework.Shell;
 
 namespace LiteDbExplorer.Modules.Shared
 {

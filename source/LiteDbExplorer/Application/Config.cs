@@ -1,8 +1,8 @@
-﻿using NLog;
-using NLog.Config;
-using NLog.Targets;
-using System.Configuration;
+﻿using System.Configuration;
 using System.IO;
+using Caliburn.Micro;
+using LiteDbExplorer.Wpf.Modules.Output;
+using Serilog;
 
 namespace LiteDbExplorer
 {
@@ -22,35 +22,24 @@ namespace LiteDbExplorer
 
         public static void ConfigureLogger()
         {
-            var config = new LoggingConfiguration();
+            var log = new LoggerConfiguration()
+                .MinimumLevel.Debug();
+
 #if DEBUG
-            var consoleTarget = new ColoredConsoleTarget()
-            {
-                Layout = @"${logger}:${message}${exception}"
-            };
-
-            config.AddTarget("console", consoleTarget);
-
-            var rule1 = new LoggingRule("*", LogLevel.Debug, consoleTarget);
-            config.LoggingRules.Add(rule1);
+            log.WriteTo.Console();
 #endif
-            var fileTarget = new FileTarget()
-            {
-                FileName = Path.Combine(Paths.AppDataPath, "explorer.log"),
-                Layout = "${longdate}|${level:uppercase=true}:${message}${exception:format=toString}",
-                KeepFileOpen = false,
-                ArchiveFileName = Path.Combine(Paths.AppDataPath, "explorer.{#####}.log"),
-                ArchiveAboveSize = 4096000,
-                ArchiveNumbering = ArchiveNumberingMode.Sequence,
-                MaxArchiveFiles = 2
-            };
+            log.WriteTo.File(
+                    Paths.ErrorLogsFilePath,
+                    fileSizeLimitBytes: 4096000,
+                    rollingInterval: RollingInterval.Month,
+                    retainedFileCountLimit: 2,
+                    restrictedToMinimumLevel: Serilog.Events.LogEventLevel.Error
+            );
 
-            config.AddTarget("file", fileTarget);
+            // TODO: Lazy
+            log.WriteTo.OutputModule(() => IoC.Get<IOutput>(), () => IoC.Get<IOutputLogFilter>());
 
-            var rule2 = new LoggingRule("*", LogLevel.Debug, fileTarget);
-            config.LoggingRules.Add(rule2);
-
-            LogManager.Configuration = config;
+            Log.Logger = log.CreateLogger();
         }
     }
 }

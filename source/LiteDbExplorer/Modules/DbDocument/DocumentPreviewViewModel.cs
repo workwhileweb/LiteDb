@@ -4,17 +4,32 @@ using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
-using LiteDbExplorer.Modules.Main;
 using LiteDB;
 using LiteDbExplorer.Modules.Shared;
+using LiteDbExplorer.Wpf.Framework;
+using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
 
 namespace LiteDbExplorer.Modules.DbDocument
 {
+
+    public class DocumentReferencePayload : IReferenceId
+    {
+        public DocumentReferencePayload(DocumentReference documentReference)
+        {
+            InstanceId = documentReference.InstanceId;
+            DocumentReference = documentReference;
+        }
+
+        public string InstanceId { get; }
+
+        public DocumentReference DocumentReference { get; }
+    }
+
     [Export(typeof(IDocumentPreview))]
     [Export(typeof(DocumentPreviewViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DocumentPreviewViewModel : Document<DocumentReference>, IDocumentPreview
+    public class DocumentPreviewViewModel : Document<DocumentReferencePayload>, IDocumentPreview
     {
         private DocumentReference _document;
         private IDocumentDetailView _view;
@@ -66,10 +81,10 @@ namespace LiteDbExplorer.Modules.DbDocument
 
         public RelayCommand OpenAsDocumentCommand { get; set; }
         
-        public override void Init(DocumentReference item)
+        public override void Init(DocumentReferencePayload item)
         {
             IsDocumentView = true;
-            ActivateDocument(item);
+            ActivateDocument(item.DocumentReference);
         }
 
         public void ActivateDocument(DocumentReference document)
@@ -105,7 +120,7 @@ namespace LiteDbExplorer.Modules.DbDocument
         [UsedImplicitly]
         public void OpenAsDocument(object _)
         {
-            IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReference>(Document);
+            IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReferencePayload>(new DocumentReferencePayload(Document));
         }
 
         protected override void OnViewLoaded(object view)

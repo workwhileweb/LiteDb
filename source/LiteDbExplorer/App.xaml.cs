@@ -1,6 +1,4 @@
-﻿using NLog;
-using NLog.Targets;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -13,6 +11,7 @@ using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Presentation;
 using Microsoft.WindowsAPICodePack.Taskbar;
+using Serilog;
 using JumpList = System.Windows.Shell.JumpList;
 
 namespace LiteDbExplorer
@@ -22,7 +21,6 @@ namespace LiteDbExplorer
     /// </summary>
     public partial class App : Application
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         private readonly string _instanceMuxet = "LiteDBExplorerInstaceMutex";
         private Mutex _appMutex;
         private bool _errorNotified;
@@ -33,10 +31,10 @@ namespace LiteDbExplorer
 
         public App()
         {
+            Config.ConfigureLogger();
+
             AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
             DispatcherUnhandledException += OnDispatcherUnhandledException;
-
-            Config.ConfigureLogger();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -53,7 +51,7 @@ namespace LiteDbExplorer
 
                 if (e.Args.Any())
                 {
-                    client.InvokeCommand(CmdlineCommands.Open, e.Args[0]);
+                    client.InvokeCommand(AppConstants.CmdlineCommands.Open, e.Args[0]);
                     Shutdown();
                     return;
                 }
@@ -144,13 +142,14 @@ namespace LiteDbExplorer
 
         private void OnCurrentDomainUnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            var log = LogManager.Configuration.FindTargetByName("file") as FileTarget;
-            Logger.Error((Exception) e.ExceptionObject, "Unhandled exception: ");
+            Log.Error((Exception) e.ExceptionObject, "Unhandled exception: ");
 
             var message = "Unhandled exception occured.\n";
-            if (log != null)
+            
+            var lastErrorLogPath = Paths.GetLastErrorLogPath();
+            if (lastErrorLogPath.HasValue)
             {
-                message += $"\nAdditional information written into: {log.FileName}.\n";
+                message += $"\nAdditional information written into: {lastErrorLogPath.Value}.\n";
             }
 
             if (e.IsTerminating)
@@ -170,19 +169,21 @@ namespace LiteDbExplorer
 
             if (e.IsTerminating)
             {
+                Log.CloseAndFlush();
                 Process.GetCurrentProcess().Kill();
             }
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            var log = LogManager.Configuration.FindTargetByName("file") as FileTarget;
-            Logger.Error(e.Exception, "An unhandled exception occurred");
+            Log.Error(e.Exception, "An unhandled exception occurred");
 
             var message = "Unhandled exception occured.\n";
-            if (log != null)
+
+            var lastErrorLogPath = Paths.GetLastErrorLogPath();
+            if (lastErrorLogPath.HasValue)
             {
-                message += $"\nAdditional information written into: {log.FileName}.\n";
+                message += $"\nAdditional information written into: {lastErrorLogPath.Value}.\n";
             }
 
             if (!e.Handled)

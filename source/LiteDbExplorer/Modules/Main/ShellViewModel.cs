@@ -4,10 +4,10 @@ using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
 using Caliburn.Micro;
-using LiteDbExplorer.Framework;
-using LiteDbExplorer.Framework.Shell;
 using LiteDbExplorer.Modules.Diagnostics;
 using LiteDbExplorer.Modules.Shared;
+using LiteDbExplorer.Wpf.Framework.Shell;
+using LiteDbExplorer.Wpf.Modules.Output;
 
 namespace LiteDbExplorer.Modules.Main
 {
@@ -29,6 +29,8 @@ namespace LiteDbExplorer.Modules.Main
 
             MainContent = IoC.Get<IDocumentSet>();
 
+            BottomToolPanels = IoC.Get<IToolPanelSet>();
+
             MainContent.ActiveDocumentChanged += MainContentOnActiveDocumentChanged;
 
             Properties.Settings.Default.PropertyChanged += OnSettingsPropertyChanged;
@@ -40,9 +42,11 @@ namespace LiteDbExplorer.Modules.Main
 
         public object LeftContent { get; }
 
-        public IShellStatusBar StatusBarContent { get; set; }
+        public IShellStatusBar StatusBarContent { get; }
 
         public IDocumentSet MainContent { get; }
+
+        public IToolPanelSet BottomToolPanels { get; }
 
         protected override void OnViewReady(object view)
         {
@@ -53,12 +57,12 @@ namespace LiteDbExplorer.Modules.Main
                     var arg = Application.Current.Properties["ArbitraryArgName"].ToString();
                     switch (arg)
                     {
-                        case CmdlineCommands.New:
+                        case AppConstants.CmdlineCommands.New:
                         {
                             IoC.Get<IDatabaseInteractions>().CreateAndOpenDatabase().Wait();
                             break;
                         }
-                        case CmdlineCommands.Open:
+                        case AppConstants.CmdlineCommands.Open:
                         {
                             IoC.Get<IDatabaseInteractions>().OpenDatabase().Wait();
                             break;
@@ -86,6 +90,8 @@ namespace LiteDbExplorer.Modules.Main
             {
                 StatusBarContent.ActivateContent(new MemoryUsageStatusButton().Start(), StatusBarContentLocation.Right);
             }
+
+            BottomToolPanels.ActivateItem(IoC.Get<IOutput>());
         }
 
         private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)

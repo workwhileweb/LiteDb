@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="LiteDbExplorer.Wpf.Modules.Output.UI.OutputView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:LiteDbExplorer.Wpf.Modules.Output.UI"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:controls="clr-namespace:LiteDbExplorer.Wpf.Controls"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <Style TargetType="{x:Type TextBlock}">
+            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundColorBrush}"/>
+        </Style>
+    </UserControl.Resources>
+    <DockPanel LastChildFill="True">
+        <controls:ToolDockPanel DockPanel.Dock="Top" ToolBarTray.IsLocked="True" Padding="6,0,0,2" 
+                                Style="{StaticResource ToolDockPanelCompact}">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Show output from: " VerticalAlignment="Center" Margin="0,0,2,0"/>
+                <ComboBox x:Name="OutputSource" DisplayMemberPath="Value" SelectedValuePath="Key" 
+                          SelectedValue="{Binding SelectedOutputSource, Mode=TwoWay}"
+                          VerticalAlignment="Center" MinWidth="160"></ComboBox>
+            </StackPanel>
+            <Separator/>
+            <Button ToolTip="Clear All" x:Name="clearAll"
+                    cal:Message.Attach="[Event Click] = [Action Clear()]" Padding="0">
+                <materialDesign:PackIcon Kind="PlaylistRemove" Height="24" Width="24"/>
+            </Button>
+            <Separator/>
+            <ToggleButton x:Name="toggleWordWrap">
+                <materialDesign:PackIcon Kind="Wrap" />
+            </ToggleButton>
+            <Border />
+        </controls:ToolDockPanel>
+
+        <FlowDocumentScrollViewer x:Name="outputText"
+                 Background="Transparent"
+                 VerticalAlignment="Stretch"
+                 HorizontalAlignment="Stretch"
+                 FontFamily="Consolas"
+                 BorderThickness="0"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto" 
+                 ContextMenu="{StaticResource TextBoxContextMenu}">
+            <FlowDocumentScrollViewer.Resources>
+                <Style TargetType="Run">
+                    <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundColorBrush}"/>
+                </Style>
+            </FlowDocumentScrollViewer.Resources>
+        </FlowDocumentScrollViewer>
+    </DockPanel>
+</UserControl>

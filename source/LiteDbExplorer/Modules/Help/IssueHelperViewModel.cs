@@ -45,7 +45,7 @@ namespace LiteDbExplorer.Modules.Help
 
             FormModel = new IssueFormModel
             {
-                AppVersion = Versions.CurrentVersion.ToString()
+                AppVersion = AppConstants.Versions.CurrentVersion.ToString()
             };
 
             GoToPreviewCommand = new RelayCommand(GoToPreview);

@@ -47,13 +47,19 @@ namespace LiteDbExplorer.Controls
             jsonEditor.TextArea.IndentationStrategy = new DefaultIndentationStrategy();
             jsonEditor.TextArea.TextView.ElementGenerators.Add(new TruncateLongLines(LineMaxLength));
 
-            SetTheme();
-            
-            ThemeManager.CurrentThemeChanged += (sender, args) => { SetTheme(); };
-            
             CommandBindings.Add(new CommandBinding(Commands.FindNext, (sender, e) => _searchReplacePanel.FindNext(), CanExecuteWithOpenSearchPanel));
             CommandBindings.Add(new CommandBinding(Commands.FindPrevious, (sender, e) => _searchReplacePanel.FindPrevious(), CanExecuteWithOpenSearchPanel));
 
+            SetTheme();
+            
+            Loaded += (sender, args) => ThemeManager.CurrentThemeChanged += ThemeManagerOnCurrentThemeChanged;
+            Unloaded += (sender, args) => ThemeManager.CurrentThemeChanged -= ThemeManagerOnCurrentThemeChanged;
+
+        }
+
+        private void ThemeManagerOnCurrentThemeChanged(object sender, EventArgs e)
+        {
+            SetTheme();
         }
 
         public static readonly DependencyProperty DocumentSourceProperty = DependencyProperty.Register(

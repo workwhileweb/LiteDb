@@ -9,8 +9,9 @@ using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Help;
-using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
+using LiteDbExplorer.Wpf.Framework;
+using LiteDbExplorer.Wpf.Framework.Shell;
 using LiteDbExplorer.Wpf.Modules.Exception;
 using MaterialDesignThemes.Wpf;
 
@@ -193,7 +194,7 @@ namespace LiteDbExplorer.Modules.DbQuery
         }
     }
 
-    public class RunQueryContext : IReferenceNode
+    public class RunQueryContext : IReferenceId
     {
         private RunQueryContext()
         {

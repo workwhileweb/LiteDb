@@ -3,9 +3,9 @@ using System.ComponentModel;
 using System.Windows.Input;
 using System.Windows.Media;
 using Caliburn.Micro;
-using LiteDbExplorer.Wpf.Framework;
+using LiteDbExplorer.Framework;
 
-namespace LiteDbExplorer.Framework
+namespace LiteDbExplorer.Wpf.Framework.Shell
 {
     public abstract class Document : LayoutItemBase, IDocument
     {
@@ -33,14 +33,14 @@ namespace LiteDbExplorer.Framework
         public event EventHandler<EventArgs> UpdateGroupDisplayRequest;
     }
 
-    public abstract class Document<T> : Document, IDocument<T> where T : IReferenceNode
+    public abstract class Document<T> : Document, IDocument<T> where T : IReferenceId
     {
         public virtual string InstanceId { get; protected set; }
 
         public abstract void Init(T item);
     }
 
-    public abstract class DocumentWithConductor<T> : Conductor<IScreen>.Collection.OneActive, IDocument<T> where T : IReferenceNode
+    public abstract class DocumentWithConductor<T> : Conductor<IScreen>.Collection.OneActive, IDocument<T> where T : IReferenceId
     {
         [Browsable(false)]
         public Guid Id { get; } = Guid.NewGuid();

@@ -4,7 +4,6 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Security;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,16 +14,30 @@ using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbDocument;
-using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
+using LiteDbExplorer.Wpf.Framework;
+using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
-using Action = System.Action;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
+
+    public class CollectionReferencePayload : IReferenceId
+    {
+        public CollectionReferencePayload(CollectionReference collectionReference)
+        {
+            InstanceId = collectionReference.InstanceId;
+            CollectionReference = collectionReference;
+        }
+
+        public string InstanceId { get; }
+        public CollectionReference CollectionReference { get; }
+
+    }
+
     [Export(typeof(CollectionExplorerViewModel))]
     [PartCreationPolicy (CreationPolicy.NonShared)]
-    public class CollectionExplorerViewModel : Document<CollectionReference>
+    public class CollectionExplorerViewModel : Document<CollectionReferencePayload>
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IApplicationInteraction _applicationInteraction;
@@ -187,7 +200,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
 
-        public override void Init(CollectionReference value)
+        public override void Init(CollectionReferencePayload value)
         {
             if (value == null)
             {
@@ -197,17 +210,19 @@ namespace LiteDbExplorer.Modules.DbCollection
 
             InstanceId = value.InstanceId;
 
-            DisplayName = value.Name;
+            var collectionReference = value.CollectionReference;
 
-            if (value.Database != null)
+            DisplayName = collectionReference.Name;
+
+            if (collectionReference.Database != null)
             {
-                GroupId = value.Database.InstanceId;
-                GroupDisplayName = value.Database.Name;
+                GroupId = collectionReference.Database.InstanceId;
+                GroupDisplayName = collectionReference.Database.Name;
             }
             
-            IconContent = value is FileCollectionReference ? new PackIcon { Kind = PackIconKind.FileMultiple } : new PackIcon { Kind = PackIconKind.TableLarge, Height = 16 };
+            IconContent = collectionReference is FileCollectionReference ? new PackIcon { Kind = PackIconKind.FileMultiple } : new PackIcon { Kind = PackIconKind.TableLarge, Height = 16 };
             
-            CollectionReference = value;
+            CollectionReference = collectionReference;
         }
 
         protected override void OnViewLoaded(object view)
@@ -283,7 +298,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                     await _databaseInteractions.OpenEditDocument(documentReference);
                     break;
                 case CollectionItemDoubleClickAction.OpenPreview:
-                    await IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReference>(documentReference);
+                    await IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReferencePayload>(new DocumentReferencePayload(documentReference));
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

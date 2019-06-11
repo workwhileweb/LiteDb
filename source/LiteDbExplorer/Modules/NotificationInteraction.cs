@@ -4,8 +4,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using Enterwell.Clients.Wpf.Notifications;
-using LiteDbExplorer.Controls;
-using MaterialDesignThemes.Wpf;
 
 namespace LiteDbExplorer.Modules
 {

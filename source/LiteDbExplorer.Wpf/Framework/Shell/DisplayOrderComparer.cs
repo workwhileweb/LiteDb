@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LiteDbExplorer.Framework.Shell
+namespace LiteDbExplorer.Wpf.Framework.Shell
 {
     public class DisplayOrderComparer : IComparer<IHaveDisplayOrder>
     {

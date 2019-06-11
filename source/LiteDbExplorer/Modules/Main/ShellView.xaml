@@ -3,8 +3,6 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:local="clr-namespace:LiteDbExplorer.Modules.Main"
-    xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
     xmlns:cal="http://www.caliburnproject.org"
     xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
     xmlns:enterwell="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
@@ -30,34 +28,30 @@
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="3.5*" />
             </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="0"/>
+            </Grid.RowDefinitions>
 
-            <Border Grid.Column="0" Grid.Row="0">
+            <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3">
                 <ContentControl x:Name="LeftContent" cal:View.Model="{Binding LeftContent}" />
             </Border>
 
-            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" />
+            <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" Grid.Row="0" Grid.RowSpan="3" />
 
             <ContentControl Grid.Column="2" Grid.Row="0" x:Name="MainContent" cal:View.Model="{Binding MainContent}" />
 
-            <Grid Grid.Column="0" Grid.ColumnSpan="3">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="3*" MaxWidth="600" MinWidth="450"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <!--<enterwell:NotificationMessageContainer Grid.Column="1" 
+            <GridSplitter Grid.Row="1" Grid.Column="2" Height="5" ResizeDirection="Rows"
+                          HorizontalAlignment="Stretch" Background="Transparent" Margin="0,-5,0,0"/>
+
+            <ContentControl Grid.Column="2" Grid.Row="2" x:Name="BottomToolPanels" cal:View.Model="{Binding BottomToolPanels}" />
+
+            <Canvas Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="3">
+                <enterwell:NotificationMessageContainer Canvas.Right="0" Canvas.Bottom="0"
                                                         x:Name="notificationMessageContainer" 
-                                                        Manager="{Binding Path=Manager, Source={StaticResource NotificationInteractionProxy}}"/>-->
-
-                <Canvas Grid.Column="0" Grid.ColumnSpan="3">
-                    <!--<Rectangle Canvas.Right="5" Canvas.Bottom="5" Panel.ZIndex="2" Fill="Yellow" Width="120" Height="30" />-->
-
-                    <enterwell:NotificationMessageContainer Canvas.Right="0" Canvas.Bottom="0"
-                                                            x:Name="notificationMessageContainer" 
-                                                            Manager="{Binding Path=Manager, Source={StaticResource NotificationInteractionProxy}}"/>
-                </Canvas>
-
-            </Grid>
+                                                        Manager="{Binding Path=Manager, Source={StaticResource NotificationInteractionProxy}}"/>
+            </Canvas>
 
         </Grid>
 

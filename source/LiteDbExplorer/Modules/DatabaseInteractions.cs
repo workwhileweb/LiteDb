@@ -13,7 +13,7 @@ using LiteDB;
 using LiteDbExplorer.Core.Events;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
-using LogManager = NLog.LogManager;
+using Serilog;
 
 namespace LiteDbExplorer.Modules
 {
@@ -47,7 +47,7 @@ namespace LiteDbExplorer.Modules
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IApplicationInteraction _applicationInteraction;
-        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = Log.ForContext<DatabaseInteractions>();
 
         [ImportingConstructor]
         public DatabaseInteractions(
@@ -129,6 +129,8 @@ namespace LiteDbExplorer.Modules
                 return;
             }
             
+            Logger.Information("Open database {path}", path);
+
             try
             {
                 if (DatabaseReference.IsDbPasswordProtected(path) && 
@@ -560,7 +562,7 @@ namespace LiteDbExplorer.Modules
             catch (Exception e)
             {
                 var message = "Failed to import document from text content: " + e.Message;
-                Logger.Warn(e, "Cannot process clipboard data.");
+                Logger.Warning(e, "Cannot process clipboard data.");
                 _applicationInteraction.ShowError(e, message, "Import Error");
 
                 return Task.FromResult(Result.Fail<CollectionDocumentChangeEventArgs>(message));

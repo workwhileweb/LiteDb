@@ -103,7 +103,7 @@ namespace LiteDbExplorer.Modules
             }
 
             var documentSet = IoC.Get<IDocumentSet>();
-            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReference>(collection);
+            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReferencePayload>(new CollectionReferencePayload(collection));
             if (vm != null)
             {
                 vm.SelectedDocument = selectedDocuments?.FirstOrDefault();
@@ -120,7 +120,7 @@ namespace LiteDbExplorer.Modules
             }
 
             var documentSet = IoC.Get<IDocumentSet>();
-            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReference>(document.Collection);
+            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReferencePayload>(new CollectionReferencePayload(document.Collection));
             if (vm != null)
             {
                 vm.SelectedDocument = document;

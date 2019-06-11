@@ -1,9 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Media;
-using LiteDbExplorer.Wpf.Framework;
 
-namespace LiteDbExplorer.Framework
+namespace LiteDbExplorer.Wpf.Framework.Shell
 {
     public enum GroupDisplayVisibility
     {
@@ -32,7 +30,7 @@ namespace LiteDbExplorer.Framework
 
     }
 
-    public interface IDocument<in T> : IReferenceNode, IDocument where T : IReferenceNode
+    public interface IDocument<in T> : IReferenceId, IDocument where T : IReferenceId
     {
         void Init(T item);
     }

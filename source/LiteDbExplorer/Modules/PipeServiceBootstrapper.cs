@@ -2,7 +2,7 @@
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
-using NLog;
+using Serilog;
 
 namespace LiteDbExplorer.Modules
 {
@@ -11,9 +11,9 @@ namespace LiteDbExplorer.Modules
     public class PipeServiceBootstrapper
     {
         private readonly IDatabaseInteractions _databaseInteractions;
-        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = Log.ForContext<PipeServiceBootstrapper>();
 
-        private static readonly string[] _commands = {CmdlineCommands.Open, CmdlineCommands.New, CmdlineCommands.Focus};
+        private static readonly string[] _commands = {AppConstants.CmdlineCommands.Open, AppConstants.CmdlineCommands.New, AppConstants.CmdlineCommands.Focus};
 
         private PipeService _pipeService;
         private PipeServer _pipeServer;
@@ -36,31 +36,31 @@ namespace LiteDbExplorer.Modules
                 var args = Environment.GetCommandLineArgs();
                 if (args.Length > 1 && !_commands.Contains(args[1], StringComparer.OrdinalIgnoreCase))
                 {
-                    PipeService_CommandExecuted(this, new CommandExecutedEventArgs(CmdlineCommands.Open, args[1]));
+                    PipeService_CommandExecuted(this, new CommandExecutedEventArgs(AppConstants.CmdlineCommands.Open, args[1]));
                 }
             }
         }
 
         private void PipeService_CommandExecuted(object sender, CommandExecutedEventArgs args)
         {
-            Logger.Info(@"Executing command ""{0}"" from pipe with arguments ""{1}""", args.Command, args.Args);
+            Logger.Information(@"Executing command {Command} from pipe with arguments {@Args}", args.Command, args.Args);
 
             switch (args.Command)
             {
-                case CmdlineCommands.Focus:
+                case AppConstants.CmdlineCommands.Focus:
                 {
                     RestoreWindow();
                     break;
                 }
 
-                case CmdlineCommands.New:
+                case AppConstants.CmdlineCommands.New:
                 {
                     _databaseInteractions.CreateAndOpenDatabase().Wait();
                     RestoreWindow();
                     break;
                 }
 
-                case CmdlineCommands.Open:
+                case AppConstants.CmdlineCommands.Open:
                 {
                     if (!string.IsNullOrEmpty(args.Args))
                     {
@@ -88,7 +88,7 @@ namespace LiteDbExplorer.Modules
 
                 default:
                 {
-                    Logger.Warn("Unknown command received");
+                    Logger.Warning("Unknown command received");
                     break;
                 }
             }

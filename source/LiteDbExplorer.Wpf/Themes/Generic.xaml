@@ -2,7 +2,6 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:LiteDbExplorer.Controls">
 
-
     <!-- MahApps Brushes -->
     <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource Primary700}" />
     <SolidColorBrush x:Key="AccentBaseColorBrush" Color="{DynamicResource Primary600}" />
@@ -28,6 +27,7 @@
                      Color="{DynamicResource Primary400}" />
     <SolidColorBrush x:Key="MahApps.Metro.Brushes.ToggleSwitchButton.ThumbIndicatorCheckedBrush.Win10"
                      Color="{DynamicResource Primary500Foreground}" />
+
 
     <Style TargetType="controls:ExceptionViewer">
         <Setter Property="ControlsBorderBrush" Value="{DynamicResource MaterialDesignDivider}" />

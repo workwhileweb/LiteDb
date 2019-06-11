@@ -8,8 +8,9 @@ using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using Humanizer;
 using LiteDbExplorer.Framework;
-using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
+using LiteDbExplorer.Wpf.Framework;
+using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
 
 namespace LiteDbExplorer.Modules.Help
@@ -68,7 +69,7 @@ namespace LiteDbExplorer.Modules.Help
         }
     }
 
-    public interface IMarkdownDocContext : IReferenceNode
+    public interface IMarkdownDocContext : IReferenceId
     {
         string Title { get; }
         string RootUrl { get; }

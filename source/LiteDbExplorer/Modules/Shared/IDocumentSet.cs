@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using LiteDbExplorer.Framework;
+using LiteDbExplorer.Wpf.Framework;
+using LiteDbExplorer.Wpf.Framework.Shell;
 
 namespace LiteDbExplorer.Modules.Shared
 {
@@ -14,11 +15,11 @@ namespace LiteDbExplorer.Modules.Shared
         void CloseDocument(IDocument document);
         void ActivateItem(IDocument item);
         void DeactivateItem(IDocument item, bool close);
-        Task OpenDocument<TDoc>() where TDoc : IDocument;
+        Task OpenDocument<TDocument>() where TDocument : IDocument;
 
-        Task<TDoc> OpenDocument<TDoc, TNode>(TDoc model, TNode init)
-            where TDoc : IDocument<TNode> where TNode : IReferenceNode;
-        Task<TDoc> OpenDocument<TDoc, TNode>(TNode init) where TDoc : IDocument<TNode> where TNode : IReferenceNode;
+        Task<TDocument> OpenDocument<TDocument, TReferenceId>(TDocument document, TReferenceId initPayload) where TDocument : IDocument<TReferenceId> where TReferenceId : IReferenceId;
+
+        Task<TDocument> OpenDocument<TDocument, TReferenceId>(TReferenceId initPayload) where TDocument : IDocument<TReferenceId> where TReferenceId : IReferenceId;
         
         event EventHandler ActiveDocumentChanging;
         event EventHandler ActiveDocumentChanged;

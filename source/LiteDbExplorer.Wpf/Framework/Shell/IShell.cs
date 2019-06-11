@@ -1,6 +1,6 @@
 ﻿using Caliburn.Micro;
 
-namespace LiteDbExplorer.Framework.Shell
+namespace LiteDbExplorer.Wpf.Framework.Shell
 {
     public interface IShell : IGuardClose, IDeactivate
     {

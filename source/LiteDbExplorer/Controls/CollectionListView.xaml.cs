@@ -74,6 +74,15 @@ namespace LiteDbExplorer.Controls
             ListCollectionData.SelectionChanged += OnListViewSelectionChanged;
             ListCollectionData.Loaded += ListCollectionDataOnLoaded;
 
+            Unloaded += (sender, args) =>
+            {
+                ListCollectionData.MouseDoubleClick -= ListCollectionDataOnMouseDoubleClick;
+                ListCollectionData.SelectionChanged -= OnListViewSelectionChanged;
+                ListCollectionData.Loaded -= ListCollectionDataOnLoaded;
+
+                CollectionReference = null;
+            };
+
             ListCollectionData.SetBinding(Selector.SelectedItemProperty, new Binding
             {
                 Source = this,

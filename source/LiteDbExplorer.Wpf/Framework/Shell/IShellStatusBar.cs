@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace LiteDbExplorer.Framework.Shell
+namespace LiteDbExplorer.Wpf.Framework.Shell
 {
     public interface IShellStatusBar : INotifyPropertyChanged
     {

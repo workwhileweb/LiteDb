@@ -4,13 +4,13 @@ using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
 using LiteDbExplorer.Framework.Services;
-using LogManager = NLog.LogManager;
+using Serilog;
 
 namespace LiteDbExplorer.Modules
 {
     public class DefaultCommandsHandler : ApplicationCommandHandler
     {
-        private static readonly NLog.Logger Logger = LogManager.GetCurrentClassLogger();
+        private static readonly ILogger Logger = Log.ForContext<DefaultCommandsHandler>();
 
         private readonly IDatabaseInteractions _databaseInteractions;
         private readonly IApplicationInteraction _applicationInteraction;
