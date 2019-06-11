@@ -111,12 +111,12 @@
 
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" />
 
-        <TabControl Grid.Row="3" x:Name="Items" Padding="0" Margin="0">
+        <TabControl Grid.Row="3" x:Name="Items" Padding="0" Margin="0"
+                    mah:TabControlHelper.Underlined="SelectedTabItem">
             <TabControl.Resources>
                 <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
-                    <Setter Property="mah:ControlsHelper.HeaderFontSize" Value="15" />
-                    <Setter Property="mah:TabControlHelper.Underlined" Value="None"/>
-                    <Setter Property="Padding" Value="15,10"/>
+                    <Setter Property="mah:ControlsHelper.HeaderFontSize" Value="14" />
+                    <Setter Property="Padding" Value="15,6"/>
                     <Setter Property="MinWidth" Value="80"/>
                 </Style>
             </TabControl.Resources>

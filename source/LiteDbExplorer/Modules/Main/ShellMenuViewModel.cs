@@ -18,16 +18,19 @@ namespace LiteDbExplorer.Modules.Main
         private readonly IDatabaseInteractions _databaseInteractions;
         private readonly IWindowManager _windowManager;
         private readonly IApplicationInteraction _applicationInteraction;
+        private readonly IEventAggregator _eventAggregator;
 
         [ImportingConstructor]
         public ShellMenuViewModel(
             IDatabaseInteractions databaseInteractions,
             IWindowManager windowManager,
-            IApplicationInteraction applicationInteraction)
+            IApplicationInteraction applicationInteraction,
+            IEventAggregator eventAggregator)
         {
             _databaseInteractions = databaseInteractions;
             _windowManager = windowManager;
             _applicationInteraction = applicationInteraction;
+            _eventAggregator = eventAggregator;
 
             PathDefinitions = databaseInteractions.PathDefinitions;
         }
@@ -80,6 +83,12 @@ namespace LiteDbExplorer.Modules.Main
         public void ShowReleaseNotes()
         {
             _applicationInteraction.ShowReleaseNotes();
+        }
+
+        [UsedImplicitly]
+        public void OpenOutput()
+        {
+            _eventAggregator.BeginPublishOnUIThread(new ToolSetPanelActionRequest(ToolSetPanelAction.Open));
         }
     }
 }

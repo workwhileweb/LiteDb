@@ -15,13 +15,13 @@
         </Style>
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
-        <controls:ToolDockPanel DockPanel.Dock="Top" ToolBarTray.IsLocked="True" Padding="6,0,0,2" 
+        <controls:ToolDockPanel DockPanel.Dock="Top" ToolBarTray.IsLocked="True" Padding="15,0" 
                                 Style="{StaticResource ToolDockPanelCompact}">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Show output from: " VerticalAlignment="Center" Margin="0,0,2,0"/>
                 <ComboBox x:Name="OutputSource" DisplayMemberPath="Value" SelectedValuePath="Key" 
                           SelectedValue="{Binding SelectedOutputSource, Mode=TwoWay}"
-                          VerticalAlignment="Center" MinWidth="160"></ComboBox>
+                          VerticalAlignment="Center" MinWidth="160"/>
             </StackPanel>
             <Separator/>
             <Button ToolTip="Clear All" x:Name="clearAll"

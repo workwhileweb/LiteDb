@@ -9,6 +9,7 @@ using LiteDbExplorer.Wpf.Framework.Shell;
 namespace LiteDbExplorer.Wpf.Modules.Output.UI
 {
     [Export(typeof(IOutput))]
+    [PartCreationPolicy(CreationPolicy.Shared)]
     public class OutputViewModel : ToolPanel, IOutput
     {
         private readonly StringBuilder _stringBuilder;
@@ -30,7 +31,7 @@ namespace LiteDbExplorer.Wpf.Modules.Output.UI
 
             OutputSource = new Dictionary<string, string>
             {
-                {"app_logger","Application log" }
+                {"app_logger","Application" }
             };
         }
 

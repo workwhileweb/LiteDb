@@ -13,10 +13,18 @@ namespace LiteDbExplorer.Modules.Main
 {
     [Export(typeof(IShell))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public sealed class ShellViewModel : Screen, IShell
+    public sealed class ShellViewModel : Screen, IShell, IHandle<ToolSetPanelActionRequest>
     {
-        public ShellViewModel()
+        private readonly IEventAggregator _eventAggregator;
+        private IOwnerViewModelMessageHandler _view;
+
+        [ImportingConstructor]
+        public ShellViewModel(IEventAggregator eventAggregator)
         {
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.Subscribe(this);
+
             DisplayName = "LiteDB Explorer";
 
             WindowMenu = IoC.Get<IShellMenu>();
@@ -48,8 +56,26 @@ namespace LiteDbExplorer.Modules.Main
 
         public IToolPanelSet BottomToolPanels { get; }
 
+        public void Handle(ToolSetPanelActionRequest message)
+        {
+            switch (message.Action)
+            {
+                case ToolSetPanelAction.Open:
+                    _view?.Handle("OpenToolSetPanel");
+                    break;
+                case ToolSetPanelAction.Close:
+                    _view?.Handle("CloseToolSetPanel");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+        }
+
         protected override void OnViewReady(object view)
         {
+            _view = view as IOwnerViewModelMessageHandler;
+
             try
             {
                 if (Application.Current.Properties["ArbitraryArgName"] != null)
@@ -117,5 +143,6 @@ namespace LiteDbExplorer.Modules.Main
                 await MainContent.OpenDocument<IStartupDocument>();
             }            
         }
+
     }
 }
