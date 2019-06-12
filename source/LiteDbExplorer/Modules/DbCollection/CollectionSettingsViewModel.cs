@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using System.Windows.Controls;
 using Caliburn.Micro;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Wpf.Controls;
 using LiteDbExplorer.Wpf.Modules.Settings;
 using PropertyTools.DataAnnotations;

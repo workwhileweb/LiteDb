@@ -4,28 +4,27 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
-using LiteDbExplorer.Core;
 using LiteDB;
+using Serilog;
 
-namespace LiteDbExplorer
+namespace LiteDbExplorer.Core
 {
-    public class DatabaseReference : ReferenceNode<DatabaseReference>, IDisposable
+    public sealed class DatabaseReference : ReferenceNode<DatabaseReference>
     {
-        private string _name;
-        private string _location;
+        private readonly bool _enableLog;
         private ObservableCollection<CollectionReference> _collections;
         private bool _isDisposing;
         private bool _beforeDisposeHandled;
 
-        public DatabaseReference(string path, string password)
+        public DatabaseReference(string path, string password, bool enableLog = false)
         {
+            _enableLog = enableLog;
             Location = path;
             Name = Path.GetFileName(path);
 
             LiteDatabase = string.IsNullOrEmpty(password)
-                ? new LiteDatabase(path)
-                : new LiteDatabase($"Filename={path};Password={password}");
+                ? new LiteDatabase(path, log: GetLogger())
+                : new LiteDatabase($"Filename={path};Password={password}", log: GetLogger());
 
             UpdateCollections();
 
@@ -34,37 +33,18 @@ namespace LiteDbExplorer
         
         public LiteDatabase LiteDatabase { get; }
 
-        public string Name
-        {
-            get => _name;
-            set
-            {
-                if (value == _name) return;
-                OnPropertyChanging();
-                _name = value;
-                OnPropertyChanged();
-            }
-        }
+        public string Name { get; set; }
 
-        public string Location
-        {
-            get => _location;
-            set
-            {
-                if (value == _location) return;
-                OnPropertyChanging();
-                _location = value;
-                OnPropertyChanged();
-            }
-        }
-        
+        public string Location { get; set; }
+
+        public ObservableCollection<CollectionReferenceLookup> CollectionsLookup { get; private set; }
+
         public ObservableCollection<CollectionReference> Collections
         {
             get => _collections;
             set
             {
                 OnPropertyChanging();
-
                 if (_collections != null)
                 {
                     _collections.CollectionChanged -= OnCollectionChanged;
@@ -129,10 +109,10 @@ namespace LiteDbExplorer
 
             _beforeDisposeHandled = true;
 
-            BroadcastChanges(ReferenceNodeChangeAction.Remove, this);
+            BroadcastChanges(ReferenceNodeChangeAction.Dispose, this);
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
             if (_isDisposing)
             {
@@ -143,24 +123,48 @@ namespace LiteDbExplorer
 
             if (!_beforeDisposeHandled)
             {
-                BroadcastChanges(ReferenceNodeChangeAction.Remove, this);
+                BroadcastChanges(ReferenceNodeChangeAction.Dispose, this);
             }
             
             LiteDatabase.Dispose();
         }
-        
+
+        private Logger GetLogger()
+        {
+            if (_enableLog)
+            {
+                return new Logger(Logger.FULL, log =>
+                {
+                    Log.ForContext("DatabaseName", Name).Information(log);
+                });
+            }
+
+            return null;
+        }
+
         private void UpdateCollections()
         {
-            var collectionReferences = new ObservableCollection<CollectionReference>(
+            CollectionsLookup = new ObservableCollection<CollectionReferenceLookup>(
                 LiteDatabase.GetCollectionNames()
-                    .Where(a => a != @"_chunks")
-                    .OrderBy(a => a)
-                    .Select(a => a == @"_files" ? new FileCollectionReference(a, this) : new CollectionReference(a, this))
+                    .Where(name => name != @"_chunks")
+                    .OrderBy(name => name)
+                    .Select(name => new CollectionReferenceLookup(name))
             );
 
-            Collections = collectionReferences;
+            Collections = new ObservableCollection<CollectionReference>(MapCollectionReference(CollectionsLookup));
         }
-        
+
+        private IEnumerable<CollectionReference> MapCollectionReference(IEnumerable<CollectionReferenceLookup> lookups)
+        {
+            return lookups.Select(MapCollectionReference);
+        }
+
+        private CollectionReference MapCollectionReference(CollectionReferenceLookup lookup)
+        {
+            return lookup.Type == CollectionHandlerType.Files
+                ? new FileCollectionReference(lookup.Name, this)
+                : new CollectionReference(lookup.Name, this);
+        }
 
         public DocumentReference AddFile(string id, string path)
         {

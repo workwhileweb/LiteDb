@@ -20,7 +20,7 @@ namespace LiteDbExplorer.Modules.DbQuery
 
     [Export(typeof(QueryViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class QueryViewModel : DocumentWithConductor<RunQueryContext>
+    public class QueryViewModel : DocumentConductorOneActive<RunQueryContext>
     {
         private readonly IApplicationInteraction _applicationInteraction;
         private static int _queryRefCount = 0;

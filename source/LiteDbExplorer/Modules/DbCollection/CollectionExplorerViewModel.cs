@@ -18,6 +18,7 @@ using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
+using Serilog;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
@@ -37,7 +38,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
     [Export(typeof(CollectionExplorerViewModel))]
     [PartCreationPolicy (CreationPolicy.NonShared)]
-    public class CollectionExplorerViewModel : Document<CollectionReferencePayload>
+    public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IApplicationInteraction _applicationInteraction;
@@ -58,7 +59,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             _applicationInteraction = applicationInteraction;
             _databaseInteractions = databaseInteractions;
 
-            DocumentPreview = documentPreview;
+            ActiveItem = documentPreview;
             
             SplitOrientation = Properties.Settings.Default.CollectionExplorer_SplitOrientation;
             ShowDocumentPreview = Properties.Settings.Default.CollectionExplorer_ShowPreview;
@@ -143,7 +144,11 @@ namespace LiteDbExplorer.Modules.DbCollection
                 _selectedDocument = value;
                 if (_showDocumentPreview)
                 {
-                    DocumentPreview?.ActivateDocument(_selectedDocument);
+                    ActivateDocumentPreview();
+                }
+                else
+                {
+                    DeactivateDocumentPreview();
                 }
             }
         }
@@ -151,8 +156,6 @@ namespace LiteDbExplorer.Modules.DbCollection
         [UsedImplicitly]
         public IList<DocumentReference> SelectedDocuments { get; set; }
 
-        public IDocumentPreview DocumentPreview { get; private set; }
-        
         [UsedImplicitly]
         public bool IsFindOpen { get; private set; }
 
@@ -163,9 +166,13 @@ namespace LiteDbExplorer.Modules.DbCollection
             {
                 if (_showDocumentPreview == false && value)
                 {
-                    DocumentPreview?.ActivateDocument(_selectedDocument);
+                    ActivateDocumentPreview();
                 }
                 _showDocumentPreview = value;
+                if (_showDocumentPreview == false)
+                {
+                    DeactivateDocumentPreview();
+                }
             }
         }
 
@@ -208,6 +215,8 @@ namespace LiteDbExplorer.Modules.DbCollection
                 return;
             }
 
+            Log.Debug("Init. {ViewModelName}, ReferenceId {ReferenceId}", nameof(CollectionExplorerViewModel), value.InstanceId);
+
             InstanceId = value.InstanceId;
 
             var collectionReference = value.CollectionReference;
@@ -247,12 +256,25 @@ namespace LiteDbExplorer.Modules.DbCollection
         {
             if (close)
             {
-                DocumentPreview?.TryClose();
-                ShowDocumentPreview = false;
+                Log.Debug("Deactivate {ViewModelName}, ReferenceId {ReferenceId}", nameof(CollectionExplorerViewModel), InstanceId);
+
+                DeactivateItem(ActiveItem, true);
+
                 SelectedDocuments = null;
                 SelectedDocument = null;
                 CollectionReference = null;
             }
+        }
+
+        protected void ActivateDocumentPreview()
+        {
+            ActiveItem?.SetActiveDocument(_selectedDocument);
+            ActivateItem(ActiveItem);
+        }
+
+        protected void DeactivateDocumentPreview()
+        {
+            DeactivateItem(ActiveItem, false);
         }
         
         #region Handles

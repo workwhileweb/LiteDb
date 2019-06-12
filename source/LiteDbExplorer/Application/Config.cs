@@ -3,6 +3,7 @@ using System.IO;
 using Caliburn.Micro;
 using LiteDbExplorer.Wpf.Modules.Output;
 using Serilog;
+using Serilog.Events;
 
 namespace LiteDbExplorer
 {
@@ -37,7 +38,16 @@ namespace LiteDbExplorer
             );
 
             // TODO: Lazy
-            log.WriteTo.OutputModule(() => IoC.Get<IOutput>(), () => IoC.Get<IOutputLogFilter>());
+            log.WriteTo.OutputModule(
+                () => IoC.Get<IOutput>(),
+                () =>
+                {
+                    var outputLogFilter = IoC.Get<IOutputLogFilter>();
+#if DEBUG
+                    outputLogFilter.MinLogLevel = LogEventLevel.Debug;
+#endif
+                    return outputLogFilter;
+                });
 
             Log.Logger = log.CreateLogger();
         }

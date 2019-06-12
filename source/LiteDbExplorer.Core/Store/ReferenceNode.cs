@@ -1,41 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
-using LiteDbExplorer.Core;
+using PropertyChanging;
 
-namespace LiteDbExplorer
+namespace LiteDbExplorer.Core
 {
-    public class ReferenceChangedEventArgs<T> : EventArgs
-    {
-        public ReferenceChangedEventArgs(ReferenceNodeChangeAction action, T reference)
-        {
-            Action = action;
-            Reference = reference;
-        }
-
-        public ReferenceNodeChangeAction Action { get; }
-        public T Reference { get; }
-    }
-
-    public class CollectionReferenceChangedEventArgs<T> : EventArgs
-    {
-        public CollectionReferenceChangedEventArgs(ReferenceNodeChangeAction action, IEnumerable<T> items)
-        {
-            Action = action;
-            Items = items;
-        }
-
-        public ReferenceNodeChangeAction Action { get; }
-        public IEnumerable<T> Items { get; }
-    }
-
-    public abstract class ReferenceNode<T> : INotifyPropertyChanging, INotifyPropertyChanged, IReferenceNode
+    [ImplementPropertyChanging]
+    public abstract class ReferenceNode<T> : INotifyPropertyChanging, INotifyPropertyChanged, IReferenceNode, IDisposable
     {
         protected ReferenceNode()
         {
             InstanceId = Guid.NewGuid().ToString();
+
+            // Log.Debug("Ctor. {ReferenceType}, InstanceId {InstanceId}", GetType(), InstanceId);
         }
 
         public virtual string InstanceId { get; }
@@ -45,11 +23,26 @@ namespace LiteDbExplorer
             return InstanceId.Equals(reference?.InstanceId);
         }
 
+        public void Dispose()
+        {
+            // Log.Debug("Dispose {ReferenceType}, InstanceId {InstanceId}", GetType(), InstanceId);
+
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected abstract void Dispose(bool disposing);
+
         public event EventHandler<ReferenceChangedEventArgs<T>> ReferenceChanged;
         
         internal virtual void OnReferenceChanged(ReferenceNodeChangeAction action, T item)
         {
             OnReferenceChanged(new ReferenceChangedEventArgs<T>(action, item));
+            
+            if (action == ReferenceNodeChangeAction.Dispose)
+            {
+                Dispose();
+            }
         }
 
         protected virtual void OnReferenceChanged(ReferenceChangedEventArgs<T> e)
@@ -72,5 +65,6 @@ namespace LiteDbExplorer
         {
             PropertyChanging?.Invoke(this, new PropertyChangingEventArgs(name));
         }
+
     }
 }

@@ -14,12 +14,15 @@ namespace LiteDbExplorer.Wpf.Modules.Output
             get
             {
                 if (!_disableLog.HasValue)
+                {
                     _disableLog = Properties.Settings.Default.Output_DisableLog;
+                }
+
                 return _disableLog ?? false;
             }
         }
 
-        private LogEventLevel MinLogLevel
+        public LogEventLevel MinLogLevel
         {
             get
             {
@@ -30,6 +33,7 @@ namespace LiteDbExplorer.Wpf.Modules.Output
 
                 return _minLogLevel ?? LogEventLevel.Information;
             }
+            set => _minLogLevel = value;
         }
 
         public void InvalidateCache()

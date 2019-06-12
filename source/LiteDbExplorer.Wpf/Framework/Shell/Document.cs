@@ -40,7 +40,7 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
         public abstract void Init(T item);
     }
 
-    public abstract class DocumentWithConductor<T> : Conductor<IScreen>.Collection.OneActive, IDocument<T> where T : IReferenceId
+    public abstract class DocumentConductor<T, TItem> : Conductor<TItem>, IDocument<T> where T : IReferenceId where TItem : class, IScreen
     {
         [Browsable(false)]
         public Guid Id { get; } = Guid.NewGuid();
@@ -48,18 +48,8 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
         [Browsable(false)]
         public string ContentId => Id.ToString();
 
-        private bool _isSelected;
-
         [Browsable(false)]
-        public bool IsSelected
-        {
-            get => _isSelected;
-            set
-            {
-                _isSelected = value;
-                NotifyOfPropertyChange(() => IsSelected);
-            }
-        }
+        public bool IsSelected { get; set; }
 
         [Browsable(false)]
         public virtual bool ShouldReopenOnStart => false;
@@ -78,13 +68,57 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
 
         public virtual string InstanceId { get; protected set; }
 
+        private ICommand _closeCommand;
+        public virtual ICommand CloseCommand
+        {
+            get { return _closeCommand ?? (_closeCommand = new RelayCommand(p => TryClose(null), p => true)); }
+        }
+
         public abstract void Init(T item);
+
+        public void UpdateGroupDisplay()
+        {
+            UpdateGroupDisplayRequest?.Invoke(this, EventArgs.Empty);
+        }
+
+        public event EventHandler<EventArgs> UpdateGroupDisplayRequest;
+    }
+
+    public abstract class DocumentConductorOneActive<T> : Conductor<IScreen>.Collection.OneActive, IDocument<T> where T : IReferenceId
+    {
+        [Browsable(false)]
+        public Guid Id { get; } = Guid.NewGuid();
+
+        [Browsable(false)]
+        public string ContentId => Id.ToString();
+
+        [Browsable(false)]
+        public bool IsSelected { get; set; }
+
+        [Browsable(false)]
+        public virtual bool ShouldReopenOnStart => false;
+
+        public virtual object IconContent { get; set; }
+
+        public string GroupId { get; set; }
+
+        public string GroupDisplayName { get; set; }
+
+        public bool GroupDisplayNameIsVisible { get; set; }
+
+        public GroupDisplayVisibility GroupDisplayVisibility { get; set; } = GroupDisplayVisibility.Auto;
+
+        public SolidColorBrush GroupDisplayBackground { get; set; }
+
+        public virtual string InstanceId { get; protected set; }
 
         private ICommand _closeCommand;
         public virtual ICommand CloseCommand
         {
             get { return _closeCommand ?? (_closeCommand = new RelayCommand(p => TryClose(null), p => true)); }
         }
+
+        public abstract void Init(T item);
 
         public void UpdateGroupDisplay()
         {

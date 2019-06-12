@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Interactivity;
 using JetBrains.Annotations;
 using LiteDB;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Wpf.Behaviors;
 

@@ -3,6 +3,7 @@ using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDbExplorer.Windows;
 using LiteDB;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.Database
 {

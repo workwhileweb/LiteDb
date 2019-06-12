@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Wpf.Framework.Windows;
 using Newtonsoft.Json.Serialization;
 

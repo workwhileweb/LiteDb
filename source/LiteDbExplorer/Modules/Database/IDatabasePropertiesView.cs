@@ -1,4 +1,5 @@
 ﻿using Caliburn.Micro;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.Database
 {

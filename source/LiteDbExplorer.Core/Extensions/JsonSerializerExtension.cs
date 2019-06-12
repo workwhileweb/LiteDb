@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using LiteDB;
-using LiteDbExplorer.Core;
 
-namespace LiteDbExplorer.Extensions
+namespace LiteDbExplorer.Core
 {
     public static class JsonSerializerExtension
     {

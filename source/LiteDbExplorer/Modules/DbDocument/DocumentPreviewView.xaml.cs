@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.DbDocument
 {

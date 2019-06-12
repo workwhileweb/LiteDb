@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {

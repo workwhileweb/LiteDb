@@ -5,7 +5,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 
-namespace LiteDbExplorer
+namespace LiteDbExplorer.Core
 {
     public sealed class Store : INotifyPropertyChanged
     {

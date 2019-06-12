@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using LiteDB;
-using LiteDbExplorer.Extensions;
 
 namespace LiteDbExplorer.Core
 {

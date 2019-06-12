@@ -1,10 +1,7 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using LiteDB;
-using LiteDbExplorer.Core;
-using LiteDbExplorer.Extensions;
 
-namespace LiteDbExplorer
+namespace LiteDbExplorer.Core
 {
     public enum DocumentTypeFilter
     {
@@ -13,17 +10,8 @@ namespace LiteDbExplorer
         File = 1
     }
 
-    public enum DocumentType
+    public sealed class DocumentReference : ReferenceNode<DocumentReference>, IJsonSerializerProvider
     {
-        BsonDocument = 0,
-        File = 1
-    }
-
-    public class DocumentReference : ReferenceNode<DocumentReference>, IDisposable, IJsonSerializerProvider
-    {
-        private BsonDocument _liteDocument;
-        private CollectionReference _collection;
-
         public DocumentReference()
         {
         }
@@ -34,28 +22,10 @@ namespace LiteDbExplorer
             Collection = collection;
         }
 
-        public BsonDocument LiteDocument
-        {
-            get => _liteDocument;
-            set
-            {
-                OnPropertyChanging();
-                _liteDocument = value;
-                OnPropertyChanged();
-            }
-        }
+        public BsonDocument LiteDocument { get; set; }
 
-        public CollectionReference Collection
-        {
-            get => _collection;
-            set
-            {
-                OnPropertyChanging();
-                _collection = value;
-                OnPropertyChanged();
-            }
-        }
-        
+        public CollectionReference Collection { get; set; }
+
         public bool ContainsReference(CollectionReference collectionReference)
         {
             if (Collection == null)
@@ -71,7 +41,7 @@ namespace LiteDbExplorer
             Collection?.RemoveItem(this);
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
             LiteDocument = null;
             Collection = null;

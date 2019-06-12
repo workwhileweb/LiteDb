@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace LiteDbExplorer.Core.Events
+namespace LiteDbExplorer.Core
 {
     public abstract class ReferenceNodeChangeEventArgs<T> where T : IReferenceNode
     {

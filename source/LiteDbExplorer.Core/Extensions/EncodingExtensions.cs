@@ -2,7 +2,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace LiteDbExplorer.Extensions
+namespace LiteDbExplorer.Core
 {
     public static class EncodingExtensions
     {

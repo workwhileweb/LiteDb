@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace LiteDbExplorer.Core.Events
+namespace LiteDbExplorer.Core
 {
     public class DocumentChangeEventArgs : ReferenceNodeChangeEventArgs<DocumentReference>
     {

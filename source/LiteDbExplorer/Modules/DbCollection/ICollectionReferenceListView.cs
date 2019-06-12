@@ -1,4 +1,5 @@
 ﻿using System;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Services;
 
 namespace LiteDbExplorer.Modules.DbCollection

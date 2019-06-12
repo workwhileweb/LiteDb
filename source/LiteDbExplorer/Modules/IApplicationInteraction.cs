@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
 using LiteDB;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Modules.DbQuery;
 
 namespace LiteDbExplorer.Modules

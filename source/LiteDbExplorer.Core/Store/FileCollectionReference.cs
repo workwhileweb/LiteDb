@@ -1,8 +1,8 @@
 ﻿using LiteDB;
 
-namespace LiteDbExplorer
+namespace LiteDbExplorer.Core
 {
-    public class FileCollectionReference : CollectionReference
+    public sealed class FileCollectionReference : CollectionReference
     {
         public FileCollectionReference(string name, DatabaseReference database) : base(name, database)
         {

@@ -1,4 +1,6 @@
-﻿namespace LiteDbExplorer.Modules.DbDocument
+﻿using LiteDbExplorer.Core;
+
+namespace LiteDbExplorer.Modules.DbDocument
 {
     public interface IDocumentDetailView
     {

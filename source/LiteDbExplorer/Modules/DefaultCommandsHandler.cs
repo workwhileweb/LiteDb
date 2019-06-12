@@ -3,6 +3,7 @@ using System.ComponentModel.Composition;
 using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Services;
 using Serilog;
 

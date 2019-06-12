@@ -215,7 +215,7 @@
             </controls1:SplitContainer.FirstChild>
             <controls1:SplitContainer.SecondChild>
                 <ContentControl x:Name="DocumentPreview" 
-                                cal:View.Model="{Binding DocumentPreview}" />
+                                cal:View.Model="{Binding ActiveItem}" />
             </controls1:SplitContainer.SecondChild>
         </controls1:SplitContainer>
 

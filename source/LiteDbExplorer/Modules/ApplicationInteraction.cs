@@ -7,6 +7,7 @@ using System.Windows;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using LiteDbExplorer.Controls;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Modules.Database;
 using LiteDbExplorer.Modules.DbCollection;

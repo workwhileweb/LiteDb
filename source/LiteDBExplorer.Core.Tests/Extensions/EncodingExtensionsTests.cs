@@ -1,4 +1,4 @@
-﻿using LiteDbExplorer.Extensions;
+﻿using LiteDbExplorer.Core;
 using NUnit.Framework;
 
 namespace LiteDBExplorer.Core.Tests.Extensions

@@ -1,4 +1,4 @@
-﻿namespace LiteDbExplorer
+﻿namespace LiteDbExplorer.Core
 {
     public interface IReferenceNode
     {

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.Composition;
 using Caliburn.Micro;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.DbDocument
 {

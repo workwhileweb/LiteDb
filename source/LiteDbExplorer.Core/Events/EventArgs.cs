@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace LiteDbExplorer
+namespace LiteDbExplorer.Core
 {
     public class EventArgs<T> : EventArgs
     {

@@ -10,7 +10,6 @@ using CSharpFunctionalExtensions;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Windows;
 using LiteDB;
-using LiteDbExplorer.Core.Events;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;

@@ -6,6 +6,6 @@
         Add = 1,
         Remove = 2,
         Update = 3,
-        Close = 10
+        Dispose = 10
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace LiteDbExplorer.Modules.DbQuery
+﻿using LiteDbExplorer.Core;
+
+namespace LiteDbExplorer.Modules.DbQuery
 {
     public class QueryReference
     {

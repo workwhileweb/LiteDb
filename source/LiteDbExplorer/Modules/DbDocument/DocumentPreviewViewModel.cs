@@ -9,6 +9,7 @@ using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
+using Serilog;
 
 namespace LiteDbExplorer.Modules.DbDocument
 {
@@ -83,12 +84,17 @@ namespace LiteDbExplorer.Modules.DbDocument
         
         public override void Init(DocumentReferencePayload item)
         {
+            Log.Debug("Init. {ViewModelName}, ReferenceId {ReferenceId}", nameof(DocumentPreviewViewModel), item.InstanceId);
+
             IsDocumentView = true;
-            ActivateDocument(item.DocumentReference);
+
+            SetActiveDocument(item.DocumentReference);
         }
 
-        public void ActivateDocument(DocumentReference document)
+        public void SetActiveDocument(DocumentReference document)
         {
+            Log.Debug("ActiveDocument {ViewModelName}, ReferenceId {ReferenceId}", nameof(DocumentPreviewViewModel), document?.InstanceId);
+
             InstanceId = document?.InstanceId;
 
             DisplayName = "Document Preview";
@@ -130,8 +136,10 @@ namespace LiteDbExplorer.Modules.DbDocument
 
         protected override void OnDeactivate(bool close)
         {
-            if (close && _document != null)
+            if (close)
             {
+                Log.Debug("Deactivate {ViewModelName}, ReferenceId {ReferenceId}", nameof(DocumentPreviewViewModel), InstanceId);
+
                 FileInfo = null;
                 Document = null;
             }
@@ -147,7 +155,7 @@ namespace LiteDbExplorer.Modules.DbDocument
                     TryClose();
                     break;
                 case ReferenceNodeChangeAction.Update:
-                    ActivateDocument(e.Reference);
+                    SetActiveDocument(e.Reference);
                     _view?.UpdateView(e.Reference);
                     break;
             }

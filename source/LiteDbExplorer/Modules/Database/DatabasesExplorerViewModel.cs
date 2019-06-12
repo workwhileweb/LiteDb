@@ -8,6 +8,7 @@ using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using Enterwell.Clients.Wpf.Notifications;
 using JetBrains.Annotations;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.DbQuery;

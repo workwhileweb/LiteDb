@@ -6,5 +6,6 @@ namespace LiteDbExplorer.Wpf.Modules.Output
     {
         void InvalidateCache();
         bool Filter(LogEvent logEvent);
+        LogEventLevel MinLogLevel { get; set; }
     }
 }

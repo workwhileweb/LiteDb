@@ -1,10 +1,11 @@
 ﻿using Caliburn.Micro;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.DbDocument
 {
     public interface IDocumentPreview : IScreen
     {
-        void ActivateDocument(DocumentReference document);
+        void SetActiveDocument(DocumentReference document);
         bool HasDocument { get; }
     }
 }
