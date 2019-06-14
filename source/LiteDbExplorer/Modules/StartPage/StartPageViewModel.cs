@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using JetBrains.Annotations;
-using LiteDbExplorer.Framework;
 using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework.Shell;
 
@@ -19,12 +18,15 @@ namespace LiteDbExplorer.Modules.StartPage
         private bool _showStartPageOnOpen;
 
         [ImportingConstructor]
-        public StartPageViewModel(IDatabaseInteractions databaseInteractions, IApplicationInteraction applicationInteraction)
+        public StartPageViewModel(
+            IDatabaseInteractions databaseInteractions, 
+            IApplicationInteraction applicationInteraction,
+            IRecentFilesProvider recentFilesProvider)
         {
             _databaseInteractions = databaseInteractions;
             _applicationInteraction = applicationInteraction;
 
-            PathDefinitions = databaseInteractions.PathDefinitions;
+            PathDefinitions = recentFilesProvider;
 
             ShowStartPageOnOpen = Properties.Settings.Default.ShowStartPageOnOpen;
             
@@ -38,7 +40,7 @@ namespace LiteDbExplorer.Modules.StartPage
 
         public override object IconContent => IconProvider.GetImageIcon("/Images/icon.png", new ImageIconOptions{Height = 16});
 
-        public Paths PathDefinitions { get; }
+        public IRecentFilesProvider PathDefinitions { get; }
         
         public bool ShowStartPageOnOpen
         {

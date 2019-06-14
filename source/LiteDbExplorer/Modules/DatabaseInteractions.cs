@@ -5,20 +5,16 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Windows;
 using LiteDB;
-using Microsoft.Win32;
-using Microsoft.WindowsAPICodePack.Dialogs;
 using Serilog;
 
 namespace LiteDbExplorer.Modules
 {
     public interface IDatabaseInteractions
     {
-        Paths PathDefinitions { get; }
         Task CreateAndOpenDatabase();
         Task OpenDatabase();
         Task OpenDatabase(string path, string password = "");
@@ -44,61 +40,44 @@ namespace LiteDbExplorer.Modules
     [PartCreationPolicy (CreationPolicy.Shared)]
     public class DatabaseInteractions : IDatabaseInteractions
     {
-        private readonly IEventAggregator _eventAggregator;
-        private readonly IApplicationInteraction _applicationInteraction;
         private static readonly ILogger Logger = Log.ForContext<DatabaseInteractions>();
+        private readonly IApplicationInteraction _applicationInteraction;
+        private readonly IRecentFilesProvider _recentFilesProvider;
 
         [ImportingConstructor]
-        public DatabaseInteractions(
-            IEventAggregator eventAggregator, 
-            IApplicationInteraction applicationInteraction)
+        public DatabaseInteractions(IApplicationInteraction applicationInteraction, IRecentFilesProvider recentFilesProvider)
         {
-            _eventAggregator = eventAggregator;
             _applicationInteraction = applicationInteraction;
-            PathDefinitions = new Paths();
+            _recentFilesProvider = recentFilesProvider;
         }
-
-        public Paths PathDefinitions { get; }
 
         public async Task CreateAndOpenDatabase()
         {
-            var dialog = new SaveFileDialog
-            {
-                Title = "New Database",
-                Filter = "All files|*.*",
-                OverwritePrompt = true
-            };
-
-            if (dialog.ShowDialog() != true)
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("New Database");
+            if (maybeFileName.HasNoValue)
             {
                 return;
             }
 
-            using (var stream = new FileStream(dialog.FileName, System.IO.FileMode.Create))
+            using (var stream = new FileStream(maybeFileName.Value, System.IO.FileMode.Create))
             {
                 LiteEngine.CreateDatabase(stream);
             }
 
-            await OpenDatabase(dialog.FileName).ConfigureAwait(false);
+            await OpenDatabase(maybeFileName.Value).ConfigureAwait(false);
         }
 
         public async Task OpenDatabase()
         {
-            var dialog = new OpenFileDialog
-            {
-                Title = "Open Database",
-                Filter = "All files|*.*",
-                Multiselect = false
-            };
-
-            if (dialog.ShowDialog() != true)
+            var maybeFileName = await _applicationInteraction.ShowOpenFileDialog("Open Database");
+            if (maybeFileName.HasNoValue)
             {
                 return;
             }
 
             try
             {
-                await OpenDatabase(dialog.FileName).ConfigureAwait(false);
+                await OpenDatabase(maybeFileName.Value).ConfigureAwait(false);
             }
             catch (Exception exc)
             {
@@ -132,15 +111,20 @@ namespace LiteDbExplorer.Modules
 
             try
             {
-                if (DatabaseReference.IsDbPasswordProtected(path) && 
-                    InputBoxWindow.ShowDialog("Database is password protected, enter password:", "Database password.", password, out password) != true)
+                if (DatabaseReference.IsDbPasswordProtected(path))
                 {
-                    return;
+                    var maybePassword = await _applicationInteraction.ShowInputDialog("Database is password protected, enter password:", "Database password.", password);
+                    if (maybePassword.HasNoValue)
+                    {
+                        return;    
+                    }
+                    
+                    password = maybePassword.Value;
                 }
 
                 Store.Current.AddDatabase(new DatabaseReference(path, password));
 
-                PathDefinitions.InsertRecentFile(path);
+                _recentFilesProvider.InsertRecentFile(path);
             }
             catch (LiteException liteException)
             {
@@ -172,76 +156,52 @@ namespace LiteDbExplorer.Modules
         
         public Task CloseDatabase(DatabaseReference database)
         {
-            _eventAggregator.PublishOnUIThread(new DatabaseChangeEventArgs(ReferenceNodeChangeAction.Remove, database));
-
             Store.Current.CloseDatabase(database);
 
             return Task.CompletedTask;
         }
 
-        public Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database)
+        public async Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database)
         {
             var databaseLocation = database.Location;
             var fileInfo = new FileInfo(databaseLocation);
-            if (fileInfo?.DirectoryName == null)
+            if (fileInfo.DirectoryName == null)
             {
                 throw new FileNotFoundException(databaseLocation);
             }
 
-            var fileCount = 0;
-            var newFileName = fileInfo.Name;
-            do
-            {
-                fileCount++;
-                newFileName = $"{Path.GetFileNameWithoutExtension(fileInfo.Name)} {(fileCount > 0 ? "(" + fileCount + ")" : "")}{Path.GetExtension(fileInfo.Name)}";
-            }
-            while (File.Exists(Path.Combine(fileInfo.DirectoryName, newFileName)));
+            var newFileName = fileInfo.EnsureUniqueFileName();
 
-            var dialog = new SaveFileDialog
-            {
-                Title = "Save database as...",
-                Filter = "All files|*.*",
-                OverwritePrompt = true,
-                InitialDirectory = fileInfo.DirectoryName ?? Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                FileName = newFileName
-            };
+            var initialDirectory = fileInfo.DirectoryName ??
+                               Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-            if (dialog.ShowDialog() != true)
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save database as...", fileName: newFileName, initialDirectory: initialDirectory);
+            if (maybeFileName.HasNoValue)
             {
-                return Task.FromResult(Maybe<string>.None);
+                return Maybe<string>.None;
             }
 
-            fileInfo.CopyTo(dialog.FileName, false);
+            fileInfo.CopyTo(maybeFileName.Value, false);
 
-            return Task.FromResult(Maybe<string>.From(dialog.FileName));
+            return Maybe<string>.From(maybeFileName.Value);
         }
 
-        public Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database)
+        public async Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database)
         {
-            var dialog = new OpenFileDialog
+            var maybeFileName = await _applicationInteraction.ShowOpenFileDialog("Add file to database");
+            if (maybeFileName.HasNoValue)
             {
-                Title = "Add file to database",
-                Filter = "All files|*.*",
-                Multiselect = false
-            };
-
-            if (dialog.ShowDialog() != true)
-            {
-                return Task.FromResult(Result.Fail<CollectionDocumentChangeEventArgs>("FILE_OPEN_CANCELED"));
+                return Result.Fail<CollectionDocumentChangeEventArgs>("FILE_OPEN_CANCELED");
             }
 
             try
             {
-                if (InputBoxWindow.ShowDialog("New file id:", "Enter new file id", Path.GetFileName(dialog.FileName),
-                        out string id) == true)
+                var maybeId = await _applicationInteraction.ShowInputDialog("New file id:", "Enter new file id", Path.GetFileName(maybeFileName.Value));
+                if (maybeId.HasValue)
                 {
-                    var file = database.AddFile(id, dialog.FileName);
-
+                    var file = database.AddFile(maybeId.Value, maybeFileName.Value);
                     var documentsCreated = new CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction.Add, new [] {file}, file.Collection);
-
-                    _eventAggregator.PublishOnUIThread(documentsCreated);
-
-                    return Task.FromResult(Result.Ok(documentsCreated));
+                    return Result.Ok(documentsCreated);
                 }
             }
             catch (Exception exc)
@@ -250,7 +210,7 @@ namespace LiteDbExplorer.Modules
             }
 
 
-            return Task.FromResult(Result.Fail<CollectionDocumentChangeEventArgs>("FILE_OPEN_FAIL"));
+            return Result.Fail<CollectionDocumentChangeEventArgs>("FILE_OPEN_FAIL");
         }
 
         public Task<Result> RemoveDocuments(IEnumerable<DocumentReference> documents)
@@ -268,46 +228,46 @@ namespace LiteDbExplorer.Modules
             return Task.FromResult(Result.Ok());
         }
 
-        public Task<Result<CollectionReference>> AddCollection(DatabaseReference database)
+        public async Task<Result<CollectionReference>> AddCollection(DatabaseReference database)
         {
             try
             {
-                if (InputBoxWindow.ShowDialog("New collection name:", "Enter new collection name", "", out string name) == true)
+                var maybeName = await _applicationInteraction.ShowInputDialog("New collection name:", "Enter new collection name");
+                if (maybeName.HasValue)
                 {
-                    var collectionReference = database.AddCollection(name);
-
-                    return Task.FromResult(Result.Ok(collectionReference));
+                    var collectionReference = database.AddCollection(maybeName.Value);
+                    return Result.Ok(collectionReference);
                 }
 
-                return Task.FromResult(Result.Ok<CollectionReference>(null));
+                return Result.Ok<CollectionReference>(null);
             }
             catch (Exception exc)
             {
                 var message = "Failed to add new collection:" + Environment.NewLine + exc.Message;
                 _applicationInteraction.ShowError(exc, message, "Database error");
-                return Task.FromResult(Result.Fail<CollectionReference>(message));
+                return Result.Fail<CollectionReference>(message);
             }
         }
 
-        public Task<Result> RenameCollection(CollectionReference collection)
+        public async Task<Result> RenameCollection(CollectionReference collection)
         {
             try
             {
                 var currentName = collection.Name;
-                if (InputBoxWindow.ShowDialog("New name:", "Enter new collection name", currentName, out string name) == true)
+                var maybeName = await _applicationInteraction.ShowInputDialog("New collection name:", "Enter new collection name", currentName);
+                if (maybeName.HasValue)
                 {
-                    collection.Database.RenameCollection(currentName, name);
-
-                    return Task.FromResult(Result.Ok());
+                    collection.Database.RenameCollection(currentName, maybeName.Value);
+                    return Result.Ok();
                 }
 
-                return Task.FromResult(Result.Fail(Fails.Canceled));
+                return Result.Fail(Fails.Canceled);
             }
             catch (Exception exc)
             {
                 var message = "Failed to rename collection:" + Environment.NewLine + exc.Message;
                 _applicationInteraction.ShowError(exc, message, "Database error");
-                return Task.FromResult(Result.Fail(message));
+                return Result.Fail(message);
             }
         }
 
@@ -320,8 +280,6 @@ namespace LiteDbExplorer.Modules
                 {
                     collection.Database.DropCollection(collectionName);
 
-                    _eventAggregator.PublishOnUIThread(new CollectionChangeEventArgs(ReferenceNodeChangeAction.Remove, collection));
-                    
                     return Task.FromResult(Result.Ok(collection));
                 }
 
@@ -335,65 +293,47 @@ namespace LiteDbExplorer.Modules
             }
         }
 
-        public Task ExportCollection(CollectionReference collectionReference)
+        public async Task ExportCollection(CollectionReference collectionReference)
         {
             if (collectionReference == null)
             {
-                return Task.CompletedTask;
+                return;
             }
 
             if (collectionReference.IsFilesOrChunks)
             {
-                var folderDialog = new CommonOpenFileDialog
-                {
-                    IsFolderPicker = true,
-                    Title = "Select folder to export files to..."
-                };
-
-                if (folderDialog.ShowDialog() == CommonFileDialogResult.Ok)
+                var maybeDirectoryPath = await _applicationInteraction.ShowFolderPickerDialog("Select folder to export files to...");
+                if (maybeDirectoryPath.HasValue)
                 {
                     foreach (var file in collectionReference.Items)
                     {
-                        var path = Path.Combine(folderDialog.FileName, $"{file.LiteDocument["_id"].AsString}-{file.LiteDocument["filename"].AsString}");
-                        var dir = Path.GetDirectoryName(path);
-                        if (!Directory.Exists(dir))
-                        {
-                            Directory.CreateDirectory(dir);
-                        }
-
+                        var path = Path.Combine(maybeDirectoryPath.Value, $"{file.LiteDocument["_id"].AsString}-{file.LiteDocument["filename"].AsString}");
+                        
+                        DirectoryExtensions.EnsureFileDirectory(path);
+                        
                         (file.Collection as FileCollectionReference)?.SaveFile(file, path);
                     }
                 }
             }
             else
             {
-                var dialog = new SaveFileDialog
-                {
-                    Title = "Save Json export",
-                    Filter = "Json File|*.json",
-                    FileName = $"{collectionReference.Name}_export.json",
-                    OverwritePrompt = true
-                };
-
-                if (dialog.ShowDialog() == true)
+                var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", $"{collectionReference.Name}_export.json");
+                if (maybeFileName.HasValue)
                 {
                     var data = new BsonArray(collectionReference.LiteCollection.FindAll());
-
-                    using (var writer = new StreamWriter(dialog.FileName))
+                    using (var writer = new StreamWriter(maybeFileName.Value))
                     {
                         JsonSerializer.Serialize(data, writer, true, false);
                     }
-                }   
+                }
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task ExportDocuments(ICollection<DocumentReference> documents)
+        public async Task ExportDocuments(ICollection<DocumentReference> documents)
         {
             if (documents == null || !documents.Any())
             {
-                return Task.CompletedTask;
+                return;
             }
 
             var documentReference = documents.First();
@@ -403,39 +343,23 @@ namespace LiteDbExplorer.Modules
                 if (documents.Count == 1)
                 {
                     var file = documentReference;
-
-                    var dialog = new SaveFileDialog
+                    var maybeFileName = await _applicationInteraction.ShowSaveFileDialog(fileName: file.LiteDocument["filename"]);
+                    if (maybeFileName.HasValue)
                     {
-                        Filter = "All files|*.*",
-                        FileName = file.LiteDocument["filename"],
-                        OverwritePrompt = true
-                    };
-
-                    if (dialog.ShowDialog() == true)
-                    {
-                        (file.Collection as FileCollectionReference)?.SaveFile(file, dialog.FileName);
+                        (file.Collection as FileCollectionReference)?.SaveFile(file, maybeFileName.Value);
                     }
                 }
                 else
                 {
-                    var dialog = new CommonOpenFileDialog
-                    {
-                        IsFolderPicker = true,
-                        Title = "Select folder to export files to..."
-                    };
-
-                    if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+                    var maybeDirectoryPath = await _applicationInteraction.ShowFolderPickerDialog("Select folder to export files to...");
+                    if (maybeDirectoryPath.HasValue)
                     {
                         foreach (var file in documents)
                         {
-                            var path = Path.Combine(dialog.FileName,
-                                $"{file.LiteDocument["_id"].AsString}-{file.LiteDocument["filename"].AsString}");
-                            var dir = Path.GetDirectoryName(path);
-                            if (!Directory.Exists(dir))
-                            {
-                                Directory.CreateDirectory(dir);
-                            }
-
+                            var path = Path.Combine(maybeDirectoryPath.Value, $"{file.LiteDocument["_id"].AsString}-{file.LiteDocument["filename"].AsString}");
+                            
+                            DirectoryExtensions.EnsureFileDirectory(path);
+                            
                             (file.Collection as FileCollectionReference)?.SaveFile(file, path);
                         }
                     }
@@ -443,20 +367,12 @@ namespace LiteDbExplorer.Modules
             }
             else
             {
-                var dialog = new SaveFileDialog
-                {
-                    Title = "Save Json export",
-                    Filter = "Json File|*.json",
-                    FileName = "export.json",
-                    OverwritePrompt = true
-                };
-
-                if (dialog.ShowDialog() == true)
+                var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", "export.json");
+                if (maybeFileName.HasValue)
                 {
                     if (documents.Count == 1)
                     {
-
-                        using (var writer = new StreamWriter(dialog.FileName))
+                        using (var writer = new StreamWriter(maybeFileName.Value))
                         {
                             JsonSerializer.Serialize(documentReference.LiteDocument, writer, true, false);
                         }
@@ -464,46 +380,31 @@ namespace LiteDbExplorer.Modules
                     else
                     {
                         var data = new BsonArray(documents.Select(a => a.LiteDocument));
-                        using (var writer = new StreamWriter(dialog.FileName))
+                        using (var writer = new StreamWriter(maybeFileName.Value))
                         {
                             JsonSerializer.Serialize(data, writer, true, false);
                         }
                     }
                 }
             }
-
-            return Task.CompletedTask;
         }
 
-        public Task ExportJson(IJsonSerializerProvider provider, string name = "")
+        public async Task ExportJson(IJsonSerializerProvider provider, string name = "")
         {
-            var dialog = new SaveFileDialog
-            {
-                Title = "Save Json export",
-                Filter = "Json File|*.json",
-                FileName = "export.json",
-                OverwritePrompt = true
-            };
-
+            var fileName = "export.json";
             if (!string.IsNullOrEmpty(name))
             {
-                if (!name.EndsWith(".json"))
-                {
-                    name += ".json";
-                }
-
-                dialog.FileName = $"{name}";
+                fileName = DirectoryExtensions.EnsureFileNameExtension(name, ".json");
             }
 
-            if (dialog.ShowDialog() == true)
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", fileName);
+            if (maybeFileName.HasValue)
             {
-                using (var writer = new StreamWriter(dialog.FileName))
+                using (var writer = new StreamWriter(maybeFileName.Value))
                 {
                     provider.Serialize(writer, true);
                 }
             }
-
-            return Task.CompletedTask;
         }
 
         public Task<Result> CopyDocuments(IEnumerable<DocumentReference> documents)
@@ -518,13 +419,7 @@ namespace LiteDbExplorer.Modules
         public Task<Maybe<DocumentReference>> OpenEditDocument(DocumentReference document)
         {
             var result = _applicationInteraction.OpenEditDocument(document);
-            if (result)
-            {
-                _eventAggregator.PublishOnUIThread(new DocumentChangeEventArgs(ReferenceNodeChangeAction.Update, document));
-
-                return Task.FromResult(Maybe<DocumentReference>.From(document));
-            }
-            return Task.FromResult(Maybe<DocumentReference>.From(null));
+            return Task.FromResult(Maybe<DocumentReference>.From(result ? document: null));
         }
         
         public Task<Result<CollectionDocumentChangeEventArgs>> ImportDataFromText(CollectionReference collection, string textData)

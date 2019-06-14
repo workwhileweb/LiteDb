@@ -20,7 +20,6 @@ namespace LiteDbExplorer.Core
 
         public string Name { get; set; }
 
-
         [AlsoNotifyFor(nameof(LiteCollection))]
         public DatabaseReference Database { get; set; }
 

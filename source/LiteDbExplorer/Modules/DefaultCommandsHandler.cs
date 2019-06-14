@@ -19,8 +19,7 @@ namespace LiteDbExplorer.Modules
         [ImportingConstructor]
         public DefaultCommandsHandler(
             IDatabaseInteractions databaseInteractions,
-            IApplicationInteraction applicationInteraction,
-            IEventAggregator eventAggregator)
+            IApplicationInteraction applicationInteraction)
         {
             _databaseInteractions = databaseInteractions;
             _applicationInteraction = applicationInteraction;

@@ -10,7 +10,6 @@ using Enterwell.Clients.Wpf.Notifications;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
-using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Presentation;
@@ -27,15 +26,16 @@ namespace LiteDbExplorer.Modules.Database
         [ImportingConstructor]
         public DatabasesExplorerViewModel(
             IDatabaseInteractions databaseInteractions,
-            IApplicationInteraction applicationInteraction)
+            IApplicationInteraction applicationInteraction, 
+            IRecentFilesProvider recentFilesProvider)
         {
             _databaseInteractions = databaseInteractions;
             _applicationInteraction = applicationInteraction;
 
-            PathDefinitions = databaseInteractions.PathDefinitions;
+            PathDefinitions = recentFilesProvider;
 
             OpenRecentItemCommand = new RelayCommand<RecentFileInfo>(async info => await OpenRecentItem(info));
-            ItemDoubleClickCommand = new RelayCommand<CollectionReference>(NodeDoubleClick);
+            ItemDoubleClickCommand = new RelayCommand<CollectionReference>( async reference => await NodeDoubleClick(reference));
 
             SaveDatabaseCopyAsCommand = new RelayCommand(async _ => await SaveDatabaseCopyAs(), o => CanSaveDatabaseCopyAs());
             CloseDatabaseCommand = new RelayCommand(async _ => await CloseDatabase(), o => CanCloseDatabase());
@@ -49,7 +49,7 @@ namespace LiteDbExplorer.Modules.Database
             EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), _ => CanEditDbProperties());
         }
 
-        public Paths PathDefinitions { get; }
+        public IRecentFilesProvider PathDefinitions { get; }
 
         public ICommand OpenRecentItemCommand { get; }
 
@@ -138,10 +138,9 @@ namespace LiteDbExplorer.Modules.Database
             }
         }
 
-        public void NodeDoubleClick(CollectionReference value)
+        public async Task NodeDoubleClick(CollectionReference value)
         {
-            var documentSet = IoC.Get<IDocumentSet>();
-            documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReferencePayload>(new CollectionReferencePayload(value));
+            await _applicationInteraction.ActivateCollection(value);
         }
 
         [UsedImplicitly]

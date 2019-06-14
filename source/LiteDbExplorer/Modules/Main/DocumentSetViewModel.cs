@@ -16,15 +16,23 @@ using LiteDbExplorer.Wpf.Framework.Shell;
 namespace LiteDbExplorer.Modules.Main
 {
     [Export(typeof(IDocumentSet))]
+    [Export(typeof(IViewModelHost))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class DocumentSetViewModel : Conductor<IDocument>.Collection.OneActive, IDocumentSet
+    public class DocumentSetViewModel : Conductor<IDocument>.Collection.OneActive, IDocumentSet, IViewModelHost, IHandle<NavigationRequestMessage>
     {
+        private readonly IEventAggregator _eventAggregator;
+
 #pragma warning disable 649
         private bool _closing;
 #pragma warning restore 649
         
-        public DocumentSetViewModel()
+        [ImportingConstructor]
+        public DocumentSetViewModel(IEventAggregator eventAggregator)
         {
+            _eventAggregator = eventAggregator;
+
+            _eventAggregator.Subscribe(this);
+
             DisplayName = $"LiteDB Explorer {AppConstants.Versions.CurrentVersion}";
 
             CloseDocumentCommand = new RelayCommand<FrameworkElement>(CloseDocument);
@@ -74,6 +82,24 @@ namespace LiteDbExplorer.Modules.Main
             OpenDocument(doc);
 
             return Task.CompletedTask;
+        }
+
+        public IScreen FindViewModel(Type viewModelType, IReferenceId referenceId)
+        {
+            if (!string.IsNullOrEmpty(referenceId.InstanceId))
+            {
+                return Items.FirstOrDefault(p => viewModelType.IsInstanceOfType(p) && !string.IsNullOrEmpty(p.InstanceId) && p.InstanceId.Equals(referenceId.InstanceId));
+            }
+
+            return null;
+        }
+
+        public void Handle(NavigationRequestMessage message)
+        {
+            if (message.ViewModel is IDocument document)
+            {
+                OpenDocument(document);
+            }
         }
 
         public Task<TDocument> OpenDocument<TDocument, TNode>(TDocument document, TNode initPayload) where TDocument : IDocument<TNode> where TNode : IReferenceId

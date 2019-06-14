@@ -9,6 +9,8 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
 {
     public abstract class Document : LayoutItemBase, IDocument
     {
+        public virtual string InstanceId { get; protected set; }
+
         public string GroupId { get; set; }
 
         public string GroupDisplayName { get; set; }
@@ -35,8 +37,6 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
 
     public abstract class Document<T> : Document, IDocument<T> where T : IReferenceId
     {
-        public virtual string InstanceId { get; protected set; }
-
         public abstract void Init(T item);
     }
 

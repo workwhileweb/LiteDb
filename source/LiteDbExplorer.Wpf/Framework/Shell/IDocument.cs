@@ -9,9 +9,10 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
         AlwaysVisible = 10
     }
 
-    public interface IDocument : ILayoutItem
+    public interface IDocument : ILayoutItem, IReferenceId
     {
         string GroupDisplayName { get; set; }
+
         bool GroupDisplayNameIsVisible { get; set; }
 
         GroupDisplayVisibility GroupDisplayVisibility { get; set; }
@@ -30,7 +31,7 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
 
     }
 
-    public interface IDocument<in T> : IReferenceId, IDocument where T : IReferenceId
+    public interface IDocument<in T> : IDocument where T : IReferenceId
     {
         void Init(T item);
     }

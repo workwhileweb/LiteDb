@@ -77,8 +77,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Application\IRecentFilesProvider.cs" />
+    <Compile Include="Application\RecentFileInfo.cs" />
     <Compile Include="Modules\Diagnostics\DiagnosticsSettings.cs" />
     <Compile Include="Modules\Diagnostics\MemoryUsageStatusButton.cs" />
+    <Compile Include="Modules\DirectoryExtensions.cs" />
     <Compile Include="Modules\Main\ToolPanelSetView.xaml.cs">
       <DependentUpon>ToolPanelSetView.xaml</DependentUpon>
     </Compile>
@@ -125,6 +128,7 @@
     </Compile>
     <Compile Include="Modules\Shared\ShellStatusBarButtonViewModel.cs" />
     <Compile Include="Modules\Shared\ShellStatusBarLabelViewModel.cs" />
+    <Compile Include="Modules\ShellNavigationService.cs" />
     <Compile Include="Modules\Update\AppUpdateManager.cs" />
     <Compile Include="Modules\DbCollection\CollectionExplorerView.xaml.cs">
       <DependentUpon>CollectionExplorerView.xaml</DependentUpon>

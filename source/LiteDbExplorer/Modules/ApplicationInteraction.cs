@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
@@ -15,6 +14,9 @@ using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Help;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Windows;
+using LiteDbExplorer.Wpf.Framework;
+using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace LiteDbExplorer.Modules
 {
@@ -23,11 +25,13 @@ namespace LiteDbExplorer.Modules
     public class ApplicationInteraction : IApplicationInteraction
     {
         private readonly IWindowManager _windowManager;
+        private readonly IShellNavigationService _navigationService;
 
         [ImportingConstructor]
-        public ApplicationInteraction(IWindowManager windowManager)
+        public ApplicationInteraction(IWindowManager windowManager, IShellNavigationService navigationService)
         {
             _windowManager = windowManager;
+            _navigationService = navigationService;
         }
 
         public bool OpenDatabaseProperties(DatabaseReference database)
@@ -103,12 +107,7 @@ namespace LiteDbExplorer.Modules
                 return Result.Ok();
             }
 
-            var documentSet = IoC.Get<IDocumentSet>();
-            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReferencePayload>(new CollectionReferencePayload(collection));
-            if (vm != null)
-            {
-                vm.SelectedDocument = selectedDocuments?.FirstOrDefault();
-            }
+            await _navigationService.Navigate<CollectionExplorerViewModel>(new CollectionReferencePayload(collection, selectedDocuments));
 
             return Result.Ok();
         }
@@ -190,5 +189,121 @@ namespace LiteDbExplorer.Modules
             var viewModel = IoC.Get<IssueHelperViewModel>();
             _windowManager.ShowDialog(viewModel, null, IssueHelperViewModel.DefaultDialogOptions.Value);
         }
+
+
+        public Task<Maybe<string>> ShowSaveFileDialog(string title = "", string filter = "All files|*.*",
+            string fileName = "", string initialDirectory = "", bool overwritePrompt = true)
+        {
+            var completionSource = new TaskCompletionSource<Maybe<string>>();
+
+            var dialog = new SaveFileDialog
+            {
+                OverwritePrompt = overwritePrompt
+            };
+
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                dialog.FileName = fileName;
+            }
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                dialog.Filter = filter;
+            }
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                dialog.Title = title;
+            }
+
+            if (!string.IsNullOrEmpty(initialDirectory))
+            {
+                dialog.InitialDirectory = initialDirectory;
+            }
+
+            completionSource.SetResult(dialog.ShowDialog() == true ? dialog.FileName : Maybe<string>.None);
+
+            return completionSource.Task;
+        }
+
+        public Task<Maybe<string>> ShowOpenFileDialog(string title = "", string filter = "All files|*.*",
+            string fileName = "", string initialDirectory = "")
+        {
+            var completionSource = new TaskCompletionSource<Maybe<string>>();
+
+            var dialog = new OpenFileDialog
+            {
+                Multiselect = false
+            };
+
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                dialog.FileName = fileName;
+            }
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                dialog.Filter = filter;
+            }
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                dialog.Title = title;
+            }
+
+            if (!string.IsNullOrEmpty(initialDirectory))
+            {
+                dialog.InitialDirectory = initialDirectory;
+            }
+
+            completionSource.SetResult(dialog.ShowDialog() == true ? dialog.FileName : Maybe<string>.None);
+
+            return completionSource.Task;
+        }
+
+        public Task<Maybe<string>> ShowFolderPickerDialog(string title = "", string initialDirectory = "")
+        {
+            var completionSource = new TaskCompletionSource<Maybe<string>>();
+
+            var dialog = new CommonOpenFileDialog
+            {
+                Multiselect = false,
+                IsFolderPicker = true
+            };
+
+            if (!string.IsNullOrEmpty(title))
+            {
+                dialog.Title = title;
+            }
+
+            if (!string.IsNullOrEmpty(initialDirectory))
+            {
+                dialog.InitialDirectory = initialDirectory;
+            }
+
+            completionSource.SetResult(
+                dialog.ShowDialog() == CommonFileDialogResult.Ok
+                ? dialog.FileName
+                : Maybe<string>.None);
+
+            return completionSource.Task;
+        }
+
+        public Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "")
+        {
+            var completionSource = new TaskCompletionSource<Maybe<string>>();
+
+            if (InputBoxWindow.ShowDialog(message, caption, predefined, out var inputText) == true)
+            {
+                completionSource.SetResult(inputText);
+            }
+            else
+            {
+                completionSource.SetResult(Maybe<string>.None);
+            }
+
+            return completionSource.Task;
+        }
+
     }
 }

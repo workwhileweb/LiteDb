@@ -23,5 +23,11 @@ namespace LiteDbExplorer.Modules
         void ShowAbout();
         void ShowReleaseNotes(Version version = null);
         void ShowIssueHelper();
+        Task<Maybe<string>> ShowSaveFileDialog(string title = "", string filter = "All files|*.*", string fileName = "",
+            string initialDirectory = "", bool overwritePrompt = true);
+        Task<Maybe<string>> ShowOpenFileDialog(string title = "", string filter = "All files|*.*", string fileName = "",
+            string initialDirectory = "");
+        Task<Maybe<string>> ShowFolderPickerDialog(string title = "", string initialDirectory = "");
+        Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "");
     }
 }

@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using JetBrains.Annotations;
-using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using LiteDbExplorer.Wpf.Modules.Settings;
@@ -25,17 +24,18 @@ namespace LiteDbExplorer.Modules.Main
             IDatabaseInteractions databaseInteractions,
             IWindowManager windowManager,
             IApplicationInteraction applicationInteraction,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IRecentFilesProvider recentFilesProvider)
         {
             _databaseInteractions = databaseInteractions;
             _windowManager = windowManager;
             _applicationInteraction = applicationInteraction;
             _eventAggregator = eventAggregator;
 
-            PathDefinitions = databaseInteractions.PathDefinitions;
+            PathDefinitions = recentFilesProvider;
         }
 
-        public Paths PathDefinitions { get; }
+        public IRecentFilesProvider PathDefinitions { get; }
         
         [UsedImplicitly]
         public async Task OpenRecentItem(RecentFileInfo info)

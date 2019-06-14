@@ -12,13 +12,13 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using Caliburn.Micro;
-using Enterwell.Clients.Wpf.Notifications;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Framework.Services;
 using LiteDbExplorer.Modules;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf;
+using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using LiteDbExplorer.Wpf.Modules.Settings;
 
@@ -54,11 +54,14 @@ namespace LiteDbExplorer
 
             batch.AddExportedValue<IWindowManager>(windowManager);
             batch.AddExportedValue<IEventAggregator>(new EventAggregator());
-            batch.AddExportedValue<INotificationMessageManager>(NotificationInteraction.Manager);
+            batch.AddExportedValue<IRecentFilesProvider>(new Paths());
+            batch.AddExportedValue(NotificationInteraction.Manager);
             batch.AddExportedValue(_container);
 
             _container.Compose(batch);
-            
+
+            var export = _container.GetExport<IShellNavigationService>();
+
             AddCustomConventions();
 
             AddCustomViewLocator();

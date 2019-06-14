@@ -25,20 +25,22 @@ namespace LiteDbExplorer.Modules.DbCollection
 
     public class CollectionReferencePayload : IReferenceId
     {
-        public CollectionReferencePayload(CollectionReference collectionReference)
+        public CollectionReferencePayload(CollectionReference collectionReference, IEnumerable<DocumentReference> selectedDocuments = null)
         {
             InstanceId = collectionReference.InstanceId;
             CollectionReference = collectionReference;
+            SelectedDocuments = selectedDocuments;
         }
 
         public string InstanceId { get; }
         public CollectionReference CollectionReference { get; }
+        public IEnumerable<DocumentReference> SelectedDocuments { get; }
 
     }
 
     [Export(typeof(CollectionExplorerViewModel))]
     [PartCreationPolicy (CreationPolicy.NonShared)]
-    public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>
+    public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>, IViewModelParams<CollectionReferencePayload>
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IApplicationInteraction _applicationInteraction;
@@ -487,6 +489,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        [UsedImplicitly]
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {

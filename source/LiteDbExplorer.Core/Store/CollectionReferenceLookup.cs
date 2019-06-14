@@ -25,6 +25,7 @@ namespace LiteDbExplorer.Core
         public CollectionHandlerType Type { get; }
 
         public string Name { get; set; }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         [UsedImplicitly]

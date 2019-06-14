@@ -49,19 +49,6 @@ namespace LiteDbExplorer.Core
             Databases = new ObservableCollection<DatabaseReference>();
         }
 
-        public DatabaseReference GetDatabaseReference(string instanceId)
-        {
-            var dbReference = Databases.FirstOrDefault(p => p.InstanceId.Equals(instanceId));
-            if(dbReference != null)
-            {
-                return dbReference;
-            }
-
-            return Databases.FirstOrDefault(
-                p => p.Collections.Any(c => c.InstanceId.Equals(instanceId))
-            );
-        }
-
         public bool IsDatabaseOpen(string path)
         {
             return Databases.FirstOrDefault(a => a.Location == path) != null;
