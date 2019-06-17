@@ -107,8 +107,6 @@ namespace LiteDbExplorer.Modules
                 return;
             }
             
-            Logger.Information("Open database {path}", path);
-
             try
             {
                 if (DatabaseReference.IsDbPasswordProtected(path))

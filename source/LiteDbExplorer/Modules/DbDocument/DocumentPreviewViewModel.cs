@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using System.Windows.Controls;
-using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDB;
-using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
@@ -13,32 +12,21 @@ using Serilog;
 
 namespace LiteDbExplorer.Modules.DbDocument
 {
-
-    public class DocumentReferencePayload : IReferenceId
-    {
-        public DocumentReferencePayload(DocumentReference documentReference)
-        {
-            InstanceId = documentReference.InstanceId;
-            DocumentReference = documentReference;
-        }
-
-        public string InstanceId { get; }
-
-        public DocumentReference DocumentReference { get; }
-    }
-
     [Export(typeof(IDocumentPreview))]
     [Export(typeof(DocumentPreviewViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DocumentPreviewViewModel : Document<DocumentReferencePayload>, IDocumentPreview
+    public class DocumentPreviewViewModel : Document<DocumentReferencePayload>, IDocumentPreview, INavigationTarget<DocumentReferencePayload>
     {
+        private readonly IShellNavigationService _navigationService;
         private DocumentReference _document;
         private IDocumentDetailView _view;
 
         [ImportingConstructor]
-        public DocumentPreviewViewModel()
+        public DocumentPreviewViewModel(IShellNavigationService navigationService)
         {
-            OpenAsDocumentCommand = new RelayCommand(OpenAsDocument, _ => CanOpenAsDocument);
+            _navigationService = navigationService;
+
+            OpenAsDocumentCommand = new RelayCommand(async doc => await OpenAsDocument(doc), _ => CanOpenAsDocument);
 
             SplitOrientation = Properties.Settings.Default.DocumentPreview_SplitOrientation;
             ContentMaxLength = Properties.Settings.Default.DocumentPreview_ContentMaxLength;
@@ -83,6 +71,7 @@ namespace LiteDbExplorer.Modules.DbDocument
         public RelayCommand OpenAsDocumentCommand { get; set; }
         
         public override void Init(DocumentReferencePayload item)
+
         {
             Log.Debug("Init. {ViewModelName}, ReferenceId {ReferenceId}", nameof(DocumentPreviewViewModel), item.InstanceId);
 
@@ -124,9 +113,9 @@ namespace LiteDbExplorer.Modules.DbDocument
         }
 
         [UsedImplicitly]
-        public void OpenAsDocument(object _)
+        public async Task OpenAsDocument(object _)
         {
-            IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReferencePayload>(new DocumentReferencePayload(Document));
+            await _navigationService.Navigate<DocumentPreviewViewModel>(new DocumentReferencePayload(Document));
         }
 
         protected override void OnViewLoaded(object view)
@@ -152,6 +141,7 @@ namespace LiteDbExplorer.Modules.DbDocument
             switch (e.Action)
             {
                 case ReferenceNodeChangeAction.Remove:
+                case ReferenceNodeChangeAction.Dispose:
                     TryClose();
                     break;
                 case ReferenceNodeChangeAction.Update:

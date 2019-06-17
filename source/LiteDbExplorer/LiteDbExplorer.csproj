@@ -79,6 +79,9 @@
     <Compile Include="AppConstants.cs" />
     <Compile Include="Application\IRecentFilesProvider.cs" />
     <Compile Include="Application\RecentFileInfo.cs" />
+    <Compile Include="Modules\DbCollection\CollectionReferencePayload.cs" />
+    <Compile Include="Modules\DbDocument\DocumentReferencePayload.cs" />
+    <Compile Include="Modules\DbQuery\RunQueryContext.cs" />
     <Compile Include="Modules\Diagnostics\DiagnosticsSettings.cs" />
     <Compile Include="Modules\Diagnostics\MemoryUsageStatusButton.cs" />
     <Compile Include="Modules\DirectoryExtensions.cs" />
@@ -199,6 +202,7 @@
     <Compile Include="Modules\Main\MainSettingsViewModel.cs" />
     <Compile Include="Modules\NotificationInteraction.cs" />
     <Compile Include="Modules\StartPage\StartPageSettingsViewModel.cs" />
+    <Compile Include="Modules\Update\LocalZipPackageExtractor.cs" />
     <Compile Include="Modules\Update\UpdateSettingsViewModel.cs" />
     <Compile Include="Modules\Main\ShellMenuView.xaml.cs">
       <DependentUpon>ShellMenuView.xaml</DependentUpon>
@@ -493,6 +497,9 @@
     </PackageReference>
     <PackageReference Include="Dragablz">
       <Version>0.0.3.203</Version>
+    </PackageReference>
+    <PackageReference Include="DynamicData">
+      <Version>6.10.0.2604</Version>
     </PackageReference>
     <PackageReference Include="Enterwell.Clients.Wpf.Notifications">
       <Version>1.4.2</Version>

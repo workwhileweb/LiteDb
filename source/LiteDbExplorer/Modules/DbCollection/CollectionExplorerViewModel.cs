@@ -22,25 +22,9 @@ using Serilog;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
-
-    public class CollectionReferencePayload : IReferenceId
-    {
-        public CollectionReferencePayload(CollectionReference collectionReference, IEnumerable<DocumentReference> selectedDocuments = null)
-        {
-            InstanceId = collectionReference.InstanceId;
-            CollectionReference = collectionReference;
-            SelectedDocuments = selectedDocuments;
-        }
-
-        public string InstanceId { get; }
-        public CollectionReference CollectionReference { get; }
-        public IEnumerable<DocumentReference> SelectedDocuments { get; }
-
-    }
-
     [Export(typeof(CollectionExplorerViewModel))]
     [PartCreationPolicy (CreationPolicy.NonShared)]
-    public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>, IViewModelParams<CollectionReferencePayload>
+    public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>, INavigationTarget<CollectionReferencePayload>
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IApplicationInteraction _applicationInteraction;
@@ -286,6 +270,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             switch (e.Action)
             {
                 case ReferenceNodeChangeAction.Remove:
+                case ReferenceNodeChangeAction.Dispose:
                     TryClose();
                     break;
                 case ReferenceNodeChangeAction.Update:
@@ -322,7 +307,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                     await _databaseInteractions.OpenEditDocument(documentReference);
                     break;
                 case CollectionItemDoubleClickAction.OpenPreview:
-                    await IoC.Get<IDocumentSet>().OpenDocument<DocumentPreviewViewModel, DocumentReferencePayload>(new DocumentReferencePayload(documentReference));
+                    await _applicationInteraction.ActivateDefaultDocumentView(documentReference);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
@@ -339,7 +324,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             await _databaseInteractions.CreateItem(CollectionReference)
                 .OnSuccess(async reference =>
                 {
-                    await _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
+                    await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference, reference.Items);
                     _eventAggregator.PublishOnUIThread(reference);
                 });
         }

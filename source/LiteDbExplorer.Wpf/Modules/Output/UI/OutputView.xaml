@@ -7,11 +7,12 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:controls="clr-namespace:LiteDbExplorer.Wpf.Controls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <Style TargetType="{x:Type TextBlock}">
-            <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundColorBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
         </Style>
     </UserControl.Resources>
     <DockPanel LastChildFill="True">
@@ -35,19 +36,16 @@
             <Border />
         </controls:ToolDockPanel>
 
-        <FlowDocumentScrollViewer x:Name="outputText"
-                 Background="Transparent"
-                 VerticalAlignment="Stretch"
-                 HorizontalAlignment="Stretch"
-                 FontFamily="Consolas"
-                 BorderThickness="0"
-                 ScrollViewer.VerticalScrollBarVisibility="Auto" 
-                 ContextMenu="{StaticResource TextBoxContextMenu}">
-            <FlowDocumentScrollViewer.Resources>
-                <Style TargetType="Run">
-                    <Setter Property="Foreground" Value="{DynamicResource DefaultForegroundColorBrush}"/>
-                </Style>
-            </FlowDocumentScrollViewer.Resources>
-        </FlowDocumentScrollViewer>
+        <avalonedit:TextEditor x:Name="outputText"
+                               FontFamily="Consolas"
+                               FontSize="10pt"
+                               IsReadOnly="True"
+                               SnapsToDevicePixels="True"
+                               UseLayoutRounding="True"
+                               Foreground="{DynamicResource MaterialDesignBody}"
+                               ContextMenu="{StaticResource TextBoxContextMenu}"
+                               Padding="15,10">
+        </avalonedit:TextEditor>
+
     </DockPanel>
 </UserControl>

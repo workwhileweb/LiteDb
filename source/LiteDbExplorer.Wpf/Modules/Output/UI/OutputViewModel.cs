@@ -27,6 +27,7 @@ namespace LiteDbExplorer.Wpf.Modules.Output.UI
             DisplayName = "Output";
 
             _stringBuilder = new StringBuilder();
+
             _writer = new OutputWriter(this);
 
             OutputSource = new Dictionary<string, string>
@@ -59,9 +60,9 @@ namespace LiteDbExplorer.Wpf.Modules.Output.UI
 
         public void Clear()
         {
-            _view?.Clear();
-
             _stringBuilder.Clear();
+
+            _view?.Clear();
         }
 
         public void AppendLine(string text)

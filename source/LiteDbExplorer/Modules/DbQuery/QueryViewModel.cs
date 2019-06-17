@@ -20,7 +20,7 @@ namespace LiteDbExplorer.Modules.DbQuery
 
     [Export(typeof(QueryViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class QueryViewModel : DocumentConductorOneActive<RunQueryContext>
+    public class QueryViewModel : DocumentConductorOneActive<RunQueryContext>, INavigationTarget<RunQueryContext>
     {
         private readonly IApplicationInteraction _applicationInteraction;
         private static int _queryRefCount = 0;
@@ -192,27 +192,5 @@ namespace LiteDbExplorer.Modules.DbQuery
 
             ActiveItem = Items.FirstOrDefault();
         }
-    }
-
-    public class RunQueryContext : IReferenceId
-    {
-        private RunQueryContext()
-        {
-            InstanceId = Guid.NewGuid().ToString("D");
-        }
-
-        public RunQueryContext(DatabaseReference databaseReference = null, QueryReference queryReference = null) : this()
-        {
-            DatabaseReference = databaseReference;
-            QueryReference = queryReference;
-        }
-
-        public string InstanceId { get; }
-
-        public DatabaseReference DatabaseReference { get; }
-
-        public QueryReference QueryReference { get; }
-
-        public bool RunOnStart { get; set; }
     }
 }

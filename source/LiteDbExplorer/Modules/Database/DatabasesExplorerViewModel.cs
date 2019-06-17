@@ -140,7 +140,7 @@ namespace LiteDbExplorer.Modules.Database
 
         public async Task NodeDoubleClick(CollectionReference value)
         {
-            await _applicationInteraction.ActivateCollection(value);
+            await _applicationInteraction.ActivateDefaultCollectionView(value);
         }
 
         [UsedImplicitly]
@@ -218,7 +218,7 @@ namespace LiteDbExplorer.Modules.Database
             await _databaseInteractions.AddFileToDatabase(SelectedDatabase)
                 .OnSuccess(async reference =>
                 {
-                    await _applicationInteraction.ActivateCollection(reference.CollectionReference, reference.Items);
+                    await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference, reference.Items);
                 });
         }
 
@@ -234,7 +234,7 @@ namespace LiteDbExplorer.Modules.Database
             await _databaseInteractions.AddCollection(SelectedDatabase)
                 .OnSuccess(async reference =>
                 {
-                    await _applicationInteraction.ActivateCollection(reference);
+                    await _applicationInteraction.ActivateDefaultCollectionView(reference);
                 });
         }
 

@@ -10,9 +10,9 @@ using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Modules.Database;
 using LiteDbExplorer.Modules.DbCollection;
+using LiteDbExplorer.Modules.DbDocument;
 using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Help;
-using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Windows;
 using LiteDbExplorer.Wpf.Framework;
 using Microsoft.Win32;
@@ -79,8 +79,7 @@ namespace LiteDbExplorer.Modules
 
         public async Task<Result> OpenQuery(RunQueryContext queryContext)
         {
-            var documentSet = IoC.Get<IDocumentSet>();
-            await documentSet.OpenDocument<QueryViewModel, RunQueryContext>(queryContext);
+            await _navigationService.Navigate<QueryViewModel>(queryContext);
 
             return Result.Ok();
         }
@@ -100,7 +99,7 @@ namespace LiteDbExplorer.Modules
             return true;
         }
 
-        public async Task<Result> ActivateCollection(CollectionReference collection, IEnumerable<DocumentReference> selectedDocuments = null)
+        public async Task<Result> ActivateDefaultCollectionView(CollectionReference collection, IEnumerable<DocumentReference> selectedDocuments = null)
         {
             if (collection == null)
             {
@@ -112,19 +111,14 @@ namespace LiteDbExplorer.Modules
             return Result.Ok();
         }
 
-        public async Task<Result> ActivateDocument(DocumentReference document)
+        public async Task<Result> ActivateDefaultDocumentView(DocumentReference document)
         {
             if (document == null)
             {
                 return Result.Ok();
             }
 
-            var documentSet = IoC.Get<IDocumentSet>();
-            var vm = await documentSet.OpenDocument<CollectionExplorerViewModel, CollectionReferencePayload>(new CollectionReferencePayload(document.Collection));
-            if (vm != null)
-            {
-                vm.SelectedDocument = document;
-            }
+            await _navigationService.Navigate<DocumentPreviewViewModel>(new DocumentReferencePayload(document));
 
             return Result.Ok();
         }

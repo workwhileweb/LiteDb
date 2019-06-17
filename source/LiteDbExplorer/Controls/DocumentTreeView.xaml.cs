@@ -38,8 +38,6 @@ namespace LiteDbExplorer.Controls
         public DocumentTreeView()
         {
             InitializeComponent();
-
-            Unloaded += (sender, args) => { DocumentSource = null; };
         }
 
         public static readonly DependencyProperty ContentMaxLengthProperty = DependencyProperty.Register(

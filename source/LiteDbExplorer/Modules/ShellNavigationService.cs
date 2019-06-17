@@ -15,9 +15,9 @@ namespace LiteDbExplorer.Wpf.Framework
     }
 
     // This is just to help with some reflection stuff
-    public interface IViewModelParams { }
+    public interface INavigationTarget { }
 
-    public interface IViewModelParams<in T> : IViewModelParams        
+    public interface INavigationTarget<in T> : INavigationTarget        
     {
         // It contains a single method which will pass arguments to the viewmodel after the nav service has instantiated it from the container
         void Init(T modelParams);
@@ -76,12 +76,12 @@ namespace LiteDbExplorer.Wpf.Framework
             // Check if the viewmodel implements IViewModelParams and call accordingly
             var interfaces = viewModel.GetType()
                 .GetInterfaces()
-                .Where(x => typeof(IViewModelParams).IsAssignableFrom(x) && x.IsGenericType);
+                .Where(x => typeof(INavigationTarget).IsAssignableFrom(x) && x.IsGenericType);
 
             // Loop through interfaces and find one that matches the generic signature based on modelParams...
             foreach (var @interface in interfaces)
             {
-                var method = @interface.GetMethod(nameof(IViewModelParams<object>.Init));
+                var method = @interface.GetMethod(nameof(INavigationTarget<object>.Init));
                 if (method == null)
                 {
                     continue;

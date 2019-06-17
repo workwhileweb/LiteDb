@@ -19,6 +19,9 @@ namespace LiteDbExplorer.Core
         public DatabaseReference(string path, string password, bool enableLog = false)
         {
             _enableLog = enableLog;
+            
+            Log.Information("Open database {path}", path);
+
             Location = path;
             Name = Path.GetFileName(path);
 
@@ -126,6 +129,8 @@ namespace LiteDbExplorer.Core
                 BroadcastChanges(ReferenceNodeChangeAction.Dispose, this);
             }
             
+            Log.Information("Dispose database {path}", Location);
+
             LiteDatabase.Dispose();
         }
 

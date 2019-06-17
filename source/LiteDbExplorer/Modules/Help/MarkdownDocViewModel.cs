@@ -7,7 +7,6 @@ using System.Windows;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using Humanizer;
-using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
@@ -17,7 +16,7 @@ namespace LiteDbExplorer.Modules.Help
 {
     [Export(typeof(MarkdownDocViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class MarkdownDocViewModel : Document<IMarkdownDocContext>
+    public class MarkdownDocViewModel : Document<IMarkdownDocContext>, INavigationTarget<IMarkdownDocContext>
     {
         private IMarkdownDocContext _markdownDocContext;
         
