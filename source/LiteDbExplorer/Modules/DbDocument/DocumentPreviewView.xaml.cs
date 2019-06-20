@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Controls;
+using LiteDbExplorer.Controls;
 using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.DbDocument
@@ -13,12 +14,7 @@ namespace LiteDbExplorer.Modules.DbDocument
         {
             InitializeComponent();
             
-            splitOrientationSelector.SelectionChanged += (sender, args) =>
-            {
-                splitContainer.Orientation = splitOrientationSelector.SelectedIndex == 0
-                    ? Orientation.Vertical
-                    : Orientation.Horizontal;
-            };
+            SplitContainerSelectionController.Attach(splitContainer, splitOrientationSelector);
         }
 
         public void UpdateView(DocumentReference documentReference)

@@ -60,8 +60,6 @@ namespace LiteDbExplorer
 
             _container.Compose(batch);
 
-            var export = _container.GetExport<IShellNavigationService>();
-
             AddCustomConventions();
 
             AddCustomViewLocator();

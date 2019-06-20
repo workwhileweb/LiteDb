@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using LiteDbExplorer.Controls;
 using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.DbCollection
@@ -15,12 +16,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         {
             InitializeComponent();
 
-            splitOrientationSelector.SelectionChanged += (sender, args) =>
-            {
-                splitContainer.Orientation = splitOrientationSelector.SelectedIndex == 0
-                    ? Orientation.Vertical
-                    : Orientation.Horizontal;
-            };
+            SplitContainerSelectionController.Attach(splitContainer, splitOrientationSelector);
 
             DockSearch.IsVisibleChanged += (sender, args) =>
             {

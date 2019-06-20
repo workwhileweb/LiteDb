@@ -46,11 +46,15 @@ namespace LiteDbExplorer.Modules.DbQuery
             RunQueryCommand = new RelayCommand(_=> RunQuery(), _=> CanRunQuery);
 
             RunSelectedQueryCommand = new RelayCommand(_=> RunSelectedQuery(), _=> CanRunSelectedQuery);
+
+            OpenHelpCommand = new RelayCommand(_=> OpenHelp(), _=> true);
         }
 
-        public ICommand RunQueryCommand { get; set; }
+        public ICommand RunQueryCommand { get; }
 
-        public ICommand RunSelectedQueryCommand { get; set; }
+        public ICommand RunSelectedQueryCommand { get; }
+
+        public ICommand OpenHelpCommand { get; }
 
         [UsedImplicitly]
         public ObservableCollection<DatabaseReference> Databases => Store.Current.Databases;

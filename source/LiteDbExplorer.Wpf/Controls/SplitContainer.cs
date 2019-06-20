@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Windows;
 using System.Windows.Controls;
 
@@ -39,8 +40,20 @@ namespace LiteDbExplorer.Wpf.Controls
         }
     }
 
+    public class SplitContainerOrientationEventArgs : EventArgs
+    {
+        public SplitContainerOrientationEventArgs(SplitOrientation orientation)
+        {
+            Orientation = orientation;
+        }
+
+        public SplitOrientation Orientation { get; }
+    }
+
     public class SplitContainer : Control
     {
+        public event EventHandler<SplitContainerOrientationEventArgs> OrientationChanged;
+
         static SplitContainer()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SplitContainer),
@@ -59,7 +72,8 @@ namespace LiteDbExplorer.Wpf.Controls
 
         private static readonly DependencyPropertyKey CurrentOrientationPropertyKey
             = DependencyProperty.RegisterReadOnly(nameof(CurrentOrientation), typeof(Orientation), typeof(SplitContainer),
-                new FrameworkPropertyMetadata(System.Windows.Controls.Orientation.Horizontal,
+                new FrameworkPropertyMetadata(
+                    System.Windows.Controls.Orientation.Horizontal,
                     FrameworkPropertyMetadataOptions.None));
 
         public static readonly DependencyProperty CurrentOrientationProperty
@@ -127,7 +141,11 @@ namespace LiteDbExplorer.Wpf.Controls
         {
             if (Orientation.HasValue)
             {
-                CurrentOrientation = Orientation.Value;
+                if (CurrentOrientation != Orientation.Value)
+                {
+                    CurrentOrientation = Orientation.Value;
+                    OnOrientationChanged(new SplitContainerOrientationEventArgs(Orientation.ToSplitOrientation()));
+                }
             }
             else if (Parent is FrameworkElement frameworkElement)
             {
@@ -135,8 +153,18 @@ namespace LiteDbExplorer.Wpf.Controls
                 var elementActualWidth = frameworkElement.ActualWidth / 1.61;
                 var elementActualHeight = frameworkElement.ActualHeight;
 
-                CurrentOrientation = elementActualWidth < elementActualHeight ? System.Windows.Controls.Orientation.Vertical : System.Windows.Controls.Orientation.Horizontal;
+                var currentOrientation = elementActualWidth < elementActualHeight ? System.Windows.Controls.Orientation.Vertical : System.Windows.Controls.Orientation.Horizontal;
+                if (CurrentOrientation != currentOrientation)
+                {
+                    CurrentOrientation = currentOrientation;
+                    OnOrientationChanged(new SplitContainerOrientationEventArgs(Orientation.ToSplitOrientation()));
+                }
             }
+        }
+
+        protected virtual void OnOrientationChanged(SplitContainerOrientationEventArgs e)
+        {
+            OrientationChanged?.Invoke(this, e);
         }
     }
 }

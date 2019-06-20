@@ -9,6 +9,7 @@
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:commands="clr-namespace:LiteDbExplorer.Framework.Commands;assembly=LiteDbExplorer.Wpf"
+             xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
@@ -18,6 +19,8 @@
                                           TargetCommand="{Binding RunQueryCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RunSelected" 
                                           TargetCommand="{Binding RunSelectedQueryCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Help" 
+                                          TargetCommand="{Binding OpenHelpCommand}"/>
     </commands:CommandToCommand.Bindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -41,10 +44,20 @@
                 <Separator />
                 <Button
                     x:Name="RunQuery"
-                    ToolTip="Run query">
+                    Command="liteDbExplorer:Commands.Run"
+                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
                     <StackPanel Orientation="Horizontal">
                         <materialDesign:PackIcon Kind="Play" />
                         <TextBlock Text="Run" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button
+                    x:Name="RunSelectedQuery"
+                    Command="liteDbExplorer:Commands.RunSelected"
+                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="PlayBoxOutline" />
+                        <TextBlock Text="Run selected" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="NewQuery" ToolTip="New Query">
@@ -54,7 +67,9 @@
                     </StackPanel>
                 </Button>
                 <Separator />
-                <Button x:Name="OpenHelp" ToolTip="Help">
+                <Button x:Name="OpenHelp" 
+                        Command="Help"
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True">
                     <materialDesign:PackIcon Kind="Help" />
                 </Button>
             </ToolBar>
@@ -112,18 +127,30 @@
         <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" />
 
         <TabControl Grid.Row="3" x:Name="Items" Padding="0" Margin="0"
-                    mah:TabControlHelper.Underlined="SelectedTabItem">
+                    mah:TabControlHelper.Underlined="TabPanel"
+                    mah:TabControlHelper.UnderlineBrush="{DynamicResource MaterialDesignDivider}"
+                    mah:TabControlHelper.UnderlineSelectedBrush="{DynamicResource MaterialDesignBody}"
+                    mah:TabControlHelper.UnderlineMouseOverSelectedBrush="{DynamicResource MaterialDesignBody}"
+                    mah:TabControlHelper.UnderlineMouseOverBrush="{DynamicResource MaterialDesignBody}">
             <TabControl.Resources>
-                <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource {x:Type TabItem}}">
+                <Style TargetType="{x:Type TabPanel}">
+                    <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}"/>
+                </Style>
+                <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource MahTabItem}">
                     <Setter Property="mah:ControlsHelper.HeaderFontSize" Value="14" />
-                    <Setter Property="Padding" Value="15,6"/>
-                    <Setter Property="MinWidth" Value="80"/>
+                    <Setter Property="Padding" Value="0,10,0,6"/>
+                    <Setter Property="MinWidth" Value="30"/>
+                    <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}"/>
+                    <Setter Property="BorderBrush" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="16,0,4,0"/>
                 </Style>
             </TabControl.Resources>
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding DisplayName}" />
+                        <TextBlock Text="{Binding DisplayName}" 
+                                   Foreground="{DynamicResource MaterialDesignBody}"
+                                   Typography.Capitals="AllSmallCaps"/>
                     </StackPanel>
                 </DataTemplate>
             </TabControl.ItemTemplate>

@@ -14,7 +14,7 @@
                                 Height="Auto"
                                 Fill="Transparent" />
                         <Border x:Name="CornerScrollBarRectangle"
-                            CornerRadius="5"
+                            CornerRadius="0"
                             HorizontalAlignment="Stretch"
                             VerticalAlignment="Stretch"
                             Width="Auto"

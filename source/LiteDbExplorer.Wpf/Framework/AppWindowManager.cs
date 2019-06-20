@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Data;
 using Caliburn.Micro;
 using LiteDbExplorer.Framework.Windows;
@@ -50,11 +51,13 @@ namespace LiteDbExplorer.Framework
                             Mode = BindingMode.OneWay
                         });
                     
-                    var windowName = view.GetType().FullName;
+                    var windowName = view.GetType().FullName ?? string.Empty;
 
                     if (_store != null)
                     {
-                        window.AttachPositionHandler(_store, windowName);
+
+                        var isMainWindows = windowName.EndsWith(@".ShellView", StringComparison.OrdinalIgnoreCase) && Application.Current.Windows.Count == 1;
+                        window.AttachPositionHandler(_store, windowName, isMainWindows);
                     }
                 }
                 

@@ -7,9 +7,9 @@ namespace LiteDbExplorer
 {
     public static class WindowPositionHandlerExtensions
     {
-        public static void AttachPositionHandler(this Window window, IWindowStateStore store, string windowName)
+        public static void AttachPositionHandler(this Window window, IWindowStateStore store, string windowName, bool isMainWindow = false)
         {
-            var unused = new WindowStateHandler(store, window, windowName, true);
+            var unused = new WindowStateHandler(store, window, windowName, true) { IsMainWindow = isMainWindow };
         }
     }
 
@@ -169,6 +169,10 @@ namespace LiteDbExplorer
                     }
                 
                     WindowPosition.ToWindow(_window, data);
+                }
+                else if (IsMainWindow)
+                {
+                    _window.WindowState = WindowState.Maximized;
                 }
             }
             finally

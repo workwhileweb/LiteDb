@@ -14,7 +14,6 @@ using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbDocument;
-using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
@@ -38,15 +37,12 @@ namespace LiteDbExplorer.Modules.DbCollection
         public CollectionExplorerViewModel(
             IEventAggregator eventAggregator, 
             IApplicationInteraction applicationInteraction,
-            IDatabaseInteractions databaseInteractions,
-            IDocumentPreview documentPreview)
+            IDatabaseInteractions databaseInteractions)
         {
             _eventAggregator = eventAggregator;
             _applicationInteraction = applicationInteraction;
             _databaseInteractions = databaseInteractions;
 
-            ActiveItem = documentPreview;
-            
             SplitOrientation = Properties.Settings.Default.CollectionExplorer_SplitOrientation;
             ShowDocumentPreview = Properties.Settings.Default.CollectionExplorer_ShowPreview;
             ContentMaxLength = Properties.Settings.Default.CollectionExplorer_ContentMaxLength;
@@ -254,6 +250,11 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         protected void ActivateDocumentPreview()
         {
+            if (ActiveItem == null)
+            {
+                ActiveItem = IoC.Get<IDocumentPreview>();
+            }
+
             ActiveItem?.SetActiveDocument(_selectedDocument);
             ActivateItem(ActiveItem);
         }
