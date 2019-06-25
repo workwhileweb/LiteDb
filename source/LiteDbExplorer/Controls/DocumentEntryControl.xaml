@@ -97,13 +97,8 @@
                     <materialDesign:PackIcon Kind="ArrowRight" />
                 </Button>
 
-                <Grid Grid.Column="1" Grid.Row="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-
-                    <ListView Name="ListItems" Grid.Column="0"
+                <UniformGrid Grid.Column="1" Grid.Row="0" Rows="1">
+                    <ListView Name="ListItems"
                               SizeChanged="ItemsField_SizeChanged"
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               BorderThickness="0"
@@ -166,7 +161,7 @@
                         </Border>
                         <controls:FileView x:Name="FileView" DockPanel.Dock="Top" />
                     </DockPanel>
-                </Grid>
+                </UniformGrid>
 
 
                 <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Height="1" BorderThickness="0,0,0,1"

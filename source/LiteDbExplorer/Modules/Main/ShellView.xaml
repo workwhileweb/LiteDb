@@ -43,10 +43,13 @@
 
             <ContentControl Grid.Column="2" Grid.Row="0" x:Name="MainContent" cal:View.Model="{Binding MainContent}" />
 
-            <GridSplitter Grid.Row="1" Grid.Column="2" Height="5" ResizeDirection="Rows"
+            <GridSplitter x:Name="SplitterToolPanels" 
+                          Grid.Row="1" Grid.Column="2" Height="5" ResizeDirection="Rows"
                           HorizontalAlignment="Stretch" Background="Transparent" Margin="0,-5,0,0"/>
 
-            <ContentControl Grid.Column="2" Grid.Row="2" x:Name="BottomToolPanels" cal:View.Model="{Binding BottomToolPanels}" />
+            <ContentControl x:Name="BottomToolPanels" 
+                            Grid.Column="2" Grid.Row="2" 
+                            cal:View.Model="{Binding BottomToolPanels}" />
 
             <Canvas Grid.Column="0" Grid.ColumnSpan="3" Grid.Row="0" Grid.RowSpan="3">
                 <enterwell:NotificationMessageContainer Canvas.Right="0" Canvas.Bottom="0"

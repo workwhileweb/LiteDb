@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Dragablz;
 
 namespace LiteDbExplorer.Modules.Main
@@ -13,6 +14,19 @@ namespace LiteDbExplorer.Modules.Main
         public ShellView()
         {
             InitializeComponent();
+
+            SplitterToolPanels.DragCompleted += (sender, args) =>
+            {
+                var heightValue = (int) toolPanelRowDefinition.Height.Value;
+                if (heightValue < 100 && heightValue > 60)
+                {
+                    toolPanelRowDefinition.Height = new GridLength(100);
+                }
+                else if (heightValue < 60)
+                {
+                    toolPanelRowDefinition.Height = new GridLength(0);
+                }
+            };
         }
 
         public void Handle(string message, object payload = null)

@@ -33,9 +33,11 @@
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.TimeSpanUpDown.xaml" />
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.DateTimePicker.xaml" />
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
-                <ResourceDictionary Source="Themes/Controls.ScrollBar.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
+
+            <Style TargetType="{x:Type ScrollBar}" 
+                   BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
 
             <!-- Dragablz Material Design -->
             <Style TargetType="{x:Type dragablz:TabablzControl}"

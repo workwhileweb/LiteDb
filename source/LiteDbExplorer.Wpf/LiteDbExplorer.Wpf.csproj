@@ -63,6 +63,7 @@
     <Compile Include="Behaviors\KeyGestureExtension.cs" />
     <Compile Include="Behaviors\MouseDoubleClick.cs" />
     <Compile Include="Behaviors\RoutedCommandToolTip.cs" />
+    <Compile Include="Behaviors\ScrollBarAssist.cs" />
     <Compile Include="Behaviors\ScrollViewerHelper.cs" />
     <Compile Include="Behaviors\TreeViewHelper.cs" />
     <Compile Include="Behaviors\WindowOptionsBehavior.cs" />
@@ -209,6 +210,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\MaterialDesignTheme.ListView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\MaterialDesignTheme.ScrollBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\MaterialDesignTheme.ScrollViewer.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
