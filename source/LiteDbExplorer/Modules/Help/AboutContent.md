@@ -123,6 +123,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
 
+### [DynamicData](https://github.com/RolandPheasant/DynamicData)
+[MIT License](https://licenses.nuget.org/MIT).
+
 
 ### [Enterwell Client WPF - Notifications](https://github.com/Enterwell/Wpf.Notifications)
 MIT License
@@ -147,6 +150,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+
+### [EPPlus](https://github.com/JanKallman/EPPlus)
+[The project is licensed under the GNU Library General Public License (LGPL).](https://licenses.nuget.org/LGPL-3.0-or-later).
 
 
 ### [wpftoolkit](https://github.com/xceedsoftware/wpftoolkit)
@@ -370,3 +376,11 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
 CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
 TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+
+### [Serilog](https://github.com/serilog/serilog)
+[Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0)
+
+
+### [Reactive Extensions](https://github.com/dotnet/reactive)
+[Apache-2.0](https://licenses.nuget.org/Apache-2.0)

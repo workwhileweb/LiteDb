@@ -24,7 +24,7 @@
                                  SecondChildIsCollapsed="{Binding HideFileInfo}">
             <controls:SplitContainer.FirstChild>
                 <DockPanel>
-                    <controls:ToolDockPanel DockPanel.Dock="Top">
+                    <controls:ToolDockPanel DockPanel.Dock="Top" Style="{StaticResource ToolDockPanelDefault}">
                         
                         <ListBox DockPanel.Dock="Right" x:Name="detailViewSelector"
                                  SelectedIndex="0">

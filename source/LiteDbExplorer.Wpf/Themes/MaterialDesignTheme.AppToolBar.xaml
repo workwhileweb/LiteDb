@@ -16,6 +16,8 @@
         <Setter Property="ToolBarTray.IsLocked" Value="True" />
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Padding" Value="2"/>
+        <Setter Property="Height" Value="44"/>
     </Style>
 
     <Style x:Key="BottomToolBarPanel" TargetType="{x:Type Panel}">
@@ -59,13 +61,15 @@
     </Style>
 
     <Style x:Key="TollButtonDefault" TargetType="Button">
-        <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Padding" Value="10"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Padding" Value="10,4"/>
         <Setter Property="HorizontalContentAlignment" Value="Center"/>
         <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
         <Setter Property="TextBlock.FontWeight" Value="DemiBold"/>
         <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}"/>
-        <Setter Property="MinHeight" Value="42" />
+        <Setter Property="Height" Value="38" />
+        <Setter Property="MinHeight" Value="38" />
         <Setter Property="Margin" Value="3,0"/>
         <Setter Property="materialDesign:RippleAssist.Feedback" Value="{DynamicResource MaterialDesignFlatButtonRipple}" />
         <Setter Property="Template">
@@ -74,7 +78,7 @@
                     <ControlTemplate.Resources>
                         <Style TargetType="TextBlock">
                             <Setter Property="FontWeight" Value="Normal"/>
-                            <Setter Property="FontSize" Value="15"/>
+                            <Setter Property="FontSize" Value="14"/>
                             <Setter Property="Margin" Value="5,0"/>
                         </Style>
                         <Style TargetType="materialDesign:PackIcon">
@@ -111,7 +115,8 @@
         <Setter Property="TextBlock.FontWeight" Value="DemiBold" />
         <Setter Property="TextBlock.FontSize" Value="18" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
-        <Setter Property="Height" Value="42" />
+        <Setter Property="Height" Value="38" />
+        <Setter Property="MinHeight" Value="38" />
         <Setter Property="Margin" Value="3,0"/>
         <Setter Property="Padding" Value="14,6,14,6" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
@@ -152,32 +157,37 @@
         <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}" />
         <Setter Property="ClipToBounds" Value="True" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="Height" Value="44" />
         <Setter Property="MinHeight" Value="44" />
-        <Setter Property="Padding" Value="5,1,2,1"/>
+        <Setter Property="Padding" Value="5,3,2,3"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:ToolDockPanel}">
                     <ControlTemplate.Resources>
                         <Style TargetType="Separator" BasedOn="{StaticResource ToolDockPanelSeparator}"/>
                         <Style TargetType="{x:Type Button}" BasedOn="{StaticResource TollButtonDefault}">
-                            <Setter Property="MinWidth" Value="54" />
+                            <Setter Property="MinHeight" Value="38" />
+                            <Setter Property="MinWidth" Value="46" />
                         </Style>
                         <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource MaterialDesignToolToggleButton}">
-                            <Setter Property="MinWidth" Value="54" />
+                            <Setter Property="MinHeight" Value="38" />
+                            <Setter Property="MinWidth" Value="46" />
                         </Style>
                         <Style TargetType="materialDesign:PackIcon" BasedOn="{StaticResource ToolPackIcon}"/>
                         <Style TargetType="ListBox"
                                BasedOn="{StaticResource MaterialDesignToolToggleFlatListBox}">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="3,0"/>
                             <Setter Property="ItemContainerStyle">
                                 <Setter.Value>
                                     <Style TargetType="ListBoxItem"
                                            BasedOn="{StaticResource MaterialDesignToolToggleListBoxItem}">
                                         <Setter Property="TextBlock.FontWeight" Value="DemiBold" />
                                         <Setter Property="TextBlock.FontSize" Value="15" />
-                                        <Setter Property="MinHeight" Value="42" />
-                                        <Setter Property="MinWidth" Value="54" />
+                                        <Setter Property="MinHeight" Value="38" />
+                                        <Setter Property="MinWidth" Value="46" />
                                         <Setter Property="HorizontalContentAlignment" Value="Center" />
-                                        <Setter Property="Padding" Value="10" />
+                                        <Setter Property="Padding" Value="6" />
                                     </Style>
                                 </Setter.Value>
                             </Setter>
@@ -198,9 +208,61 @@
 
     <Style x:Key="ToolDockPanelCompact" TargetType="{x:Type controls:ToolDockPanel}" 
            BasedOn="{StaticResource ToolDockPanelDefault}">
+        <Setter Property="Height" Value="36" />
+        <Setter Property="MinHeight" Value="36"/>
+        <Setter Property="Padding" Value="5,3,2,3"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:ToolDockPanel}">
+                    <ControlTemplate.Resources>
+                        <Style TargetType="Separator" BasedOn="{StaticResource ToolDockPanelSeparator}"/>
+                        <Style TargetType="{x:Type Button}" BasedOn="{StaticResource TollButtonDefault}">
+                            <Setter Property="Height" Value="30" />
+                            <Setter Property="MinHeight" Value="30" />
+                            <Setter Property="MinWidth" Value="34" />
+                            <Setter Property="Padding" Value="3" />
+                        </Style>
+                        <Style TargetType="{x:Type ToggleButton}" BasedOn="{StaticResource MaterialDesignToolToggleButton}">
+                            <Setter Property="Height" Value="30" />
+                            <Setter Property="MinHeight" Value="30" />
+                            <Setter Property="MinWidth" Value="34" />
+                            <Setter Property="Padding" Value="3" />
+                        </Style>
+                        <Style TargetType="materialDesign:PackIcon" BasedOn="{StaticResource ToolPackIcon}"/>
+                        <Style TargetType="ListBox"
+                               BasedOn="{StaticResource MaterialDesignToolToggleFlatListBox}">
+                            <Setter Property="VerticalAlignment" Value="Center"/>
+                            <Setter Property="Margin" Value="3,0"/>
+                            <Setter Property="ItemContainerStyle">
+                                <Setter.Value>
+                                    <Style TargetType="ListBoxItem"
+                                           BasedOn="{StaticResource MaterialDesignToolToggleListBoxItem}">
+                                        <Setter Property="TextBlock.FontWeight" Value="DemiBold" />
+                                        <Setter Property="TextBlock.FontSize" Value="15" />
+                                        <Setter Property="Height" Value="30" />
+                                        <Setter Property="MinHeight" Value="30" />
+                                        <Setter Property="MinWidth" Value="34" />
+                                        <Setter Property="Padding" Value="3" />
+                                        <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    </Style>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ControlTemplate.Resources>
+                    <Border Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}"
+                            SnapsToDevicePixels="True">
+                        <DockPanel IsItemsHost="True">
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
     </Style>
 
     <Style x:Key="{x:Static ToolBar.ButtonStyleKey}" TargetType="Button" BasedOn="{StaticResource TollButtonDefault}"/>
-    <Style  TargetType="{x:Type controls:ToolDockPanel}" BasedOn="{StaticResource ToolDockPanelDefault}"/>
+    <Style TargetType="{x:Type controls:ToolDockPanel}" BasedOn="{StaticResource ToolDockPanelDefault}"/>
 
 </ResourceDictionary>

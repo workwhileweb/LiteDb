@@ -81,11 +81,11 @@
                             </Button>
                         </ToolBar>
                     </ToolBarTray>
+                    
 
                     <controls1:ToolDockPanel DockPanel.Dock="Bottom" Style="{StaticResource ToolDockPanelCompact}">
 
                         <ToggleButton DockPanel.Dock="Right"
-                                      Style="{StaticResource MaterialDesignToolToggleButton}"
                                       IsChecked="{Binding ShowDocumentPreview}"
                                       ToolTip="Show Document Preview">
                             <materialDesign:PackIcon Kind="EyeOutline" />

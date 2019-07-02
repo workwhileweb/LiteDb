@@ -33,8 +33,9 @@
         </controls:ToolDockPanel>
 
         <controls:ToolDockPanel Grid.Row="2" Style="{StaticResource ToolDockPanelCompact}">
-            <StackPanel Orientation="Horizontal" Opacity="0.5" Margin="10,0">
-                <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" ToolTip="{Binding SourceUrl}"> 
+            <StackPanel Orientation="Horizontal" Opacity="1" Margin="10,0">
+                <TextBlock VerticalAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis" 
+                           ToolTip="Navigate to source"> 
                     <Hyperlink NavigateUri="{Binding NavigateUrl}" RequestNavigate="Hyperlink_RequestNavigate">
                         <Hyperlink.Inlines>
                             <Run Text="Source:"/>

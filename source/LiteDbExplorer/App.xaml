@@ -39,6 +39,11 @@
             <Style TargetType="{x:Type ScrollBar}" 
                    BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
 
+            <!--<Style TargetType="Hyperlink"
+                   BasedOn="{StaticResource {x:Type Hyperlink}}">
+                <Setter Property="Foreground" Value="{DynamicResource AccentColorBrush2}"/>
+            </Style>-->
+
             <!-- Dragablz Material Design -->
             <Style TargetType="{x:Type dragablz:TabablzControl}"
                    BasedOn="{StaticResource MaterialDesignTabablzControlStyle}" />
