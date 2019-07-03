@@ -39,7 +39,7 @@ namespace LiteDbExplorer.Modules.DbQuery
         [UsedImplicitly]
         public async Task ExportJson()
         {
-            await _databaseInteractions.ExportJson(QueryResult);
+            await _databaseInteractions.ExportToJson(QueryResult);
         }
 
         [UsedImplicitly]

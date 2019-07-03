@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -11,10 +12,12 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using Enterwell.Clients.Wpf.Notifications;
+using Forge.Forms;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbDocument;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
@@ -24,8 +27,9 @@ using Serilog;
 namespace LiteDbExplorer.Modules.DbCollection
 {
     [Export(typeof(CollectionExplorerViewModel))]
-    [PartCreationPolicy (CreationPolicy.NonShared)]
-    public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>, INavigationTarget<CollectionReferencePayload>
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>,
+        INavigationTarget<CollectionReferencePayload>
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IApplicationInteraction _applicationInteraction;
@@ -37,7 +41,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         [ImportingConstructor]
         public CollectionExplorerViewModel(
-            IEventAggregator eventAggregator, 
+            IEventAggregator eventAggregator,
             IApplicationInteraction applicationInteraction,
             IDatabaseInteractions databaseInteractions)
         {
@@ -52,25 +56,25 @@ namespace LiteDbExplorer.Modules.DbCollection
 
             FindTextModel = new FindTextModel();
 
-            ItemDoubleClickCommand = new RelayCommand<DocumentReference>(async doc=> await OnItemDoubleClick(doc));
+            ItemDoubleClickCommand = new RelayCommand<DocumentReference>(async doc => await OnItemDoubleClick(doc));
 
-            AddDocumentCommand = new RelayCommand(async _=> await AddDocument(), o => CanAddDocument());
-            EditDocumentCommand = new RelayCommand(async _=> await EditDocument(), o => CanEditDocument());
-            RemoveDocumentCommand = new RelayCommand(async _=> await RemoveDocument(), o => CanRemoveDocument());
-            ExportDocumentCommand = new RelayCommand(async _=> await ExportDocument(), o => CanExportDocument());
-            CopyDocumentCommand = new RelayCommand(async _=> await CopyDocument(), o => CanCopyDocument());
-            PasteDocumentCommand = new RelayCommand(async _=> await PasteDocument(), o => CanPasteDocument());
-            RefreshCollectionCommand = new RelayCommand(_=> RefreshCollection(), o => CanRefreshCollection());
-            EditDbPropertiesCommand = new RelayCommand(_=> EditDbProperties(), o => CanEditDbProperties());
-            FindCommand = new RelayCommand(_=> OpenFind(), o => CanOpenFind());
-            FindNextCommand = new RelayCommand(_=> Find(), o => CanFind());
-            FindPreviousCommand = new RelayCommand(_=> FindPrevious(), o => CanFind());
+            AddDocumentCommand = new RelayCommand(async _ => await AddDocument(), o => CanAddDocument());
+            EditDocumentCommand = new RelayCommand(async _ => await EditDocument(), o => CanEditDocument());
+            RemoveDocumentCommand = new RelayCommand(async _ => await RemoveDocument(), o => CanRemoveDocument());
+            ExportDocumentCommand = new RelayCommand(async _ => await ExportDocument(), o => CanExportDocument());
+            CopyDocumentCommand = new RelayCommand(async _ => await CopyDocument(), o => CanCopyDocument());
+            PasteDocumentCommand = new RelayCommand(async _ => await PasteDocument(), o => CanPasteDocument());
+            RefreshCollectionCommand = new RelayCommand(_ => RefreshCollection(), o => CanRefreshCollection());
+            EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), o => CanEditDbProperties());
+            FindCommand = new RelayCommand(_ => OpenFind(), o => CanOpenFind());
+            FindNextCommand = new RelayCommand(_ => Find(), o => CanFind());
+            FindPreviousCommand = new RelayCommand(_ => FindPrevious(), o => CanFind());
         }
 
         public CollectionItemDoubleClickAction DoubleClickAction { get; }
 
         public int ContentMaxLength { get; }
-        
+
         public Orientation? SplitOrientation { get; }
 
         public RelayCommand<DocumentReference> ItemDoubleClickCommand { get; }
@@ -110,6 +114,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                     _collectionReference.ReferenceChanged -= OnCollectionReferenceChanged;
                     _collectionReference.DocumentsCollectionChanged -= OnDocumentsCollectionChanged;
                 }
+
                 _collectionReference = value;
                 if (_collectionReference != null)
                 {
@@ -118,7 +123,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                 }
             }
         }
-        
+
         [UsedImplicitly]
         public DocumentReference SelectedDocument
         {
@@ -152,6 +157,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                 {
                     ActivateDocumentPreview();
                 }
+
                 _showDocumentPreview = value;
                 if (_showDocumentPreview == false)
                 {
@@ -178,7 +184,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        public string SelectedDocumentsCountInfo 
+        public string SelectedDocumentsCountInfo
         {
             get
             {
@@ -199,7 +205,8 @@ namespace LiteDbExplorer.Modules.DbCollection
                 return;
             }
 
-            Log.Debug("Init. {ViewModelName}, ReferenceId {ReferenceId}", nameof(CollectionExplorerViewModel), value.InstanceId);
+            Log.Debug("Init. {ViewModelName}, ReferenceId {ReferenceId}", nameof(CollectionExplorerViewModel),
+                value.InstanceId);
 
             InstanceId = value.InstanceId;
 
@@ -212,9 +219,11 @@ namespace LiteDbExplorer.Modules.DbCollection
                 GroupId = collectionReference.Database.InstanceId;
                 GroupDisplayName = collectionReference.Database.Name;
             }
-            
-            IconContent = collectionReference is FileCollectionReference ? new PackIcon { Kind = PackIconKind.FileMultiple } : new PackIcon { Kind = PackIconKind.TableLarge, Height = 16 };
-            
+
+            IconContent = collectionReference is FileCollectionReference
+                ? new PackIcon {Kind = PackIconKind.FileMultiple}
+                : new PackIcon {Kind = PackIconKind.TableLarge, Height = 16};
+
             CollectionReference = collectionReference;
         }
 
@@ -235,12 +244,13 @@ namespace LiteDbExplorer.Modules.DbCollection
                 };
             }
         }
-        
+
         protected override void OnDeactivate(bool close)
         {
             if (close)
             {
-                Log.Debug("Deactivate {ViewModelName}, ReferenceId {ReferenceId}", nameof(CollectionExplorerViewModel), InstanceId);
+                Log.Debug("Deactivate {ViewModelName}, ReferenceId {ReferenceId}", nameof(CollectionExplorerViewModel),
+                    InstanceId);
 
                 DeactivateItem(ActiveItem, true);
 
@@ -265,7 +275,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         {
             DeactivateItem(ActiveItem, false);
         }
-        
+
         #region Handles
 
         private void OnCollectionReferenceChanged(object sender, ReferenceChangedEventArgs<CollectionReference> e)
@@ -283,7 +293,8 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
 
-        private void OnDocumentsCollectionChanged(object sender, CollectionReferenceChangedEventArgs<DocumentReference> e)
+        private void OnDocumentsCollectionChanged(object sender,
+            CollectionReferenceChangedEventArgs<DocumentReference> e)
         {
             if (e.Action == ReferenceNodeChangeAction.Add)
             {
@@ -296,10 +307,10 @@ namespace LiteDbExplorer.Modules.DbCollection
                 _view?.UpdateView(SelectedDocument);
             }
         }
-        
+
         protected async Task OnItemDoubleClick(DocumentReference documentReference)
         {
-            if(documentReference == null)
+            if (documentReference == null)
             {
                 return;
             }
@@ -318,16 +329,17 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         #endregion
-        
+
         #region Routed Commands
-        
+
         [UsedImplicitly]
         public async Task AddDocument()
         {
             await _databaseInteractions.CreateItem(CollectionReference)
                 .OnSuccess(async reference =>
                 {
-                    await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference, reference.Items);
+                    await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference,
+                        reference.Items);
                     _eventAggregator.PublishOnUIThread(reference);
                 });
         }
@@ -365,30 +377,13 @@ namespace LiteDbExplorer.Modules.DbCollection
         [UsedImplicitly]
         public async Task ExportDocument()
         {
-            var maybeFileName = await _databaseInteractions.ExportExcel(CollectionReference.Items, CollectionReference.Name);
-            if (maybeFileName.HasValue)
-            {
-                NotificationInteraction.Default()
-                    .HasMessage($"Export saved in:\n{maybeFileName.Value.ShrinkPath(128)}")
-                    .Dismiss().WithButton("Open", button =>
-                    {
-                        _applicationInteraction.OpenFileWithAssociatedApplication(maybeFileName.Value);
-                    })
-                    .WithButton("Reveal in Explorer", button =>
-                    {
-                        _applicationInteraction.RevealInExplorer(maybeFileName.Value);
-                    })
-                    .Dismiss().WithButton("Close", button => { })
-                    .Queue();
-            }
-
-            // await _databaseInteractions.ExportDocuments(SelectedDocuments.ToList());
+            await _databaseInteractions.ExportCollection(this, CollectionReference, SelectedDocuments);
         }
 
         [UsedImplicitly]
         public bool CanExportDocument()
         {
-            return SelectedDocuments.HasAnyDocumentsReference();
+            return CollectionReference != null && CollectionReference.Items.Any();
         }
 
         [UsedImplicitly]
@@ -489,7 +484,7 @@ namespace LiteDbExplorer.Modules.DbCollection
     public class FindTextModel : INotifyPropertyChanged
     {
         public string Text { get; set; }
-        
+
         public bool MatchCase { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;

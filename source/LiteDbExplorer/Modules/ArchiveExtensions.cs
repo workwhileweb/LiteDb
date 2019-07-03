@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
 namespace LiteDbExplorer.Modules
 {
-    public static class DirectoryExtensions
+    public static class ArchiveExtensions
     {
         public static string EnsureUniqueFileName(this FileInfo fileInfo)
         {
@@ -62,6 +63,24 @@ namespace LiteDbExplorer.Modules
         public static void PrependTimeStamp(ref string fileName)
         {
             fileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{DateTime.Now:yyyy-MM-dd_HH-mmss}_{Path.GetExtension(fileName)}";
+        }
+
+        public static string EnsureFileName(string name, string fallbackName, string extension, bool prependTimestamp)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                name = fallbackName;
+            }
+
+            var result = Path.GetFileNameWithoutExtension(name);
+            if (prependTimestamp)
+            {
+                result += $"_{DateTime.Now:yyyy-MM-dd_HH-mmss}";
+            }
+
+            result += $".{extension.TrimStart('.')}";
+
+            return result;
         }
     }
 }

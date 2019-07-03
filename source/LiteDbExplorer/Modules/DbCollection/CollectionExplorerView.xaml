@@ -218,6 +218,5 @@
                                 cal:View.Model="{Binding ActiveItem}" />
             </controls1:SplitContainer.SecondChild>
         </controls1:SplitContainer>
-
     </Grid>
 </UserControl>

@@ -95,7 +95,11 @@
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <ContentControl cal:View.Model="{Binding}" />
+                        <materialDesign:DialogHost Identifier="{Binding DialogHostIdentifier}" 
+                                                   Style="{StaticResource MaterialDesignEmbeddedDialogHost}"
+                                                   DialogTheme="Inherit">
+                            <ContentControl cal:View.Model="{Binding}" />
+                        </materialDesign:DialogHost>
                     </DataTemplate>
                 </Setter.Value>
             </Setter>

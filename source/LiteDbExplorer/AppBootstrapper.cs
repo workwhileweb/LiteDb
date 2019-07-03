@@ -18,7 +18,6 @@ using LiteDbExplorer.Modules;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf;
-using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using LiteDbExplorer.Wpf.Modules.Settings;
 

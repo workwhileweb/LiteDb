@@ -7,6 +7,7 @@
     xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
     xmlns:enterwell="clr-namespace:Enterwell.Clients.Wpf.Notifications.Controls;assembly=Enterwell.Clients.Wpf.Notifications"
     xmlns:modules="clr-namespace:LiteDbExplorer.Modules"
+    xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
     x:Class="LiteDbExplorer.Modules.Main.ShellView"
     mc:Ignorable="d"
     d:DesignHeight="200" d:DesignWidth="600">
@@ -56,6 +57,11 @@
                                                         x:Name="notificationMessageContainer" 
                                                         Manager="{Binding Path=Manager, Source={StaticResource NotificationInteractionProxy}}"/>
             </Canvas>
+
+            <materialDesign:DialogHost Grid.Row="0" Grid.Column="0" Grid.RowSpan="3" Grid.ColumnSpan="3"
+                                       Identifier="ShellDialog" 
+                                       DialogTheme="Inherit">
+            </materialDesign:DialogHost>
 
         </Grid>
 

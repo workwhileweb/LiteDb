@@ -9,6 +9,55 @@ namespace LiteDbExplorer.Core
 {
     public static class LiteDbReferenceExtensions
     {
+        public static IEnumerable<string> SelectAllDistinctKeys(this IEnumerable<DocumentReference> documents, FieldSortOrder sortOrder = FieldSortOrder.Original)
+        {
+            if (documents == null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            var result = documents
+                .SelectMany(p => p.LiteDocument.Keys)
+                .Distinct(StringComparer.InvariantCulture);
+
+            if (sortOrder == FieldSortOrder.Alphabetical)
+            {
+                result = result.OrderBy(_ => _);
+            }
+
+            return result;
+        }
+
+        public static IEnumerable<string> SelectAllDistinctKeys(this IEnumerable<BsonDocument> documents,
+            FieldSortOrder sortOrder = FieldSortOrder.Original)
+        {
+            if (documents == null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            var result = documents
+                .SelectMany(p => p.Keys)
+                .Distinct(StringComparer.InvariantCulture);
+
+            if (sortOrder == FieldSortOrder.Alphabetical)
+            {
+                result = result.OrderBy(_ => _);
+            }
+
+            return result;
+        }
+
+        public static bool IsFilesOrChunksCollection(this CollectionReference reference)
+        {
+            if (reference == null)
+            {
+                return false;
+            }
+
+            return reference.Name == @"_files" || reference.Name == @"_chunks";
+        }
+
         public static bool HasAnyDocumentsReference(this IEnumerable<DocumentReference> documentReferences, DocumentTypeFilter filter = DocumentTypeFilter.All)
         {
             if (documentReferences == null)

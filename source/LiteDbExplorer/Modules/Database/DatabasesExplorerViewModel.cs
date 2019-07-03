@@ -259,7 +259,7 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public async Task RevealInExplorer()
         {
-            await _databaseInteractions.RevealInExplorer(SelectedDatabase);
+            await _applicationInteraction.RevealInExplorer(SelectedDatabase.Location);
         }
 
         [UsedImplicitly]
@@ -297,7 +297,7 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public async Task ExportCollection()
         {
-            await _databaseInteractions.ExportCollection(SelectedCollection);
+            await _databaseInteractions.ExportCollection(this, SelectedCollection);
         }
 
         [UsedImplicitly]

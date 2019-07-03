@@ -4,12 +4,19 @@ using System.ComponentModel.Composition;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
+using Caliburn.Micro;
 using CSharpFunctionalExtensions;
+using Enterwell.Clients.Wpf.Notifications;
+using Forge.Forms;
+using ICSharpCode.AvalonEdit.Document;
 using LiteDbExplorer.Core;
 using LiteDB;
+using LiteDbExplorer.Modules.Shared;
+using LiteDbExplorer.Presentation;
 using OfficeOpenXml;
 using Serilog;
 
@@ -23,9 +30,6 @@ namespace LiteDbExplorer.Modules
         Task OpenDatabases(IEnumerable<string> paths);
         Task CloseDatabase(DatabaseReference database);
         Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database);
-        Task ExportJson(IJsonSerializerProvider provider, string name = "");
-        Task ExportCollection(CollectionReference collectionReference);
-        Task ExportDocuments(ICollection<DocumentReference> documents);
         Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database);
         Task<Result<CollectionDocumentChangeEventArgs>> ImportDataFromText(CollectionReference collection, string textData);
         Task<Result<CollectionDocumentChangeEventArgs>> CreateItem(CollectionReference collection);
@@ -35,8 +39,15 @@ namespace LiteDbExplorer.Modules
         Task<Result> RenameCollection(CollectionReference collection);
         Task<Result<CollectionReference>> DropCollection(CollectionReference collection);
         Task<Result> RemoveDocuments(IEnumerable<DocumentReference> documents);
-        Task<Result<bool>> RevealInExplorer(DatabaseReference database);
-        Task<Maybe<string>> ExportExcel(ICollection<DocumentReference> documents, string name);
+
+        Task<Maybe<string>> ExportToJson(IJsonSerializerProvider provider, string fileName = "");
+        Task<Maybe<string>> ExportToExcel(ICollection<DocumentReference> documents, string name = "");
+        Task<Maybe<string>> ExportToJson(ICollection<DocumentReference> documents, string name = "");
+        Task<Maybe<string>> ExportStoredFiles(ICollection<DocumentReference> documents);
+        Task<Maybe<string>> ExportToCsv(ICollection<DocumentReference> documents, string name = "");
+
+        Task<Maybe<string>> ExportCollection(IScreen context, CollectionReference collectionReference, IList<DocumentReference> selectedDocuments = null);
+        Task<Maybe<string>> ExportDocuments(IScreen context, ICollection<DocumentReference> documents, string name = "");
     }
 
     [Export(typeof(IDatabaseInteractions))]
@@ -294,118 +305,116 @@ namespace LiteDbExplorer.Modules
             }
         }
 
-        public async Task ExportCollection(CollectionReference collectionReference)
+        public async Task<Maybe<string>> ExportCollection(
+            IScreen context, 
+            CollectionReference collectionReference, 
+            IList<DocumentReference> selectedDocuments = null)
         {
             if (collectionReference == null)
             {
-                return;
+                return null;
             }
 
-            if (collectionReference.IsFilesOrChunks)
+            var exportOptions =
+                new CollectionExportOptions(collectionReference.IsFilesOrChunks, selectedDocuments?.Count);
+
+            var dialogHostIdentifier = AppConstants.DialogHosts.Shell;
+            if (context is LiteDbExplorer.Wpf.Framework.Shell.IDocument document)
             {
-                var maybeDirectoryPath = await _applicationInteraction.ShowFolderPickerDialog("Select folder to export files to...");
-                if (maybeDirectoryPath.HasValue)
+                dialogHostIdentifier = document.DialogHostIdentifier;
+            }
+            var result = await Show.Dialog(dialogHostIdentifier).For(exportOptions);
+            if (result.Action is "cancel")
+            {
+                return null;
+            }
+
+            var itemsToExport = result.Model.GetSelectedRecordsFilter() == 0
+                ? collectionReference.Items
+                : selectedDocuments;
+            var referenceName = collectionReference.Name;
+
+            Maybe<string> maybePath = null;
+            switch (result.Model.GetSelectedExportFormat())
+            {
+                case 0:
+                    maybePath = await ExportToJson(itemsToExport, referenceName);
+                    break;
+                case 1:
+                    maybePath = await ExportToExcel(itemsToExport, referenceName);
+                    break;
+                case 2:
+                    maybePath = await ExportToCsv(itemsToExport, referenceName);
+                    break;
+                case 3:
+                    maybePath = await ExportStoredFiles(itemsToExport);
+                    break;
+            }
+
+            if (maybePath.HasValue)
+            {
+                var builder = NotificationInteraction.Default()
+                    .HasMessage($"{result.Model.ExportFormat} saved in:\n{maybePath.Value.ShrinkPath(128)}");
+
+                if (Path.HasExtension(maybePath.Value))
                 {
-                    foreach (var file in collectionReference.Items)
+                    builder.Dismiss().WithButton("Open",
+                        async button =>
+                        {
+                            await _applicationInteraction.OpenFileWithAssociatedApplication(maybePath.Value);
+                        });
+                }
+
+                builder.WithButton("Reveal in Explorer",
+                        async button => { await _applicationInteraction.RevealInExplorer(maybePath.Value); })
+                    .Dismiss().WithButton("Close", button => { });
+
+                builder.Queue();
+            }
+
+            return maybePath;
+        }
+
+        public async Task<Maybe<string>> ExportDocuments(IScreen context, ICollection<DocumentReference> documents, string name = "")
+        {
+            if (documents == null || !documents.Any())
+            {
+                return null;
+            }
+
+            var documentReference = documents.First();
+            if (documentReference.Collection is FileCollectionReference)
+            {
+                return await ExportStoredFiles(documents);
+            }
+
+            return await ExportToJson(documents, name);
+        }
+
+        public async Task<Maybe<string>> ExportToJson(ICollection<DocumentReference> documents, string name = "")
+        {
+            var fileName = ArchiveExtensions.EnsureFileName(name, "export", ".json", true);
+            var maybeJsonFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", fileName);
+            if (maybeJsonFileName.HasValue)
+            {
+                if (documents.Count == 1)
+                {
+                    using (var writer = new StreamWriter(maybeJsonFileName.Value))
                     {
-                        var path = Path.Combine(maybeDirectoryPath.Value, $"{file.LiteDocument["_id"].AsString}-{file.LiteDocument["filename"].AsString}");
-                        
-                        DirectoryExtensions.EnsureFileDirectory(path);
-                        
-                        (file.Collection as FileCollectionReference)?.SaveFile(file, path);
+                        JsonSerializer.Serialize(documents.First().LiteDocument, writer, true, false);
                     }
                 }
-            }
-            else
-            {
-                var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", $"{collectionReference.Name}_export.json");
-                if (maybeFileName.HasValue)
+                else
                 {
-                    var data = new BsonArray(collectionReference.LiteCollection.FindAll());
-                    using (var writer = new StreamWriter(maybeFileName.Value))
+                    var data = new BsonArray(documents.Select(a => a.LiteDocument));
+                    using (var writer = new StreamWriter(maybeJsonFileName.Value))
                     {
                         JsonSerializer.Serialize(data, writer, true, false);
                     }
                 }
             }
-        }
 
-        public async Task ExportDocuments(ICollection<DocumentReference> documents)
-        {
-            if (documents == null || !documents.Any())
-            {
-                return;
-            }
-
-            var documentReference = documents.First();
-
-            if (documentReference.Collection is FileCollectionReference)
-            {
-                if (documents.Count == 1)
-                {
-                    var file = documentReference;
-                    var maybeFileName = await _applicationInteraction.ShowSaveFileDialog(fileName: file.LiteDocument["filename"]);
-                    if (maybeFileName.HasValue)
-                    {
-                        (file.Collection as FileCollectionReference)?.SaveFile(file, maybeFileName.Value);
-                    }
-                }
-                else
-                {
-                    var maybeDirectoryPath = await _applicationInteraction.ShowFolderPickerDialog("Select folder to export files to...");
-                    if (maybeDirectoryPath.HasValue)
-                    {
-                        foreach (var file in documents)
-                        {
-                            var path = Path.Combine(maybeDirectoryPath.Value, $"{file.LiteDocument["_id"].AsString}-{file.LiteDocument["filename"].AsString}");
-                            
-                            DirectoryExtensions.EnsureFileDirectory(path);
-                            
-                            (file.Collection as FileCollectionReference)?.SaveFile(file, path);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", "export.json");
-                if (maybeFileName.HasValue)
-                {
-                    if (documents.Count == 1)
-                    {
-                        using (var writer = new StreamWriter(maybeFileName.Value))
-                        {
-                            JsonSerializer.Serialize(documentReference.LiteDocument, writer, true, false);
-                        }
-                    }
-                    else
-                    {
-                        var data = new BsonArray(documents.Select(a => a.LiteDocument));
-                        using (var writer = new StreamWriter(maybeFileName.Value))
-                        {
-                            JsonSerializer.Serialize(data, writer, true, false);
-                        }
-                    }
-                }
-            }
-        }
-
-        public async Task ExportJson(IJsonSerializerProvider provider, string name = "")
-        {
-            var fileName = "export.json";
-            if (!string.IsNullOrEmpty(name))
-            {
-                fileName = DirectoryExtensions.EnsureFileNameExtension(name, ".json");
-            }
-
-            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", fileName);
-            if (maybeFileName.HasValue)
-            {
-                using (var writer = new StreamWriter(maybeFileName.Value))
-                {
-                    provider.Serialize(writer, true);
-                }
-            }
+            return maybeJsonFileName;
         }
 
         public static readonly Dictionary<BsonType, Func<object, string>> BsonTypeToExcelNumberFormat =
@@ -416,20 +425,16 @@ namespace LiteDbExplorer.Modules
                 {BsonType.DateTime, _ => $"{CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern} {CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern}"}
             };
 
-        public async Task<Maybe<string>> ExportExcel(ICollection<DocumentReference> documents, string name)
+        public async Task<Maybe<string>> ExportToExcel(ICollection<DocumentReference> documents, string name = "")
         {
-            var fileName = DirectoryExtensions.EnsureFileNameExtension(name, ".xlsx");
-            DirectoryExtensions.PrependTimeStamp(ref fileName);
+            var fileName = ArchiveExtensions.EnsureFileName(name, "export", ".xlsx", true);
             var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Excel export", "Excel File|*.xlsx", fileName);
             if (maybeFileName.HasNoValue)
             {
                 return null;
             }
 
-            var keys = documents
-                .SelectMany(p => p.LiteDocument.Keys)
-                .Distinct(StringComparer.InvariantCulture)
-                .ToArray();
+            var keys = documents.SelectAllDistinctKeys().ToArray();
 
             var excelPackage = new ExcelPackage();
             var ws = excelPackage.Workbook.Worksheets.Add(name);
@@ -438,7 +443,6 @@ namespace LiteDbExplorer.Modules
             for (var i = 0; i < keys.Length; i++)
             {
                 ws.Cells[1, i + 1].Value = keys[i];
-                ws.Column(i + 1).AutoFit();
             }
 
             // Add data
@@ -489,6 +493,115 @@ namespace LiteDbExplorer.Modules
             excelPackage.Dispose();
 
             return maybeFileName.Value;
+        }
+
+        public async Task<Maybe<string>> ExportToCsv(ICollection<DocumentReference> documents, string name = "")
+        {
+            var fileName = ArchiveExtensions.EnsureFileName(name, "export", ".csv", true);
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save CSV export", "Excel File|*.xlsx", fileName);
+            if (maybeFileName.HasNoValue)
+            {
+                return null;
+            }
+
+            var separator = ",";
+            var reservedTokens = new[] { '\"', ',', '\n', '\r' };
+            var keys = documents.SelectAllDistinctKeys().ToArray();
+
+            var contents = new List<string>
+            {
+                string.Join(separator, keys)
+            };
+
+            foreach (var documentReference in documents)
+            {
+                var rowCols = new string[keys.Length];
+                var currentCol = 0;
+                foreach (var key in keys)
+                {
+                    if (documentReference.LiteDocument.ContainsKey(key))
+                    {
+                        string cellValue = null;
+                        var bsonValue = documentReference.LiteDocument[key];
+                        if (!bsonValue.IsArray && !bsonValue.IsDocument && !bsonValue.IsNull)
+                        {
+                            cellValue = Convert.ToString(bsonValue.RawValue, CultureInfo.InvariantCulture);
+                        }
+                        // Escape reserved tokens
+                        if (cellValue != null && cellValue.IndexOfAny(reservedTokens) >= 0)
+                        {
+                            cellValue = "\"" + cellValue.Replace("\"", "\"\"") + "\"";  
+                        }
+                        rowCols[currentCol] = cellValue;
+                    }
+                    currentCol++;
+                }
+                contents.Add(string.Join(separator, rowCols));
+            }
+
+            File.WriteAllLines(maybeFileName.Value, contents, Encoding.UTF8);
+
+            return maybeFileName;
+
+        }
+
+        public async Task<Maybe<string>> ExportStoredFiles(ICollection<DocumentReference> documents)
+        {
+            var documentReference = documents.FirstOrDefault();
+            if (!(documentReference?.Collection is FileCollectionReference))
+            {
+                return null;
+            }
+
+            Maybe<string> maybePath = null;
+            if (documents.Count == 1)
+            {
+                var file = documentReference;
+                maybePath = await _applicationInteraction.ShowSaveFileDialog(fileName: file.LiteDocument["filename"]);
+                if (maybePath.HasValue)
+                {
+                    (file.Collection as FileCollectionReference)?.SaveFile(file, maybePath.Value);
+                }
+            }
+            else
+            {
+                maybePath = await _applicationInteraction.ShowFolderPickerDialog("Select folder to export files to...");
+                if (maybePath.HasValue)
+                {
+                    foreach (var file in documents)
+                    {
+                        var prefix = file.LiteDocument["_id"].AsString.Replace('/', ' ').Split('.').FirstOrDefault();
+
+                        var path = Path.Combine(maybePath.Value, $"{prefix}-{file.LiteDocument["filename"].AsString}");
+                            
+                        ArchiveExtensions.EnsureFileDirectory(path);
+                            
+                        (file.Collection as FileCollectionReference)?.SaveFile(file, path);
+                    }
+                }    
+            }
+
+            return maybePath;
+        }
+
+        public async Task<Maybe<string>> ExportToJson(IJsonSerializerProvider provider, string fileName = "")
+        {
+            var exportFileName = "export.json";
+            if (!string.IsNullOrEmpty(fileName))
+            {
+                exportFileName = ArchiveExtensions.EnsureFileNameExtension(fileName, ".json");
+            }
+
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Json export", "Json File|*.json", exportFileName);
+            if (maybeFileName.HasValue)
+            {
+                using (var writer = new StreamWriter(maybeFileName.Value))
+                {
+                    provider.Serialize(writer, true);
+                }
+            }
+
+            return maybeFileName;
         }
 
         public Task<Result> CopyDocuments(IEnumerable<DocumentReference> documents)
@@ -565,13 +678,5 @@ namespace LiteDbExplorer.Modules
 
             return Task.FromResult(Result.Ok(documentsCreated));
         }
-
-        public Task<Result<bool>> RevealInExplorer(DatabaseReference database)
-        {
-            var isOpen = _applicationInteraction.RevealInExplorer(database.Location);
-
-            return Task.FromResult(Result.Ok(isOpen));
-        }
-
     }
 }

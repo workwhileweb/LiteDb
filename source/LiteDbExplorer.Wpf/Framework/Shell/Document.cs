@@ -21,6 +21,8 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
 
         public SolidColorBrush GroupDisplayBackground { get; set; }
 
+        public string DialogHostIdentifier => $"Dialog_{Id}";
+
         private ICommand _closeCommand;
         public override ICommand CloseCommand
         {
@@ -68,6 +70,8 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
 
         public virtual string InstanceId { get; protected set; }
 
+        public string DialogHostIdentifier => $"Dialog_{Id}";
+
         private ICommand _closeCommand;
         public virtual ICommand CloseCommand
         {
@@ -111,6 +115,8 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
         public SolidColorBrush GroupDisplayBackground { get; set; }
 
         public virtual string InstanceId { get; protected set; }
+
+        public string DialogHostIdentifier => $"Dialog_{Id}";
 
         private ICommand _closeCommand;
         public virtual ICommand CloseCommand

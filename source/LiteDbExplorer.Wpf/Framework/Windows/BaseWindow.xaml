@@ -7,7 +7,8 @@
         xmlns:cal="http://www.caliburnproject.org"
         mc:Ignorable="d"
         Height="450" Width="800"
-        Style="{StaticResource MainWindowStyle}">
+        Style="{StaticResource MainWindowStyle}"
+        UseLayoutRounding="True">
     <mah:MetroWindow.IconTemplate>
         <DataTemplate>
             <Image Source="/Images/icon.png" Height="21" Stretch="Uniform"

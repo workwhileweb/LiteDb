@@ -80,12 +80,13 @@
     <Compile Include="Application\IRecentFilesProvider.cs" />
     <Compile Include="Application\RecentFileInfo.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
+    <Compile Include="Modules\Shared\CollectionExportOptions.cs" />
     <Compile Include="Modules\DbCollection\CollectionReferencePayload.cs" />
     <Compile Include="Modules\DbDocument\DocumentReferencePayload.cs" />
     <Compile Include="Modules\DbQuery\RunQueryContext.cs" />
     <Compile Include="Modules\Diagnostics\DiagnosticsSettings.cs" />
     <Compile Include="Modules\Diagnostics\MemoryUsageStatusButton.cs" />
-    <Compile Include="Modules\DirectoryExtensions.cs" />
+    <Compile Include="Modules\ArchiveExtensions.cs" />
     <Compile Include="Modules\Main\ToolPanelSetView.xaml.cs">
       <DependentUpon>ToolPanelSetView.xaml</DependentUpon>
     </Compile>

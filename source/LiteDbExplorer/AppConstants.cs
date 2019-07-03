@@ -26,5 +26,10 @@ namespace LiteDbExplorer
         {
             public static Version CurrentVersion => System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
         }
+
+        public class DialogHosts
+        {
+            public const string Shell = "ShellDialog";
+        }
     }
 }

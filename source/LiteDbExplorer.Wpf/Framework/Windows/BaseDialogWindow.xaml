@@ -7,7 +7,8 @@
         mc:Ignorable="d"
         Height="450" Width="800"
         WindowStartupLocation="CenterOwner"
-        Style="{StaticResource DialogWindowStyle}">
+        Style="{StaticResource DialogWindowStyle}"
+        UseLayoutRounding="True">
     <mah:MetroWindow.IconTemplate>
         <DataTemplate>
             <Image Source="/Images/icon.png" Height="21" Stretch="Uniform"

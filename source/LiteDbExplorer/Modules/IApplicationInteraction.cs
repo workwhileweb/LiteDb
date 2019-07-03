@@ -13,7 +13,7 @@ namespace LiteDbExplorer.Modules
         bool OpenDatabaseProperties(DatabaseReference database);
         bool OpenEditDocument(DocumentReference document);
         Task<Result> OpenQuery(RunQueryContext queryContext);
-        bool RevealInExplorer(string filePath);
+        Task<bool> RevealInExplorer(string filePath);
         Task<Result> ActivateDefaultDocumentView(DocumentReference document);
         Task<Result> ActivateDefaultCollectionView(CollectionReference collection, IEnumerable<DocumentReference> selectedDocuments = null);
         bool ShowConfirm(string message, string title = "Are you sure?");
@@ -29,6 +29,6 @@ namespace LiteDbExplorer.Modules
             string initialDirectory = "");
         Task<Maybe<string>> ShowFolderPickerDialog(string title = "", string initialDirectory = "");
         Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "");
-        bool OpenFileWithAssociatedApplication(string filePath);
+        Task<bool> OpenFileWithAssociatedApplication(string filePath);
     }
 }

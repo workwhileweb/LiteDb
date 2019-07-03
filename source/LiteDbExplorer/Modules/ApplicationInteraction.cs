@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.IO;
 using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
@@ -85,32 +86,35 @@ namespace LiteDbExplorer.Modules
         }
         
 
-        public bool RevealInExplorer(string filePath)
+        public Task<bool> RevealInExplorer(string filePath)
         {
-            if (!System.IO.File.Exists(filePath))
+            var isFile = Path.HasExtension(filePath);
+            if ((Path.HasExtension(filePath) && !File.Exists(filePath)) || !isFile && !Directory.Exists(filePath))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             //Clean up file path so it can be navigated OK
-            filePath = System.IO.Path.GetFullPath(filePath);
-            System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+            filePath = Path.GetFullPath(filePath);
 
-            return true;
+            System.Diagnostics.Process.Start("explorer.exe", isFile ? $"/select,\"{filePath}\"" : filePath);
+
+
+            return Task.FromResult(true);
         }
 
-        public bool OpenFileWithAssociatedApplication(string filePath)
+        public Task<bool> OpenFileWithAssociatedApplication(string filePath)
         {
             if (!System.IO.File.Exists(filePath))
             {
-                return false;
+                return Task.FromResult(false);
             }
 
             //Clean up file path so it can be navigated OK
             filePath = System.IO.Path.GetFullPath(filePath);
             System.Diagnostics.Process.Start(filePath);
 
-            return true;
+            return Task.FromResult(true);
         }
 
         public async Task<Result> ActivateDefaultCollectionView(CollectionReference collection, IEnumerable<DocumentReference> selectedDocuments = null)

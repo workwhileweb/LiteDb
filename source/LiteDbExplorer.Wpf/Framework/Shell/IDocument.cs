@@ -21,6 +21,8 @@ namespace LiteDbExplorer.Wpf.Framework.Shell
 
         string GroupId { get; set; }
 
+        string DialogHostIdentifier { get; }
+
         void UpdateGroupDisplay();
 
         event EventHandler<EventArgs> UpdateGroupDisplayRequest;

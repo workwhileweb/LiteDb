@@ -49,7 +49,6 @@ namespace LiteDbExplorer.Core
                 {
                     _items.CollectionChanged -= OnDocumentsCollectionChanged;
                 }
-
                 _items = value;
                 if (_items != null)
                 {
@@ -60,7 +59,7 @@ namespace LiteDbExplorer.Core
             }
         }
 
-        public bool IsFilesOrChunks => IsFilesOrChunksCollection(this);
+        public bool IsFilesOrChunks => this.IsFilesOrChunksCollection();
 
         public event EventHandler<CollectionReferenceChangedEventArgs<DocumentReference>> DocumentsCollectionChanged;
 
@@ -118,26 +117,7 @@ namespace LiteDbExplorer.Core
 
         public IReadOnlyList<string> GetDistinctKeys(FieldSortOrder sortOrder = FieldSortOrder.Original)
         {
-            var keys = Items
-                .SelectMany(p => p.LiteDocument.Keys)
-                .Distinct(StringComparer.InvariantCulture);
-
-            if (sortOrder == FieldSortOrder.Alphabetical)
-            {
-                keys = keys.OrderBy(_ => _);
-            }
-
-            return keys.ToList();
-        }
-
-        public static bool IsFilesOrChunksCollection(CollectionReference reference)
-        {
-            if (reference == null)
-            {
-                return false;
-            }
-
-            return reference.Name == @"_files" || reference.Name == @"_chunks";
+            return Items.SelectAllDistinctKeys(sortOrder).ToList();
         }
 
         protected virtual IEnumerable<DocumentReference> GetAllItem(LiteCollection<BsonDocument> liteCollection)
@@ -163,17 +143,17 @@ namespace LiteDbExplorer.Core
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems != null)
+                    if (e.NewItems != null && e.NewItems is IEnumerable<DocumentReference> newItems)
                     {
-                        BroadcastChanges(ReferenceNodeChangeAction.Add, e.NewItems.Cast<DocumentReference>());
+                        BroadcastChanges(ReferenceNodeChangeAction.Add, newItems);
                     }
 
                     break;
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Reset:
-                    if (e.OldItems != null)
+                    if (e.OldItems != null && e.OldItems is IEnumerable<DocumentReference> oldItems)
                     {
-                        BroadcastChanges(ReferenceNodeChangeAction.Remove, e.OldItems.Cast<DocumentReference>());
+                        BroadcastChanges(ReferenceNodeChangeAction.Remove, oldItems);
                     }
 
                     break;
