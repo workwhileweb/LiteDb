@@ -37,6 +37,10 @@ namespace LiteDbExplorer.Core
             Databases.Remove(databaseReference);
 
             databaseReference?.Dispose();
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
+            GC.Collect();
         }
 
         public void CloseDatabases()

@@ -29,5 +29,6 @@ namespace LiteDbExplorer.Modules
             string initialDirectory = "");
         Task<Maybe<string>> ShowFolderPickerDialog(string title = "", string initialDirectory = "");
         Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "");
+        bool OpenFileWithAssociatedApplication(string filePath);
     }
 }

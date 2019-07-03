@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using CSharpFunctionalExtensions;
 using LiteDbExplorer.Core;
-using LiteDbExplorer.Windows;
 using LiteDB;
+using OfficeOpenXml;
 using Serilog;
 
 namespace LiteDbExplorer.Modules
@@ -34,6 +36,7 @@ namespace LiteDbExplorer.Modules
         Task<Result<CollectionReference>> DropCollection(CollectionReference collection);
         Task<Result> RemoveDocuments(IEnumerable<DocumentReference> documents);
         Task<Result<bool>> RevealInExplorer(DatabaseReference database);
+        Task<Maybe<string>> ExportExcel(ICollection<DocumentReference> documents, string name);
     }
 
     [Export(typeof(IDatabaseInteractions))]
@@ -403,6 +406,89 @@ namespace LiteDbExplorer.Modules
                     provider.Serialize(writer, true);
                 }
             }
+        }
+
+        public static readonly Dictionary<BsonType, Func<object, string>> BsonTypeToExcelNumberFormat =
+            new Dictionary<BsonType, Func<object, string>>
+            {
+                {BsonType.Int32, _ => "0"},
+                {BsonType.Int64, _ => "0"},
+                {BsonType.DateTime, _ => $"{CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern} {CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern}"}
+            };
+
+        public async Task<Maybe<string>> ExportExcel(ICollection<DocumentReference> documents, string name)
+        {
+            var fileName = DirectoryExtensions.EnsureFileNameExtension(name, ".xlsx");
+            DirectoryExtensions.PrependTimeStamp(ref fileName);
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Excel export", "Excel File|*.xlsx", fileName);
+            if (maybeFileName.HasNoValue)
+            {
+                return null;
+            }
+
+            var keys = documents
+                .SelectMany(p => p.LiteDocument.Keys)
+                .Distinct(StringComparer.InvariantCulture)
+                .ToArray();
+
+            var excelPackage = new ExcelPackage();
+            var ws = excelPackage.Workbook.Worksheets.Add(name);
+
+            // Add headers
+            for (var i = 0; i < keys.Length; i++)
+            {
+                ws.Cells[1, i + 1].Value = keys[i];
+                ws.Column(i + 1).AutoFit();
+            }
+
+            // Add data
+            var currentColl = 1;
+            var currentRow = 2;
+            foreach (var documentReference in documents)
+            {
+                foreach (var key in keys)
+                {
+                    if (documentReference.LiteDocument.ContainsKey(key))
+                    {
+                        var bsonValue = documentReference.LiteDocument[key];
+                        object cellValue = null;
+                        if (bsonValue.IsArray || bsonValue.IsDocument)
+                        {
+                            cellValue = bsonValue.ToDisplayValue();
+                        }
+                        else
+                        {
+                            cellValue = bsonValue.RawValue;     
+                        }
+
+                        var cell = ws.Cells[currentRow, currentColl];
+                        cell.Value = cellValue;
+                        if (BsonTypeToExcelNumberFormat.TryGetValue(bsonValue.Type, out var format))
+                        {
+                            cell.Style.Numberformat.Format = format(bsonValue);
+                        }
+                    }
+                    
+                    currentColl++;
+                }
+
+                currentColl = 1;
+                currentRow++;
+            }
+            
+            var tableRange = ws.Cells[1, 1, documents.Count + 1, keys.Length];
+            var resultsTable = ws.Tables.Add(tableRange, $"{Regex.Replace(name, @"\s", "_")}_table");
+
+            resultsTable.ShowFilter = true;
+            resultsTable.ShowHeader = true;
+            
+            // AutoFit
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            excelPackage.SaveAs(new FileInfo(maybeFileName.Value));
+            excelPackage.Dispose();
+
+            return maybeFileName.Value;
         }
 
         public Task<Result> CopyDocuments(IEnumerable<DocumentReference> documents)

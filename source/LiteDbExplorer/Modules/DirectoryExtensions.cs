@@ -58,5 +58,10 @@ namespace LiteDbExplorer.Modules
 
             return fileName;
         }
+
+        public static void PrependTimeStamp(ref string fileName)
+        {
+            fileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{DateTime.Now:yyyy-MM-dd_HH-mmss}_{Path.GetExtension(fileName)}";
+        }
     }
 }

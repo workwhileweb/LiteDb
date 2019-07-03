@@ -10,10 +10,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
+using Enterwell.Clients.Wpf.Notifications;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbDocument;
+using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
@@ -363,7 +365,24 @@ namespace LiteDbExplorer.Modules.DbCollection
         [UsedImplicitly]
         public async Task ExportDocument()
         {
-            await _databaseInteractions.ExportDocuments(SelectedDocuments.ToList());
+            var maybeFileName = await _databaseInteractions.ExportExcel(CollectionReference.Items, CollectionReference.Name);
+            if (maybeFileName.HasValue)
+            {
+                NotificationInteraction.Default()
+                    .HasMessage($"Export saved in:\n{maybeFileName.Value.ShrinkPath(128)}")
+                    .Dismiss().WithButton("Open", button =>
+                    {
+                        _applicationInteraction.OpenFileWithAssociatedApplication(maybeFileName.Value);
+                    })
+                    .WithButton("Reveal in Explorer", button =>
+                    {
+                        _applicationInteraction.RevealInExplorer(maybeFileName.Value);
+                    })
+                    .Dismiss().WithButton("Close", button => { })
+                    .Queue();
+            }
+
+            // await _databaseInteractions.ExportDocuments(SelectedDocuments.ToList());
         }
 
         [UsedImplicitly]

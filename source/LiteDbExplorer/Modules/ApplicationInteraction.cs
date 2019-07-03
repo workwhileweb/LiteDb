@@ -83,7 +83,7 @@ namespace LiteDbExplorer.Modules
 
             return Result.Ok();
         }
-
+        
 
         public bool RevealInExplorer(string filePath)
         {
@@ -95,6 +95,20 @@ namespace LiteDbExplorer.Modules
             //Clean up file path so it can be navigated OK
             filePath = System.IO.Path.GetFullPath(filePath);
             System.Diagnostics.Process.Start("explorer.exe", $"/select,\"{filePath}\"");
+
+            return true;
+        }
+
+        public bool OpenFileWithAssociatedApplication(string filePath)
+        {
+            if (!System.IO.File.Exists(filePath))
+            {
+                return false;
+            }
+
+            //Clean up file path so it can be navigated OK
+            filePath = System.IO.Path.GetFullPath(filePath);
+            System.Diagnostics.Process.Start(filePath);
 
             return true;
         }

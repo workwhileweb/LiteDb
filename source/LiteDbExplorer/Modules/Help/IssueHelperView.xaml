@@ -17,7 +17,7 @@
     </UserControl.Resources>
     <Grid>
         <TabControl SelectedIndex="{Binding SelectedStepIndex, Mode=OneWay}"
-                    IsSynchronizedWithCurrentItem="True" BorderThickness="0"
+                    IsSynchronizedWithCurrentItem="True"
                     Style="{StaticResource TabControlWithoutHeader}">
             <TabItem Header="General">
                 <Grid>
@@ -126,6 +126,7 @@
                 Value="50"
                 IsIndeterminate="True" />
         </materialDesign:Card>
+
         <materialDesign:ColorZone
             Grid.Row="0"
             Grid.Column="0"

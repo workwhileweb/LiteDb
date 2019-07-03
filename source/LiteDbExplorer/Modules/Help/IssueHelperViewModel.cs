@@ -13,7 +13,6 @@ using Caliburn.Micro;
 using Forge.Forms;
 using Forge.Forms.Annotations;
 using JetBrains.Annotations;
-using LiteDB;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Wpf.Framework.Windows;
