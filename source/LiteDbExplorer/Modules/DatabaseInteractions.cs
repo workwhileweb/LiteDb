@@ -266,14 +266,38 @@ namespace LiteDbExplorer.Modules
             try
             {
                 var currentName = collection.Name;
-                var maybeName = await _applicationInteraction.ShowInputDialog("New collection name:", "Enter new collection name", currentName);
-                if (maybeName.HasValue)
+
+                Result Validate(string value)
                 {
-                    collection.Database.RenameCollection(currentName, maybeName.Value);
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        return Result.Fail("Name cannot be empty.");
+                    }
+
+                    if (value.Any(char.IsWhiteSpace))
+                    {
+                        return Result.Fail("Name can not contain white spaces.");
+                    }
+
+                    if (collection.Database.ContainsCollection(value))
+                    {
+                        return Result.Fail($"Collection \"{value}\" already exists!");
+                    }
+
                     return Result.Ok();
                 }
 
-                return Result.Fail(Fails.Canceled);
+                var maybeName = await _applicationInteraction
+                    .ShowInputDialog("New collection name:", "Enter new collection name", currentName, Validate);
+
+                if (maybeName.HasNoValue)
+                {
+                    return Result.Fail(Fails.Canceled);
+                }
+
+                collection.Database.RenameCollection(currentName, maybeName.Value);
+                return Result.Ok();
+
             }
             catch (Exception exc)
             {

@@ -65,6 +65,8 @@ namespace LiteDbExplorer.Modules
             var control = new DocumentEntryControl(document, windowController);
             var window = new DialogWindow(control, windowController)
             {
+                MinWidth = 400,
+                MinHeight = 400,
                 Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight)
             };
             if (document.Collection.IsFilesOrChunks)
@@ -111,7 +113,7 @@ namespace LiteDbExplorer.Modules
             }
 
             //Clean up file path so it can be navigated OK
-            filePath = System.IO.Path.GetFullPath(filePath);
+            filePath = Path.GetFullPath(filePath);
             System.Diagnostics.Process.Start(filePath);
 
             return Task.FromResult(true);
@@ -154,6 +156,30 @@ namespace LiteDbExplorer.Modules
                        MessageBoxButton.YesNo,
                        MessageBoxImage.Question
                    ) == MessageBoxResult.Yes;
+        }
+
+        protected static Dictionary<UINotificationType, MessageBoxImage> NotificationTypeToMessageBoxImage = 
+            new Dictionary<UINotificationType, MessageBoxImage>
+            {
+                { UINotificationType.None, MessageBoxImage.None },
+                { UINotificationType.Info, MessageBoxImage.Information },
+                { UINotificationType.Warning, MessageBoxImage.Warning },
+                { UINotificationType.Error, MessageBoxImage.Error },
+            };
+
+        public void ShowAlert(string message, string title = null, UINotificationType type = UINotificationType.None)
+        {
+            if (!NotificationTypeToMessageBoxImage.TryGetValue(type, out var image))
+            {
+                image = MessageBoxImage.None;
+            }
+
+            MessageBox.Show(
+                       message,
+                       string.IsNullOrEmpty(title) ? AppConstants.Application.DisplayName : title,
+                       MessageBoxButton.OK,
+                       image
+                   );
         }
 
         public void ShowError(string message, string title = "")
@@ -301,11 +327,11 @@ namespace LiteDbExplorer.Modules
             return completionSource.Task;
         }
 
-        public Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "")
+        public Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "", Func<string, Result> validationFunc = null)
         {
             var completionSource = new TaskCompletionSource<Maybe<string>>();
 
-            if (InputBoxWindow.ShowDialog(message, caption, predefined, out var inputText) == true)
+            if (InputBoxWindow.ShowDialog(message, caption, predefined, validationFunc, out var inputText) == true)
             {
                 completionSource.SetResult(inputText);
             }

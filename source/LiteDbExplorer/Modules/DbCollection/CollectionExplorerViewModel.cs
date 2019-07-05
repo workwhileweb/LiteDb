@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
-using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -11,14 +10,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
-using Enterwell.Clients.Wpf.Notifications;
-using Forge.Forms;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.DbDocument;
-using LiteDbExplorer.Modules.Shared;
-using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using MaterialDesignThemes.Wpf;
@@ -111,6 +106,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             {
                 if (_collectionReference != null)
                 {
+                    _collectionReference.PropertyChanged -= OnCollectionReferencePropertyChanged;
                     _collectionReference.ReferenceChanged -= OnCollectionReferenceChanged;
                     _collectionReference.DocumentsCollectionChanged -= OnDocumentsCollectionChanged;
                 }
@@ -118,6 +114,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                 _collectionReference = value;
                 if (_collectionReference != null)
                 {
+                    _collectionReference.PropertyChanged += OnCollectionReferencePropertyChanged;
                     _collectionReference.ReferenceChanged += OnCollectionReferenceChanged;
                     _collectionReference.DocumentsCollectionChanged += OnDocumentsCollectionChanged;
                 }
@@ -225,6 +222,15 @@ namespace LiteDbExplorer.Modules.DbCollection
                 : new PackIcon {Kind = PackIconKind.TableLarge, Height = 16};
 
             CollectionReference = collectionReference;
+
+            if (value.SelectedDocuments != null)
+            {
+                SelectedDocuments = value.SelectedDocuments.ToList();
+            }
+            else
+            {
+                SelectedDocument = CollectionReference.Items.FirstOrDefault();
+            }
         }
 
         protected override void OnViewLoaded(object view)
@@ -277,6 +283,14 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         #region Handles
+
+        private void OnCollectionReferencePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals(nameof(CollectionReference.Name)))
+            {
+                DisplayName = CollectionReference.Name;
+            }
+        }
 
         private void OnCollectionReferenceChanged(object sender, ReferenceChangedEventArgs<CollectionReference> e)
         {

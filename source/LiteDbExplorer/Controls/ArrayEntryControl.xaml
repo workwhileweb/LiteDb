@@ -65,19 +65,22 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ScrollViewer x:Name="ScrollViewer" Padding="5" VerticalScrollBarVisibility="Disabled">
-                <ItemsControl Name="ItemsItems" Margin="15,0,80,0" FocusVisualStyle="{x:Null}">
+                <ItemsControl Name="ItemsItems" Margin="15,0,80,0" FocusVisualStyle="{x:Null}" 
+                              Grid.IsSharedSizeScope="True" HorizontalContentAlignment="Stretch">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="5">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" MinWidth="140" />
-                                    <ColumnDefinition Width="3*" />
+                                    <ColumnDefinition Width="3*" MinWidth="140"/>
+                                    <ColumnDefinition Width="6*" />
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Name}" TextAlignment="Right" Margin="3,8,6,3"
+                                <TextBlock Grid.Column="0" Text="{Binding Name}" TextAlignment="Right" Margin="3,8,6,3"
                                            VerticalAlignment="Top" />
                                 <ContentPresenter Grid.Column="1" Content="{Binding Control}"
-                                                  MinHeight="32" Margin="10,0,10,0" VerticalAlignment="Top" />
+                                                  MinHeight="32" Margin="10,0,10,0" 
+                                                  HorizontalAlignment="Stretch" 
+                                                  VerticalAlignment="Top" />
                                 <Button Grid.Column="2" Tag="{Binding Value}"
                                         Click="ButtonRemove_Click" ToolTip="Remove Item"
                                         Style="{StaticResource MaterialDesignFlatButton}"

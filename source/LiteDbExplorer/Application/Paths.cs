@@ -105,7 +105,9 @@ namespace LiteDbExplorer
 
         public static string SettingsFilePath => Path.Combine(AppDataPath, "settings.json");
 
-        public static string ErrorLogsFilePath => Path.Combine(AppDataPath, "errors.log");
+        public static string ErrorLogsFileFullPath => Path.Combine(AppDataPath, "errors.log");
+
+        public static string ErrorLogsDirectoryPath => AppDataPath;
 
         public static string TempPath
         {
@@ -125,10 +127,23 @@ namespace LiteDbExplorer
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public static IEnumerable<string> GetAllErrorLogPaths()
+        {
+            var directoryInfo = new DirectoryInfo(ErrorLogsDirectoryPath);
+            if (!directoryInfo.Exists)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            return directoryInfo.GetFiles("*.log", SearchOption.TopDirectoryOnly)
+                .OrderByDescending(p => p.LastWriteTime)
+                .Where(p => p.Name.StartsWith("errors"))
+                .Select(p => p.FullName);
+        }
+
         public static Maybe<string> GetLastErrorLogPath()
         {
-            var directoryInfo = new DirectoryInfo(ErrorLogsFilePath);
-
+            var directoryInfo = new DirectoryInfo(ErrorLogsDirectoryPath);
             if (!directoryInfo.Exists)
             {
                 return null;

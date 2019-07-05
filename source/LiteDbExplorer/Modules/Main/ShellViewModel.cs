@@ -25,7 +25,7 @@ namespace LiteDbExplorer.Modules.Main
 
             _eventAggregator.Subscribe(this);
 
-            DisplayName = "LiteDB Explorer";
+            DisplayName = AppConstants.Application.DisplayName;
 
             WindowMenu = IoC.Get<IShellMenu>();
 

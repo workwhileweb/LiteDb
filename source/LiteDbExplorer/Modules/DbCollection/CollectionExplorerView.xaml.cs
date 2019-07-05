@@ -58,7 +58,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         public void UpdateView(DocumentReference documentReference)
         {
-            CollectionListView.UpdateGridColumns(documentReference.LiteDocument);
+            CollectionListView.UpdateGridColumns();
         }
 
         public void Find(string text, bool matchCase)

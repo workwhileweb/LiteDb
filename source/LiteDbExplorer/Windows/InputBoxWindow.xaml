@@ -14,7 +14,9 @@
         Style="{StaticResource DialogWindowStyle}">
     <DockPanel>
         <TextBlock Name="TextMessage" DockPanel.Dock="Top" Margin="15,8"/>
-        <TextBox Name="TextText" Text="" DockPanel.Dock="Top" Margin="15,8"/>
+        <TextBox Name="ValueTextBox" Text="" DockPanel.Dock="Top" Margin="15,8"/>
+        <TextBlock Name="ErrorTextBlock" DockPanel.Dock="Top" Margin="15,2"
+                   Foreground="Red" FontSize="12" TextWrapping="Wrap"/>
 
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="5,0">
             <Button Name="ButtonCancel" Content="CANCEL" IsCancel="True"

@@ -102,67 +102,56 @@ namespace LiteDbExplorer.Core
                 cultureInfo = CultureInfo.InvariantCulture;
             }
 
+            var result = string.Empty;
+
             try
             {
-                if (bsonValue.IsDocument)
+                switch (bsonValue.Type)
                 {
-                    return "[Document]";
-                }
-                if (bsonValue.IsArray)
-                {
-                    return "[Array]";
-                }
-                if (bsonValue.IsBinary)
-                {
-                    return "[Binary]";
-                }
-                if (bsonValue.IsString)
-                {
-                    return maxLength.HasValue ? bsonValue.AsString.Truncate(maxLength.Value) : bsonValue.AsString;
-                }
-                if (bsonValue.IsObjectId)
-                {
-                    return bsonValue.AsString;
-                }
-                if (bsonValue.IsDateTime)
-                {
-                    return bsonValue.AsDateTime.ToString(cultureInfo);
-                }
-                if (bsonValue.IsInt32)
-                {
-                    return bsonValue.AsInt32.ToString(cultureInfo);
-                }
-                if (bsonValue.IsInt64)
-                {
-                    return bsonValue.AsInt64.ToString(cultureInfo);
-                }
-                if (bsonValue.IsDouble)
-                {
-                    return bsonValue.AsDouble.ToString(cultureInfo);
-                }
-                if (bsonValue.IsDecimal)
-                {
-                    return bsonValue.AsDecimal.ToString(cultureInfo);
-                }
-                if (bsonValue.IsGuid)
-                {
-                    return bsonValue.AsGuid.ToString("D");
-                }
-                if (bsonValue.IsMinValue)
-                {
-                    return "-∞";
-                }
-                if (bsonValue.IsMaxValue)
-                {
-                    return "+∞";
+                    case BsonType.MinValue:
+                        result = @"-∞";
+                        break;
+                    case BsonType.MaxValue:
+                        result = @"+∞";
+                        break;
+                    case BsonType.Boolean:
+                        result = bsonValue.AsBoolean.ToString(cultureInfo).ToLower();
+                        break;
+                    case BsonType.DateTime:
+                        result = bsonValue.AsDateTime.ToString(cultureInfo);
+                        break;
+                    case BsonType.Null:
+                        result = "(null)";
+                        break;
+                    case BsonType.Binary:
+                        result = Convert.ToBase64String(bsonValue.AsBinary);
+                        break;
+                    case BsonType.Int32:
+                    case BsonType.Int64:
+                    case BsonType.Double:
+                    case BsonType.Decimal:
+                    case BsonType.String:
+                    case BsonType.ObjectId:
+                    case BsonType.Guid:
+                        result = Convert.ToString(bsonValue.RawValue, cultureInfo);
+                        break;
+                    case BsonType.Document:
+                        result = @"[Document]";
+                        break;
+                    case BsonType.Array:
+                        result = @"[Array]";
+                        break;
+                    default:
+                        result = JsonSerializer.Serialize(bsonValue);
+                        break;
                 }
 
                 if (maxLength.HasValue)
                 {
-                    return bsonValue.ToString().Truncate(maxLength.Value);
+                    return result.Truncate(maxLength.Value);
                 }
 
-                return bsonValue.ToString();
+                return result;
             }
             catch (Exception)
             {

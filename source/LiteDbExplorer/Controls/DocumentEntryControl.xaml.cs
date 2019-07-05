@@ -20,15 +20,18 @@ namespace LiteDbExplorer.Controls
 {
     public class DocumentFieldData : INotifyPropertyChanged
     {
-        public DocumentFieldData(string name, FrameworkElement editControl)
+        public DocumentFieldData(string name, FrameworkElement editControl, bool isReadonly = false)
         {
             Name = name;
             EditControl = editControl;
+            IsReadOnly = isReadonly;
         }
 
         public string Name { get; set; }
 
         public FrameworkElement EditControl { get; set; }
+
+        public bool IsReadOnly { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -126,6 +129,7 @@ namespace LiteDbExplorer.Controls
         private bool _invalidatingSize;
 
         private bool _loaded = false;
+        private Dictionary<string, BsonType> _allFieldsWithTypes;
 
         public DocumentEntryControl()
         {
@@ -137,8 +141,9 @@ namespace LiteDbExplorer.Controls
 
             AddNewFieldCommand = new RelayCommand<BsonType?>(async type => await AddNewFieldHandler(type));
 
-            AddExistingFieldCommand =
-                new RelayCommand<KeyValuePair<string, BsonType>?>(async pair => await AddExistingFieldHandler(pair));
+            AddExistingFieldCommand = new RelayCommand<KeyValuePair<string, BsonType>?>(async pair => await AddExistingFieldHandler(pair));
+
+            AddAllExistingFieldCommand = new RelayCommand(async _ => await AddAllExistingFieldHandler());
 
             LoadNewFieldsPicker();
 
@@ -171,7 +176,7 @@ namespace LiteDbExplorer.Controls
             for (var i = 0; i < document.Keys.Count; i++)
             {
                 var key = document.Keys.ElementAt(i);
-                _entryControls.Add(NewField(key, readOnly));
+                _entryControls.Add(NewField(key, IsReadOnly));
             }
 
             ListItems.ItemsSource = _entryControls;
@@ -192,6 +197,8 @@ namespace LiteDbExplorer.Controls
         public RelayCommand<BsonType?> AddNewFieldCommand { get; }
 
         public RelayCommand<KeyValuePair<string, BsonType>?> AddExistingFieldCommand { get; }
+
+        public RelayCommand AddAllExistingFieldCommand { get; }
 
         public DocumentReference DocumentReference
         {
@@ -228,6 +235,7 @@ namespace LiteDbExplorer.Controls
         {
             if (document.Collection is FileCollectionReference reference)
             {
+                IsFileCollection = true;
                 var fileInfo = reference.GetFileObject(document);
                 GroupFile.Visibility = Visibility.Visible;
                 FileView.LoadFile(fileInfo);
@@ -240,13 +248,16 @@ namespace LiteDbExplorer.Controls
             for (var i = 0; i < document.LiteDocument.Keys.Count; i++)
             {
                 var key = document.LiteDocument.Keys.ElementAt(i);
-                _entryControls.Add(NewField(key, IsReadOnly));
+                var fieldData = NewField(key, IsReadOnly);
+                _entryControls.Add(fieldData);
             }
 
             ListItems.ItemsSource = _entryControls;
 
             LoadExistingFieldsPicker();
         }
+
+        public bool IsFileCollection { get; private set; }
 
         private void LoadNewFieldsPicker()
         {
@@ -282,7 +293,7 @@ namespace LiteDbExplorer.Controls
             var currentDocumentKeys = _currentDocument.Keys;
 
             // Get distinct fields from all entries
-            var allFieldsWithTypes = _documentReference.Collection
+            _allFieldsWithTypes = _documentReference.Collection
                 .Items
                 .SelectMany(p => p.LiteDocument.RawValue)
                 .GroupBy(p => p.Key)
@@ -293,14 +304,14 @@ namespace LiteDbExplorer.Controls
                 )
                 .ToDictionary(p => p.Key, p => p.Value);
 
-            if (allFieldsWithTypes.Any())
+            if (_allFieldsWithTypes.Any())
             {
                 var existingFieldsPickerMenu = new ContextMenu
                 {
                     MinWidth = 160
                 };
 
-                foreach (var item in allFieldsWithTypes)
+                foreach (var item in _allFieldsWithTypes)
                 {
                     var menuItem = new MenuItem
                     {
@@ -311,6 +322,14 @@ namespace LiteDbExplorer.Controls
                     };
                     existingFieldsPickerMenu.Items.Add(menuItem);
                 }
+
+                existingFieldsPickerMenu.Items.Add(new Separator());
+                var allAllMenuItem = new MenuItem
+                {
+                    Header = "Add all",
+                    Command = AddAllExistingFieldCommand
+                };
+                existingFieldsPickerMenu.Items.Add(allAllMenuItem);
 
                 AddExistingFieldsButton.IsEnabled = true;
                 AddExistingFieldsButton.ContextMenu = existingFieldsPickerMenu;
@@ -325,9 +344,11 @@ namespace LiteDbExplorer.Controls
                 expandMode = OpenEditorMode.Window;
             }
 
+            var isReadOnly = readOnly || _currentDocument[key].IsObjectId || (IsFileCollection && key.Equals("_id"));
+
             if (_currentDocument[key].IsNull)
             {
-                var docTypePicker = GetNullValueEditor(key, readOnly, expandMode);
+                var docTypePicker = GetNullValueEditor(key, isReadOnly, expandMode);
                 return new DocumentFieldData(key, docTypePicker);
             }
 
@@ -337,17 +358,17 @@ namespace LiteDbExplorer.Controls
                     $"[{key}]",
                     _currentDocument[key],
                     _currentDocument,
-                    readOnly,
+                    isReadOnly,
                     key);
 
-            return new DocumentFieldData(key, valueEdit);
+            return new DocumentFieldData(key, valueEdit, isReadOnly);
         }
 
         private FrameworkElement GetNullValueEditor(string key, bool readOnly, OpenEditorMode expandMode)
         {
             var docTypePicker = new Button
             {
-                Content = "(Null)",
+                Content = "(null)",
                 ToolTip = "Select null field type",
                 Style = StyleKit.MaterialDesignEntryButtonStyle
             };
@@ -552,7 +573,21 @@ namespace LiteDbExplorer.Controls
             }
         }
 
-        private async Task AddNewField(string fieldName, BsonType bsonType)
+        private async Task AddAllExistingFieldHandler()
+        {
+            if (_allFieldsWithTypes != null)
+            {
+                var count = _allFieldsWithTypes.Count;
+                foreach (var pair in _allFieldsWithTypes)
+                {
+                    count--;
+                    await AddNewField(pair.Key, pair.Value, count == 0);
+                }
+            }
+        }
+
+
+        private async Task AddNewField(string fieldName, BsonType bsonType, bool isLast = true)
         {
             var newValue = GetFieldDefaultValue(bsonType);
 
@@ -562,14 +597,17 @@ namespace LiteDbExplorer.Controls
 
             _entryControls.Add(newField);
 
-            ItemsField_SizeChanged(ListItems, null);
+            if (isLast)
+            {
+                ItemsField_SizeChanged(ListItems, null);
 
-            LoadExistingFieldsPicker();
+                LoadExistingFieldsPicker();
 
-            await Task.Delay(150);
+                await Task.Delay(150);
 
-            ListItems.ScrollIntoView(newField);
-            newField.EditControl.Focus();
+                ListItems.ScrollIntoView(newField);
+                newField.EditControl.Focus();
+            }
         }
 
         private void RemoveField(string name)
@@ -590,19 +628,36 @@ namespace LiteDbExplorer.Controls
 
             _invalidatingSize = true;
 
-            var listView = sender as ListView;
+            /*var listView = sender as ListView;
             var grid = listView.View as GridView;
+
+            var col0MaxSize = (listView.ActualWidth / 2) - SystemParameters.VerticalScrollBarWidth - 10;
+            if (grid.Columns[0].ActualWidth > col0MaxSize)
+            {
+                grid.Columns[0].Width = col0MaxSize;
+            }
+
             var newWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 10 -
                            grid.Columns[0].ActualWidth - grid.Columns[2].ActualWidth;
 
             if (newWidth > 0)
             {
                 grid.Columns[1].Width = Math.Max(140, newWidth);
-            }
+            }*/
+
+            var listView = sender as ListView;
+            var grid = listView.View as GridView;
+
+            var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 50;
+            var col1 = 0.34;
+            var col2 = 0.66;
+
+            grid.Columns[0].Width = workingWidth*col1;
+            grid.Columns[1].Width = workingWidth*col2;
 
             if (_loaded)
             {
-                await Task.Delay(50);
+                await Task.Delay(25);
             }
 
             _invalidatingSize = false;

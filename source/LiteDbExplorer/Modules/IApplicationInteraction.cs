@@ -28,7 +28,8 @@ namespace LiteDbExplorer.Modules
         Task<Maybe<string>> ShowOpenFileDialog(string title = "", string filter = "All files|*.*", string fileName = "",
             string initialDirectory = "");
         Task<Maybe<string>> ShowFolderPickerDialog(string title = "", string initialDirectory = "");
-        Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "");
+        Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "", Func<string, Result> validationFunc = null);
         Task<bool> OpenFileWithAssociatedApplication(string filePath);
+        void ShowAlert(string message, string title = null, UINotificationType type = UINotificationType.None);
     }
 }

@@ -194,7 +194,7 @@ namespace LiteDbExplorer.Controls
             ListCollectionData.ScrollIntoView(ListCollectionData.SelectedItem);
         }
         
-        public void UpdateGridColumns(BsonDocument dbItem)
+        public void UpdateGridColumns()
         {
             var headers = GridCollectionData.Columns.Select(a => ((GridViewColumnHeader) a.Header).Tag.ToString()).ToArray();
             var keys = CollectionReference.GetDistinctKeys(App.Settings.FieldSortOrder);

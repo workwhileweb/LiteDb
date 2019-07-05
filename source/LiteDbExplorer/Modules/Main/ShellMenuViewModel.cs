@@ -90,5 +90,27 @@ namespace LiteDbExplorer.Modules.Main
         {
             _eventAggregator.BeginPublishOnUIThread(new ToolSetPanelActionRequest(ToolSetPanelAction.Open));
         }
+
+        [UsedImplicitly]
+        public async Task ViewErrorLogs()
+        {
+            var lastErrorLogPath = Paths.GetLastErrorLogPath();
+            if (lastErrorLogPath.HasNoValue)
+            {
+                _applicationInteraction.ShowAlert("No error log file available.");
+                return;
+            }
+
+            await _applicationInteraction.OpenFileWithAssociatedApplication(lastErrorLogPath.Value);
+        }
+
+        [UsedImplicitly]
+        public async Task ViewAppData()
+        {
+            var appDataPath = Paths.AppDataPath;
+            
+            await _applicationInteraction.RevealInExplorer(appDataPath);
+        }
+
     }
 }

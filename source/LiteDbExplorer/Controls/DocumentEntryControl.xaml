@@ -6,13 +6,13 @@
              xmlns:local="clr-namespace:LiteDbExplorer.Controls"
              xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
+             xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600">
 
     <UserControl.Resources>
-        <converters:InvertableBooleanToVisibilityConverter x:Key="InvertableBooleanToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
     </UserControl.Resources>
 
     <UserControl.CommandBindings>
@@ -103,6 +103,10 @@
                               ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               BorderThickness="0"
                               FocusVisualStyle="{x:Null}">
+                        <ListView.Resources>
+                            <Style x:Key="{x:Static GridView.GridViewScrollViewerStyleKey}" TargetType="{x:Type ScrollViewer}"
+                                   BasedOn="{StaticResource GridViewWithoutHeaderScrollViewerStyleKey}"/>
+                        </ListView.Resources>
                         <ListView.ItemContainerStyle>
                             <Style TargetType="ListViewItem"
                                    BasedOn="{StaticResource MaterialDesignGridViewItemNoBorder}">
@@ -111,16 +115,11 @@
                         </ListView.ItemContainerStyle>
                         <ListView.View>
                             <GridView>
-                                <GridView.ColumnHeaderContainerStyle>
-                                    <Style TargetType="GridViewColumnHeader">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                    </Style>
-                                </GridView.ColumnHeaderContainerStyle>
                                 <GridViewColumn>
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Name}" ToolTip="{Binding Name}"
-                                                       TextAlignment="Right" Margin="3,11,6,3" MinWidth="70"
+                                                       TextAlignment="Right" Margin="3,11,6,3"
                                                        VerticalAlignment="Top" TextTrimming="CharacterEllipsis" />
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
@@ -143,7 +142,7 @@
                                                     Style="{StaticResource MaterialDesignFlatButton}"
                                                     Foreground="{DynamicResource MaterialDesignBody}"
                                                     Padding="4" Margin="0,4" Height="32" Width="32"
-                                                    Visibility="{Binding IsReadOnly, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InvertableBooleanToVisibilityConverter}, ConverterParameter=Inverted}">
+                                                    Visibility="{Binding IsReadOnly, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                                                 <materialDesign:PackIcon Kind="DeleteForever" Height="20" Width="20" />
                                             </Button>
                                         </DataTemplate>
@@ -153,13 +152,9 @@
                         </ListView.View>
                     </ListView>
 
-                    <DockPanel x:Name="GroupFile" Grid.Column="1" DockPanel.Dock="Top" 
-                               Visibility="Collapsed" Margin="20,16,0,0">
-                        <Border DockPanel.Dock="Top" MinHeight="40"
-                                Background="{DynamicResource MaterialDesignToolBarBackground}" Padding="10,0">
-                            <TextBlock Text="File Preview" FontWeight="Bold" VerticalAlignment="Center" />
-                        </Border>
-                        <controls:FileView x:Name="FileView" DockPanel.Dock="Top" />
+                    <DockPanel x:Name="GroupFile" DockPanel.Dock="Top" 
+                               Visibility="Collapsed" Margin="20,0,0,0">
+                        <controls:FileView x:Name="FileView" />
                     </DockPanel>
                 </UniformGrid>
 

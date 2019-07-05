@@ -5,6 +5,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/materialdesigntheme.menu.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <system:Double x:Key="WindowTitleFontSize">14</system:Double>
@@ -85,11 +86,11 @@
         <Setter Property="DarkCloseButtonStyle" Value="{StaticResource LocalDarkCloseButtonStyle}" />
     </Style>
 
-    <Style x:Key="TopMenuItemStyle" TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
+    <Style x:Key="TopMenuItemStyle" TargetType="MenuItem" BasedOn="{StaticResource MaterialDesignMenuItem}">
         <Setter Property="Height" Value="35" />
     </Style>
 
-    <Style x:Key="TopMenuStyle" TargetType="Menu" BasedOn="{StaticResource {x:Type Menu}}">
+    <Style x:Key="TopMenuStyle" TargetType="Menu" BasedOn="{StaticResource MaterialDesignMenu}">
         <Setter Property="Background"
                 Value="{Binding Path=WindowTitleBrush, Mode=OneWay, RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type mahapps:MetroWindow}}}" />
         <Style.Triggers>

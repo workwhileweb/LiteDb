@@ -194,6 +194,7 @@ namespace LiteDbExplorer.Core
 
             coll.Insert(newDoc);
             coll.Delete(newDoc["_id"]);
+
             UpdateCollections();
 
             return Collections.FirstOrDefault(p => p.Name.Equals(name));
@@ -202,13 +203,33 @@ namespace LiteDbExplorer.Core
         public void RenameCollection(string oldName, string newName)
         {
             LiteDatabase.RenameCollection(oldName, newName);
-            UpdateCollections();
+            var item = Collections.FirstOrDefault(p => p.Name.Equals(oldName, StringComparison.Ordinal));
+            if (item != null)
+            {
+                item.Name = newName;
+            }
+            var lookupItem = CollectionsLookup.FirstOrDefault(p => p.Name.Equals(oldName, StringComparison.Ordinal));
+            if (lookupItem != null)
+            {
+                lookupItem.Name = newName;
+            }
+            // UpdateCollections();
         }
 
         public void DropCollection(string name)
         {
             LiteDatabase.DropCollection(name);
-            UpdateCollections();
+            var item = Collections.FirstOrDefault(p => p.Name.Equals(name, StringComparison.Ordinal));
+            if (item != null)
+            {
+                Collections.Remove(item);
+            }
+            // UpdateCollections();
+        }
+
+        public bool ContainsCollection(string name)
+        {
+            return Collections.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public static bool IsDbPasswordProtected(string path)

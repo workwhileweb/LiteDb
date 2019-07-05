@@ -32,7 +32,7 @@ namespace LiteDbExplorer.Modules.Help
         {
             base.OnActivate();
 
-            CurrentVersion = AppConstants.Versions.CurrentVersion;
+            CurrentVersion = AppConstants.Application.CurrentVersion;
 
             DirectoryLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
 

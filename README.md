@@ -23,18 +23,20 @@ I have seen some LiteDB use cases that go far beyond any that would have with th
 </p>
 
 ## Features in current pre-release:
-* Material dark and white theme
-* Open multiple databases at the same time
-* View and edit multiple documents with tabbed interface
-* Document details in tree or Json
-* Configurable layout options
-* Preview files (images and text files)
-* Add new items to database including files
-* Export database documents (as JSON) and files
-* Change password in protected databases
-* Shrink database
+* Material dark and white theme.
+* Open multiple databases at the same time.
+* View and edit multiple documents with tabbed interface.
+* Document details in tree or JSON.
+* Configurable layout options.
+* Preview files (images and text files).
+* Add new items to database including files.
+* Export JSON.
+* Export Excel and CSV.
+* Export Files (in files collection).
+* Change password in protected databases.
+* Shrink database.
 * Support for query using shell commands (WIP).
-* Portable exe (require .NET 4.6.2)
+* Portable exe (require .NET 4.6.2).
 
 # Download
 
@@ -71,7 +73,7 @@ Please make sure to read the Issue Reporting Checklist before opening an issue. 
 All contributions are welcome!
 
 Regarding code styling, there are only a few major rules:
-* private fields and properties should use camelCase (with underscore)
+* private fields and properties should use _camelCase (with underscore)
 * all methods (private and public) should use PascalCase
 * use spaces instead of tabs with 4 spaces width
 * always encapsulate with brackets:
@@ -86,10 +88,6 @@ instead of
 if (true)
     DoSomething()
 ```
-
-# Building
-
-To build from cmdline run **build.ps1** in PowerShell. Script builds Release configuration by default into the same directory. Script accepts *Configuration*, *OutputPath*, *Portable* (creates zip package) and *SkipBuild* parameters.
 
 # License
 [MIT License](http://opensource.org/licenses/MIT).

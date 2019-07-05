@@ -1,4 +1,7 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
+using CSharpFunctionalExtensions;
 using MahApps.Metro.Controls;
 
 namespace LiteDbExplorer.Windows
@@ -7,27 +10,44 @@ namespace LiteDbExplorer.Windows
     /// Interaction logic for InputBoxWindow.xaml
     /// </summary>
     public partial class InputBoxWindow : MetroWindow
-    {        
-        public string Text => TextText.Text;
+    {
+        private Func<string, Result> _validateCallback;
+        
+        public string Text => ValueTextBox.Text;
+
+        public string ValidationErrorText
+        {
+            get => ErrorTextBlock.Text;
+            protected set
+            {
+                ErrorTextBlock.Text = value;
+                ErrorTextBlock.Visibility = string.IsNullOrEmpty(ErrorTextBlock.Text) ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
 
         public InputBoxWindow()
         {
             InitializeComponent();
+
+            ErrorTextBlock.Visibility = Visibility.Collapsed;
         }
 
-        public static bool? ShowDialog(string message, string caption, string predefined,
-            out string input)
+        public static bool? ShowDialog(string message, string caption, string predefined, Func<string, Result> validationFunc, out string input)
         {
-            return ShowDialog(message, caption, predefined, null, out input);
+            return ShowDialog(message, caption, predefined, validationFunc, null, out input);
         }
 
-        public static bool? ShowDialog(string message, string caption, string predefined, Window owner, out string input)
+        public static bool? ShowDialog(string message, string caption, string predefined, Func<string, Result> validationFunc, Window owner, out string input)
         {
             var window = new InputBoxWindow
             {
                 Owner = owner,
-                TextMessage = {Text = message}, Title = caption, TextText = {Text = predefined}
+                TextMessage = {Text = message},
+                Title = caption,
+                ValueTextBox = {Text = predefined},
+                _validateCallback = validationFunc
             };
+
 
             var result = window.ShowDialog();
             input = window.Text;
@@ -42,14 +62,25 @@ namespace LiteDbExplorer.Windows
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
+            ValidationErrorText = string.Empty;
+            if (_validateCallback != null)
+            {
+                var validationResult = _validateCallback(Text);
+                if (validationResult.IsFailure)
+                {
+                    ValidationErrorText = validationResult.Error;
+                    return;
+                }
+            }
+
             DialogResult = true;
             Close();
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            TextText.Focus();
-            TextText.SelectAll();
+            ValueTextBox.Focus();
+            ValueTextBox.SelectAll();
         }
     }
 }

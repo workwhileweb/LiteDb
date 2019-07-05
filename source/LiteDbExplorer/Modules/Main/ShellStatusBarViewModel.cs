@@ -18,7 +18,7 @@ namespace LiteDbExplorer.Modules.Main
 
             RightContentCollection = new BindableCollection<IStatusBarContent>();
 
-            CurrentVersion = AppConstants.Versions.CurrentVersion;
+            CurrentVersion = AppConstants.Application.CurrentVersion;
         }
 
         public Version CurrentVersion { get; }

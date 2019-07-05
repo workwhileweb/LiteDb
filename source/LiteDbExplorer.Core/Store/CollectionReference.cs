@@ -78,14 +78,6 @@ namespace LiteDbExplorer.Core
             Items.Remove(document);
         }
 
-        public virtual void RemoveItems(IEnumerable<DocumentReference> documents)
-        {
-            foreach (var doc in documents)
-            {
-                RemoveItem(doc);
-            }
-        }
-
         public virtual DocumentReference AddItem(BsonDocument document)
         {
             LiteCollection.Insert(document);
@@ -143,20 +135,22 @@ namespace LiteDbExplorer.Core
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems != null && e.NewItems is IEnumerable<DocumentReference> newItems)
+                {
+                    if (e.NewItems != null)
                     {
-                        BroadcastChanges(ReferenceNodeChangeAction.Add, newItems);
+                        BroadcastChanges(ReferenceNodeChangeAction.Add, e.NewItems.Cast<DocumentReference>());
                     }
-
                     break;
+                }
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Reset:
-                    if (e.OldItems != null && e.OldItems is IEnumerable<DocumentReference> oldItems)
+                {
+                    if (e.OldItems != null)
                     {
-                        BroadcastChanges(ReferenceNodeChangeAction.Remove, oldItems);
+                        BroadcastChanges(ReferenceNodeChangeAction.Remove, e.OldItems.Cast<DocumentReference>());
                     }
-
                     break;
+                }
             }
         }
 

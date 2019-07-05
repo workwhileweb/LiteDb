@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using LiteDB;
@@ -112,4 +113,42 @@ namespace LiteDbExplorer.Core
             }
         }
     }
+
+    public class QueryResultDataTableAdapter
+    {
+        public QueryResultDataTableAdapter(IEnumerable<BsonValue> bsonValues)
+        {
+            var table = new DataTable();
+
+            foreach (var value in bsonValues)
+            {
+                var row = table.NewRow();
+                var doc = value.IsDocument ?
+                    value.AsDocument :
+                    new BsonDocument { ["[value]"] = value };
+
+                if (doc.Keys.Count == 0) doc["[root]"] = "{}";
+
+                foreach (var key in doc.Keys)
+                {
+                    var col = table.Columns[key];
+                    if (col == null)
+                    {
+                        table.Columns.Add(key);
+
+                        col = table.Columns[key];
+                        col.ReadOnly = key == "_id";
+                    }
+                }
+
+                foreach (var key in doc.Keys)
+                {
+                    row[key] = doc[key].ToDisplayValue();
+                }
+
+                table.Rows.Add(row);
+            }
+        }
+    }
+
 }

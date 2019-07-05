@@ -33,7 +33,7 @@ namespace LiteDbExplorer.Modules.Main
 
             _eventAggregator.Subscribe(this);
 
-            DisplayName = $"LiteDB Explorer {AppConstants.Versions.CurrentVersion}";
+            DisplayName = $"LiteDB Explorer {AppConstants.Application.CurrentVersion}";
 
             CloseDocumentCommand = new RelayCommand<FrameworkElement>(CloseDocument);
         }

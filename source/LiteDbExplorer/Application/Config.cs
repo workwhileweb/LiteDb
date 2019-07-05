@@ -30,7 +30,7 @@ namespace LiteDbExplorer
             log.WriteTo.Console();
 #endif
             log.WriteTo.File(
-                    Paths.ErrorLogsFilePath,
+                    Paths.ErrorLogsFileFullPath,
                     fileSizeLimitBytes: 4096000,
                     rollingInterval: RollingInterval.Month,
                     retainedFileCountLimit: 2,

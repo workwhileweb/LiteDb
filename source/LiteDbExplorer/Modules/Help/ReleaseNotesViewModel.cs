@@ -84,7 +84,7 @@ namespace LiteDbExplorer.Modules.Help
 
                 foreach (var releaseNote in releaseNotes)
                 {
-                    releaseNote.IsCurrent = AppConstants.Versions.CurrentVersion.Equals(releaseNote.Version);
+                    releaseNote.IsCurrent = AppConstants.Application.CurrentVersion.Equals(releaseNote.Version);
                 }
 
                 ReleaseNotes = releaseNotes;

@@ -66,7 +66,7 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public void SetPassword()
         {
-            if (InputBoxWindow.ShowDialog("New password, enter empty string to remove password.", "", "", out string password) == true)
+            if (InputBoxWindow.ShowDialog("New password, enter empty string to remove password.", "", "", null, out string password) == true)
             {
                 _database.Shrink(string.IsNullOrEmpty(password) ? null : password);
             }

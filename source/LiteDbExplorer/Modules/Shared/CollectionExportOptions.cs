@@ -8,9 +8,9 @@ using JetBrains.Annotations;
 
 namespace LiteDbExplorer.Modules.Shared
 {
-    [Title("Set export options to continue")]
+    [Title("Export options")]
     [Action("cancel", "CANCEL", IsCancel = true, ClosesDialog = true)]
-    [Action("ok", "NEXT", Parameter = "{Binding ExportFormat}", IsDefault = true, ClosesDialog = true,
+    [Action("ok", "EXPORT", Parameter = "{Binding ExportFormat}", IsDefault = true, ClosesDialog = true,
         Validates = true)]
     public class CollectionExportOptions : INotifyPropertyChanged
     {
