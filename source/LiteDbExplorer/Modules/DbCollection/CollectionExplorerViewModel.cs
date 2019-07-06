@@ -391,7 +391,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         [UsedImplicitly]
         public async Task ExportDocument()
         {
-            await _databaseInteractions.ExportCollection(this, CollectionReference, SelectedDocuments);
+            await _databaseInteractions.ExportAs(this, CollectionReference, SelectedDocuments);
         }
 
         [UsedImplicitly]

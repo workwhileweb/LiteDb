@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -14,6 +15,8 @@ namespace LiteDbExplorer.Core
         public QueryResult(IEnumerable<BsonValue> bsonValues)
         {
             InstanceId = Guid.NewGuid().ToString("D");
+
+            Source = bsonValues;
 
             if (bsonValues == null)
             {
@@ -81,9 +84,13 @@ namespace LiteDbExplorer.Core
 
         public bool HasValue { get; private set; }
 
+        public IEnumerable<BsonValue> Source { get; private set; }
+
         public BsonArray AsArray { get; private set; }
 
         public BsonDocument AsDocument { get; private set; }
+
+        public DataTable DataTable => Source.ToDataTable();
 
         public string Serialize(bool pretty = false, bool decoded = true)
         {
@@ -114,11 +121,16 @@ namespace LiteDbExplorer.Core
         }
     }
 
-    public class QueryResultDataTableAdapter
+    public static class QueryResultExtensions
     {
-        public QueryResultDataTableAdapter(IEnumerable<BsonValue> bsonValues)
+        // TODO: Replace DataTable with Lightweight alternative
+        public static DataTable ToDataTable(this IEnumerable<BsonValue> bsonValues)
         {
             var table = new DataTable();
+            if (bsonValues == null)
+            {
+                return table;
+            }
 
             foreach (var value in bsonValues)
             {
@@ -127,7 +139,10 @@ namespace LiteDbExplorer.Core
                     value.AsDocument :
                     new BsonDocument { ["[value]"] = value };
 
-                if (doc.Keys.Count == 0) doc["[root]"] = "{}";
+                if (doc.Keys.Count == 0)
+                {
+                    doc["[root]"] = "{}";
+                }
 
                 foreach (var key in doc.Keys)
                 {
@@ -135,19 +150,31 @@ namespace LiteDbExplorer.Core
                     if (col == null)
                     {
                         table.Columns.Add(key);
-
+                        var readOnly = key == "_id";
                         col = table.Columns[key];
-                        col.ReadOnly = key == "_id";
+                        col.ColumnName = key;
+                        col.Caption = key;
+                        col.ReadOnly = readOnly;
                     }
                 }
 
                 foreach (var key in doc.Keys)
                 {
-                    row[key] = doc[key].ToDisplayValue();
+                    var bsonValue = doc[key];
+                    if (bsonValue.IsNull || bsonValue.IsArray || bsonValue.IsDocument || bsonValue.IsBinary)
+                    {
+                        row[key] = bsonValue.ToDisplayValue();
+                    }
+                    else
+                    {
+                        row[key] = bsonValue.RawValue;                        
+                    }
                 }
 
                 table.Rows.Add(row);
             }
+
+            return table;
         }
     }
 

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -46,8 +47,13 @@ namespace LiteDbExplorer.Modules
         Task<Maybe<string>> ExportStoredFiles(ICollection<DocumentReference> documents);
         Task<Maybe<string>> ExportToCsv(ICollection<DocumentReference> documents, string name = "");
 
-        Task<Maybe<string>> ExportCollection(IScreen context, CollectionReference collectionReference, IList<DocumentReference> selectedDocuments = null);
+        Task<Maybe<string>> ExportAs(IScreen context, CollectionReference collectionReference, IList<DocumentReference> selectedDocuments = null);
         Task<Maybe<string>> ExportDocuments(IScreen context, ICollection<DocumentReference> documents, string name = "");
+
+        Task<Maybe<string>> ExportAs(
+            IScreen context, 
+            QueryResult queryResult,
+            string name = "");
     }
 
     [Export(typeof(IDatabaseInteractions))]
@@ -329,7 +335,7 @@ namespace LiteDbExplorer.Modules
             }
         }
 
-        public async Task<Maybe<string>> ExportCollection(
+        public async Task<Maybe<string>> ExportAs(
             IScreen context, 
             CollectionReference collectionReference, 
             IList<DocumentReference> selectedDocuments = null)
@@ -339,11 +345,10 @@ namespace LiteDbExplorer.Modules
                 return null;
             }
 
-            var exportOptions =
-                new CollectionExportOptions(collectionReference.IsFilesOrChunks, selectedDocuments?.Count);
+            var exportOptions = new CollectionExportOptions(collectionReference.IsFilesOrChunks, selectedDocuments?.Count);
 
             var dialogHostIdentifier = AppConstants.DialogHosts.Shell;
-            if (context is LiteDbExplorer.Wpf.Framework.Shell.IDocument document)
+            if (context is Wpf.Framework.Shell.IDocument document)
             {
                 dialogHostIdentifier = document.DialogHostIdentifier;
             }
@@ -372,6 +377,68 @@ namespace LiteDbExplorer.Modules
                     break;
                 case 3:
                     maybePath = await ExportStoredFiles(itemsToExport);
+                    break;
+            }
+
+            if (maybePath.HasValue)
+            {
+                var builder = NotificationInteraction.Default()
+                    .HasMessage($"{result.Model.ExportFormat} saved in:\n{maybePath.Value.ShrinkPath(128)}");
+
+                if (Path.HasExtension(maybePath.Value))
+                {
+                    builder.Dismiss().WithButton("Open",
+                        async button =>
+                        {
+                            await _applicationInteraction.OpenFileWithAssociatedApplication(maybePath.Value);
+                        });
+                }
+
+                builder.WithButton("Reveal in Explorer",
+                        async button => { await _applicationInteraction.RevealInExplorer(maybePath.Value); })
+                    .Dismiss().WithButton("Close", button => { });
+
+                builder.Queue();
+            }
+
+            return maybePath;
+        }
+
+
+        public async Task<Maybe<string>> ExportAs(
+            IScreen context, 
+            QueryResult queryResult,
+            string name = "")
+        {
+            if (queryResult == null)
+            {
+                return null;
+            }
+
+            var exportOptions = new CollectionExportOptions(false, null);
+
+            var dialogHostIdentifier = AppConstants.DialogHosts.Shell;
+            if (context is Wpf.Framework.Shell.IDocument document)
+            {
+                dialogHostIdentifier = document.DialogHostIdentifier;
+            }
+            var result = await Show.Dialog(dialogHostIdentifier).For(exportOptions);
+            if (result.Action is "cancel")
+            {
+                return null;
+            }
+
+            Maybe<string> maybePath = null;
+            switch (result.Model.GetSelectedExportFormat())
+            {
+                case 0:
+                    maybePath = await ExportToJson(queryResult, name);
+                    break;
+                case 1:
+                    maybePath = await ExportToExcel(queryResult.DataTable, name);
+                    break;
+                case 2:
+                    maybePath = await ExportToCsv(queryResult.DataTable, name);
                     break;
             }
 
@@ -519,6 +586,34 @@ namespace LiteDbExplorer.Modules
             return maybeFileName.Value;
         }
 
+        public async Task<Maybe<string>> ExportToExcel(DataTable dataTable, string name = "")
+        {
+            var fileName = ArchiveExtensions.EnsureFileName(name, "export", ".xlsx", true);
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save Excel export", "Excel File|*.xlsx", fileName);
+            if (maybeFileName.HasNoValue)
+            {
+                return null;
+            }
+
+            var excelPackage = new ExcelPackage();
+            var ws = excelPackage.Workbook.Worksheets.Add(name);
+
+            ws.Cells[@"A1"].LoadFromDataTable(dataTable, true);
+            
+            var resultsTable = ws.Tables.Add(ws.Dimension, $"{Regex.Replace(name, @"\s", "_")}_table");
+
+            resultsTable.ShowFilter = true;
+            resultsTable.ShowHeader = true;
+            
+            // AutoFit
+            ws.Cells[ws.Dimension.Address].AutoFitColumns();
+
+            excelPackage.SaveAs(new FileInfo(maybeFileName.Value));
+            excelPackage.Dispose();
+
+            return maybeFileName.Value;
+        }
+
         public async Task<Maybe<string>> ExportToCsv(ICollection<DocumentReference> documents, string name = "")
         {
             var fileName = ArchiveExtensions.EnsureFileName(name, "export", ".csv", true);
@@ -537,6 +632,23 @@ namespace LiteDbExplorer.Modules
                 string.Join(separator, keys)
             };
 
+            string NormalizeValue(BsonValue value)
+            {
+                string s = null;
+                if (!value.IsArray && !value.IsDocument && !value.IsNull)
+                {
+                    s = Convert.ToString(value.RawValue, CultureInfo.InvariantCulture);
+                }
+
+                // Escape reserved tokens
+                if (s != null && s.IndexOfAny(reservedTokens) >= 0)
+                {
+                    s = "\"" + s.Replace("\"", "\"\"") + "\"";
+                }
+
+                return s;
+            }
+
             foreach (var documentReference in documents)
             {
                 var rowCols = new string[keys.Length];
@@ -545,22 +657,55 @@ namespace LiteDbExplorer.Modules
                 {
                     if (documentReference.LiteDocument.ContainsKey(key))
                     {
-                        string cellValue = null;
                         var bsonValue = documentReference.LiteDocument[key];
-                        if (!bsonValue.IsArray && !bsonValue.IsDocument && !bsonValue.IsNull)
-                        {
-                            cellValue = Convert.ToString(bsonValue.RawValue, CultureInfo.InvariantCulture);
-                        }
-                        // Escape reserved tokens
-                        if (cellValue != null && cellValue.IndexOfAny(reservedTokens) >= 0)
-                        {
-                            cellValue = "\"" + cellValue.Replace("\"", "\"\"") + "\"";  
-                        }
-                        rowCols[currentCol] = cellValue;
+                        rowCols[currentCol] = NormalizeValue(bsonValue);
                     }
                     currentCol++;
                 }
                 contents.Add(string.Join(separator, rowCols));
+            }
+
+            File.WriteAllLines(maybeFileName.Value, contents, Encoding.UTF8);
+
+            return maybeFileName;
+
+        }
+
+        public async Task<Maybe<string>> ExportToCsv(DataTable dataTable, string name = "")
+        {
+            var fileName = ArchiveExtensions.EnsureFileName(name, "export", ".csv", true);
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save CSV export", "Excel File|*.xlsx", fileName);
+            if (maybeFileName.HasNoValue)
+            {
+                return null;
+            }
+
+            var separator = ",";
+            var reservedTokens = new[] { '\"', ',', '\n', '\r' };
+            var columnNames = dataTable.Columns
+                .Cast<DataColumn>()
+                .Select(column => column.ColumnName);
+
+            var contents = new List<string>
+            {
+                string.Join(separator, columnNames)
+            };
+
+            string NormalizeValue(object field)
+            {
+                var value = Convert.ToString(field, CultureInfo.InvariantCulture);
+                if (value != null && value.IndexOfAny(reservedTokens) >= 0)
+                {
+                    value = "\"" + value.Replace("\"", "\"\"") + "\"";  
+                }
+                return value;
+            }
+
+            foreach (DataRow row in dataTable.Rows)
+            {
+                var fields = row.ItemArray.Select(NormalizeValue);
+
+                contents.Add(string.Join(separator, fields));
             }
 
             File.WriteAllLines(maybeFileName.Value, contents, Encoding.UTF8);

@@ -102,7 +102,7 @@ namespace LiteDbExplorer.Core
                 cultureInfo = CultureInfo.InvariantCulture;
             }
 
-            var result = string.Empty;
+            string result;
 
             try
             {

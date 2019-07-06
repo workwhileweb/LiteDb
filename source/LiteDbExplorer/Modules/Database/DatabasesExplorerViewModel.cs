@@ -297,7 +297,7 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public async Task ExportCollection()
         {
-            await _databaseInteractions.ExportCollection(this, SelectedCollection);
+            await _databaseInteractions.ExportAs(this, SelectedCollection);
         }
 
         [UsedImplicitly]
