@@ -1,13 +1,19 @@
 
 # <img src="https://raw.githubusercontent.com/julianpaulozzi/LiteDbExplorer/master/source/LiteDbExplorer/Images/icon.png" height="42">  LiteDB Explorer
-Graphical editor for [LiteDB](https://github.com/mbdavid/LiteDB) databases. Written in .NET and WPF.
+Graphical editor for [LiteDB](https://github.com/mbdavid/LiteDB) databases.
 
 
+# Download
+
+Grab latest build from [releases](https://github.com/julianpaulozzi/LiteDbExplorer/releases) page.
+
+Portable single exe version available from version 7.0, just unzip and run.
+
+Requirements: Windows 7, 8 or 10 and [.Net 4.6.2](https://www.microsoft.com/en-us/download/details.aspx?id=53344)
 
 > **Version 0.8.4.0 has issue on notifying automatic updates.**
 >
 > If you always want to be notified about updates, please **upgrade to version 0.8.4.1** by manually checking on help menu or [download on releases page](<https://github.com/julianpaulozzi/LiteDbExplorer/releases>).
-
 
 
 ## Important Notes
@@ -37,14 +43,6 @@ I have seen some LiteDB use cases that go far beyond any that would have with th
 * Shrink database.
 * Support for query using shell commands (WIP).
 * Portable exe (require .NET 4.6.2).
-
-# Download
-
-Grab latest build from [releases](https://github.com/julianpaulozzi/LiteDbExplorer/releases) page.
-
-Portable single exe version available from version 7.0, just unzip and run.
-
-Requirements: Windows 7, 8 or 10 and [.Net 4.6.2](https://www.microsoft.com/en-us/download/details.aspx?id=53344)
 
 # Issue Reporting Guidelines
 
