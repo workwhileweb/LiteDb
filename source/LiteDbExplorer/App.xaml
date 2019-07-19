@@ -38,7 +38,12 @@
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="{x:Type ScrollBar}" 
-                   BasedOn="{StaticResource MaterialDesignScrollBarMinimal}"/>
+                   BasedOn="{StaticResource MaterialDesignScrollBarMinimal}">
+                <Setter Property="materialDesign:ScrollBarAssist.ThumbCornerRadius" Value="0" />
+                <Setter Property="materialDesign:ScrollBarAssist.ButtonsVisibility" Value="Collapsed" />
+                <Setter Property="materialDesign:ScrollBarAssist.ThumbWidth" Value="6" />
+                <Setter Property="materialDesign:ScrollBarAssist.ThumbHeight" Value="6" />
+            </Style>
 
             <Style TargetType="forge:DialogWindow"
                    BasedOn="{StaticResource {x:Type mahapps:MetroWindow}}">

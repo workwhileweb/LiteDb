@@ -148,7 +148,7 @@ namespace LiteDbExplorer.Core
 
                 if (maxLength.HasValue)
                 {
-                    return result.Truncate(maxLength.Value);
+                    return result?.Truncate(maxLength.Value);
                 }
 
                 return result;

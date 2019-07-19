@@ -38,7 +38,10 @@ namespace LiteDbExplorer.Modules.DbCollection
 
         private void CollectionListViewOnLoaded(object sender, RoutedEventArgs e)
         {
-            CollectionLoadedAction?.Invoke();
+            if (CollectionLoadedAction != null)
+            {
+                Dispatcher.Invoke(CollectionLoadedAction);
+            }
         }
 
         public void ScrollIntoItem(object item)

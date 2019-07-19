@@ -230,6 +230,7 @@ namespace LiteDbExplorer.Modules.DbCollection
             else
             {
                 SelectedDocument = CollectionReference.Items.FirstOrDefault();
+                SelectedDocuments = new List<DocumentReference> { SelectedDocument };
             }
         }
 
@@ -241,12 +242,12 @@ namespace LiteDbExplorer.Modules.DbCollection
             {
                 _view.CollectionLoadedAction = () =>
                 {
+                    _view?.FocusListView();
+
                     if (SelectedDocument != null)
                     {
-                        _view?.ScrollIntoItem(SelectedDocument);
+                        _view?.ScrollIntoSelectedItem();
                     }
-
-                    _view?.FocusListView();
                 };
             }
         }
