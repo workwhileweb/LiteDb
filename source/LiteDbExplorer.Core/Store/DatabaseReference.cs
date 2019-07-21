@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using DynamicData;
 using LiteDB;
 using Serilog;
 
@@ -45,7 +46,7 @@ namespace LiteDbExplorer.Core
         public ObservableCollection<CollectionReference> Collections
         {
             get => _collections;
-            set
+            private set
             {
                 OnPropertyChanging();
                 if (_collections != null)
@@ -149,6 +150,7 @@ namespace LiteDbExplorer.Core
 
         private void UpdateCollections()
         {
+            // TODO: Bind database tree and lazy load CollectionReference
             CollectionsLookup = new ObservableCollection<CollectionReferenceLookup>(
                 LiteDatabase.GetCollectionNames()
                     .Where(name => name != @"_chunks")

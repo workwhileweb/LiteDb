@@ -32,11 +32,11 @@ namespace LiteDbExplorer.Core
                 if (_items == null)
                 {
                     _items = new ObservableCollection<DocumentReference>();
+                    // TODO: Lazy load on non UI thread
                     foreach (var item in GetAllItem(LiteCollection))
                     {
                         _items.Add(item);
                     }
-
                     _items.CollectionChanged += OnDocumentsCollectionChanged;
                 }
 

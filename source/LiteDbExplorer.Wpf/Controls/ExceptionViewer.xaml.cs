@@ -141,7 +141,7 @@ namespace LiteDbExplorer.Controls
                 treeView1.Visibility = Visibility.Visible;
                 gridSplitter.Visibility = Visibility.Visible;
                 Grid.SetColumn(docViewer, 2);
-                Grid.SetColumnSpan(docViewer, 0);
+                Grid.SetColumnSpan(docViewer, 1);
             }
             else
             {
