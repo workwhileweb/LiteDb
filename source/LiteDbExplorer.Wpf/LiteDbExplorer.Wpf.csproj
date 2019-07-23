@@ -72,6 +72,7 @@
     <Compile Include="Controls\SearchableTextControl.cs" />
     <Compile Include="Controls\SplitContainer.cs" />
     <Compile Include="Controls\ToolDockPanel.cs" />
+    <Compile Include="Converters\BooleanToIntegerConverter.cs" />
     <Compile Include="Converters\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converters\BrushToContrastForegroundConverter.cs" />
     <Compile Include="Converters\ConverterBase.cs" />

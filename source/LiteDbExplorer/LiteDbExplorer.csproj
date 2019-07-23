@@ -79,7 +79,16 @@
     <Compile Include="AppConstants.cs" />
     <Compile Include="Application\IRecentFilesProvider.cs" />
     <Compile Include="Application\RecentFileInfo.cs" />
+    <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
+    <Compile Include="Modules\DbQuery\IQueryEditorView.cs" />
+    <Compile Include="Modules\DbQuery\IQueryHistoryHandler.cs" />
+    <Compile Include="Modules\DbQuery\QueryHistoryProvider.cs" />
+    <Compile Include="Modules\DbQuery\QueryHistoryView.xaml.cs">
+      <DependentUpon>QueryHistoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\DbQuery\QueryHistoryViewModel.cs" />
+    <Compile Include="Modules\DbQuery\RawQueryHistory.cs" />
     <Compile Include="Modules\Shared\CollectionExportOptions.cs" />
     <Compile Include="Modules\DbCollection\CollectionReferencePayload.cs" />
     <Compile Include="Modules\DbDocument\DocumentReferencePayload.cs" />
@@ -298,6 +307,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Modules\DbDocument\DocumentPreviewView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\DbQuery\QueryHistoryView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
