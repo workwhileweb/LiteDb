@@ -12,11 +12,13 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:framework="clr-namespace:LiteDbExplorer.Framework;assembly=LiteDbExplorer.Wpf"
              xmlns:controls1="clr-namespace:LiteDbExplorer.Controls"
+             xmlns:converters1="clr-namespace:LiteDbExplorer.Presentation.Converters"
              mc:Ignorable="d"
              d:DesignHeight="250" d:DesignWidth="400">
     <UserControl.Resources>
         <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters1:DateTimeHumanizeConverter x:Key="DateTimeHumanizeConverter"/>
     </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -25,11 +27,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <controls:ToolDockPanel DockPanel.Dock="Top" Style="{StaticResource ToolDockPanelDefault}">
+        <controls:ToolDockPanel Style="{StaticResource ToolDockPanelDefault}">
             <TextBlock Text="Query History" Style="{StaticResource ToolPanelTitle}" />
         </controls:ToolDockPanel>
 
-        <controls:ToolDockPanel Grid.Row="2" DockPanel.Dock="Bottom" Style="{StaticResource ToolDockPanelCompact}">
+        <controls:ToolDockPanel Grid.Row="2" Style="{StaticResource ToolDockPanelCompact}">
         </controls:ToolDockPanel>
 
         <ItemsControl x:Name="QueryHistories"
@@ -57,9 +59,10 @@
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Horizontal" Opacity="0.67" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Opacity="0.67" VerticalAlignment="Center"
+                                        ToolTip="{Binding LastRunAt, Converter={StaticResource DateTimeHumanizeConverter}}">
                                 <materialDesign:PackIcon Kind="Clock" Margin="0,0,4,0" Height="13" />
-                                <TextBlock Text="{Binding LastRunAt,StringFormat=g}"
+                                <TextBlock Text="{Binding LastRunAt}"
                                            Style="{StaticResource MaterialDesignCaptionTextBlock}" />
                             </StackPanel>
 
@@ -99,32 +102,17 @@
                                 </materialDesign:PopupBox>
                             </StackPanel>
 
-                            <Border Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                            <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
                                     Background="{DynamicResource MaterialDesignPaper}"
-                                    Padding="12,16" CornerRadius="4" Margin="0,6,0,0">
+                                    Margin="0,6,0,0" MaxHeight="208" VerticalScrollBarVisibility="Auto">
                                 <controls1:HighlightTextBlock FontFamily="Consolas"
                                                               FontSize="11pt"
                                                               TextWrapping="Wrap"
                                                               HighlightText="{Binding RawQuery}"
-                                                              SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.LiteDbCmd.xshd"/>
-                            </Border>
+                                                              SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.LiteDbCmd.xshd"
+                                                              Margin="12,16"/>
+                            </ScrollViewer>
                             
-                            <!--<TextBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
-                                     FontFamily="Consolas"
-                                     FontSize="11pt"
-                                     MinLines="1"
-                                     MaxLines="6"
-                                     Margin="0,8,0,0"
-                                     Padding="0"
-                                     Text="{Binding RawQuery, Mode=OneWay}"
-                                     Style="{StaticResource MaterialDesignOutlinedTextFieldTextBox}"
-                                     materialDesign:HintAssist.Hint="Query"
-                                     VerticalScrollBarVisibility="Auto"
-                                     VerticalAlignment="Stretch"
-                                     IsReadOnly="True"
-                                     TextWrapping="Wrap"
-                                     AcceptsReturn="True"
-                                     IsUndoEnabled="False" />-->
                         </Grid>
 
                     </Border>

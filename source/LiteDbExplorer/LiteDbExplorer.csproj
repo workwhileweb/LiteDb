@@ -79,6 +79,7 @@
     <Compile Include="AppConstants.cs" />
     <Compile Include="Application\IRecentFilesProvider.cs" />
     <Compile Include="Application\RecentFileInfo.cs" />
+    <Compile Include="Controls\AutoUpdateTextBlock.cs" />
     <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
     <Compile Include="Modules\DbQuery\IQueryEditorView.cs" />
@@ -239,6 +240,7 @@
     <Compile Include="Modules\StartPage\StartPageViewModel.cs" />
     <Compile Include="Presentation\Behaviors\BsonValueForeground.cs" />
     <Compile Include="Presentation\Behaviors\TabablzControlAssist.cs" />
+    <Compile Include="Presentation\Converters\DateTimeHumanizeConverter.cs" />
     <Compile Include="Presentation\Converters\GroupDisplayColorToForegloud.cs" />
     <Compile Include="Presentation\GroupDisplayColor.cs" />
     <Compile Include="Presentation\IconProvider.cs" />

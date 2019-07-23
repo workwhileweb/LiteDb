@@ -1,12 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Runtime.CompilerServices;
 using DynamicData;
 using DynamicData.Binding;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace LiteDbExplorer.Modules.DbQuery
 {
@@ -32,6 +36,8 @@ namespace LiteDbExplorer.Modules.DbQuery
             
             var limiter = _historySourceList.LimitSizeTo(100).Subscribe();
 
+            _historySourceList.AddRange(LoadFileData());
+
             var sharedList = _historySourceList
                 .Connect()
                 .DeferUntilLoaded()
@@ -40,7 +46,14 @@ namespace LiteDbExplorer.Modules.DbQuery
                 .Bind(out _queryHistories)
                 .Subscribe();
 
-            _compositeDisposable = new CompositeDisposable(counter, limiter, sharedList);
+            var disposable = _queryHistories.ObserveCollectionChanges()
+                .Throttle(TimeSpan.FromSeconds(2))
+                .Subscribe(pattern =>
+                {
+                    SaveFileData(_queryHistories);
+                });
+
+            _compositeDisposable = new CompositeDisposable(counter, limiter, sharedList,disposable);
         }
 
 
@@ -65,6 +78,43 @@ namespace LiteDbExplorer.Modules.DbQuery
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected static string StorageFilePath => Path.Combine(Paths.AppDataPath, "query_history.json");
+
+        private static readonly JsonSerializerSettings _serializerSettings = new JsonSerializerSettings
+        {
+            ContractResolver = new IgnoreParentPropertiesResolver(true),
+            Formatting = Formatting.Indented
+        };
+
+        private static IEnumerable<RawQueryHistory> LoadFileData()
+        {
+            try
+            {
+                if (File.Exists(StorageFilePath))
+                {
+                    var value = File.ReadAllText(StorageFilePath);
+                    return JsonConvert.DeserializeObject<IEnumerable<RawQueryHistory>>(value, _serializerSettings);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                App.ShowError(e, $"An error occurred while reading the configuration file: '{StorageFilePath}'.\n\nTo avoid this error again a new configuration will be created!");
+                if (File.Exists(StorageFilePath))
+                {
+                    File.Delete(StorageFilePath);
+                    File.WriteAllText(StorageFilePath, JsonConvert.SerializeObject(new List<RawQueryHistory>()));
+                }
+            }
+
+            return Enumerable.Empty<RawQueryHistory>();
+        }
+
+        private static void SaveFileData(IEnumerable<RawQueryHistory> data)
+        {
+            File.WriteAllText(StorageFilePath, JsonConvert.SerializeObject(data, _serializerSettings));
         }
     }
 }
