@@ -215,7 +215,7 @@ namespace LiteDbExplorer.Modules.DbQuery
                 LastRunAt = DateTime.UtcNow
             };
 
-            _queryHistoryProvider.Add(queryHistory);
+            _queryHistoryProvider.Upsert(queryHistory);
 
             ActiveItem = Items.FirstOrDefault();
         }

@@ -18,7 +18,7 @@ namespace LiteDbExplorer.Modules.DbQuery
     {
         ReadOnlyObservableCollection<RawQueryHistory> QueryHistories { get; }
         bool IsEmpty { get; }
-        void Add(RawQueryHistory item);
+        void Upsert(RawQueryHistory item);
         void Remove(RawQueryHistory item);
     }
 
@@ -46,7 +46,8 @@ namespace LiteDbExplorer.Modules.DbQuery
                 .Bind(out _queryHistories)
                 .Subscribe();
 
-            var disposable = _queryHistories.ObserveCollectionChanges()
+            var disposable = _queryHistories
+                .ObserveCollectionChanges()
                 .Throttle(TimeSpan.FromSeconds(2))
                 .Subscribe(pattern =>
                 {
@@ -61,9 +62,23 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         public bool IsEmpty { get; private set; }
 
-        public void Add(RawQueryHistory item)
+        public void Upsert(RawQueryHistory item)
         {
-            _historySourceList.Add(item);
+            _historySourceList.Edit(list =>
+            {
+                var lastHistory = list
+                    .OrderByDescending(p => p.LastRunAt)
+                    .FirstOrDefault(p => RawQueryHistory.RawSourceComparer.Equals(item, p));
+
+                if (lastHistory != null)
+                {
+                    lastHistory.LastRunAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    list.Add(item);
+                }
+            });
         }
 
         public void Remove(RawQueryHistory item)
@@ -95,7 +110,8 @@ namespace LiteDbExplorer.Modules.DbQuery
                 if (File.Exists(StorageFilePath))
                 {
                     var value = File.ReadAllText(StorageFilePath);
-                    return JsonConvert.DeserializeObject<IEnumerable<RawQueryHistory>>(value, _serializerSettings);
+                    var rawQueryHistories = JsonConvert.DeserializeObject<IEnumerable<RawQueryHistory>>(value, _serializerSettings);
+                    return rawQueryHistories ?? Enumerable.Empty<RawQueryHistory>();
                 }
             }
             catch (Exception e)
@@ -104,7 +120,11 @@ namespace LiteDbExplorer.Modules.DbQuery
                 App.ShowError(e, $"An error occurred while reading the configuration file: '{StorageFilePath}'.\n\nTo avoid this error again a new configuration will be created!");
                 if (File.Exists(StorageFilePath))
                 {
-                    File.Delete(StorageFilePath);
+                    var destFileName = Path.Combine(
+                            Path.GetDirectoryName(StorageFilePath), 
+                            $"{Path.GetFileNameWithoutExtension(StorageFilePath)}_{DateTime.UtcNow.Ticks}_fail.{Path.GetExtension(StorageFilePath).TrimStart('.')}"
+                        );
+                    File.Copy(StorageFilePath, destFileName);
                     File.WriteAllText(StorageFilePath, JsonConvert.SerializeObject(new List<RawQueryHistory>()));
                 }
             }

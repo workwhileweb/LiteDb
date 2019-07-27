@@ -2,6 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:controls="clr-namespace:LiteDbExplorer.Wpf.Controls">
 
+
+    <Style x:Key="SplitContainerVerticalGridSplitter" TargetType="GridSplitter">
+    </Style>
+
+    <Style x:Key="SplitContainerHorizontalGridSplitter" TargetType="GridSplitter">
+    </Style>
+
     <Style TargetType="{x:Type controls:SplitContainer}">
         <Setter Property="Template">
             <Setter.Value>
@@ -34,7 +41,7 @@
                                           Grid.Row="0"
                                           Grid.RowSpan="3"
                                           Grid.ColumnSpan="1"
-                                          Width="5"
+                                          Width="4"
                                           VerticalAlignment="Stretch"
                                           HorizontalAlignment="Center"
                                           ShowsPreview="True" />
@@ -61,7 +68,7 @@
                             <Setter TargetName="PART_Splitter" Property="VerticalAlignment" Value="Center" />
                             <Setter TargetName="PART_Splitter" Property="HorizontalAlignment" Value="Stretch" />
                             <Setter TargetName="PART_Splitter" Property="Width" Value="Auto" />
-                            <Setter TargetName="PART_Splitter" Property="Height" Value="5" />
+                            <Setter TargetName="PART_Splitter" Property="Height" Value="4" />
 
                             <Setter TargetName="PART_SecondChildGrid" Property="Grid.Column" Value="0" />
                             <Setter TargetName="PART_SecondChildGrid" Property="Grid.Row" Value="2" />

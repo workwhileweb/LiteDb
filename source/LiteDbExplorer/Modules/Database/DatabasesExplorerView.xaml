@@ -5,9 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
-             xmlns:liteDbExplorerCore="clr-namespace:LiteDbExplorer;assembly=LiteDbExplorer.Core"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:framework="clr-namespace:LiteDbExplorer.Framework;assembly=LiteDbExplorer.Wpf"
              xmlns:commands="clr-namespace:LiteDbExplorer.Framework.Commands;assembly=LiteDbExplorer.Wpf"
@@ -33,22 +31,18 @@
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" TargetCommand="{Binding EditDbPropertiesCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" TargetCommand="{Binding SaveDatabaseCopyAsCommand}"/>
     </commands:CommandToCommand.Bindings>
-    <UserControl.Style>
-        <Style TargetType="UserControl">
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
-            <Style.Triggers>
-                <Trigger Property="behaviors:FocusGroupState.IsFocusActive" Value="True">
-                    <Setter Property="BorderBrush" Value="#2CFFFFFF"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
     <DockPanel AllowDrop="True"
-               Background="Transparent" 
                behaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">
+
+        <Border DockPanel.Dock="Top" Height="45" Padding="10,0">
+            <TextBlock VerticalAlignment="Center" FontSize="14" Opacity="0.7"
+                Style="{StaticResource MaterialDesignSubheadingTextBlock}">
+                Databases
+            </TextBlock>
+        </Border>
+
         <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}">
+            <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}" Height="43">
                 <Button x:Name="OpenDatabase" ContextMenuService.IsEnabled="False" Padding="0">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
@@ -95,9 +89,12 @@
             </ToolBar>
         </ToolBarTray>
 
-        <TreeView Name="TreeDatabase" DockPanel.Dock="Top"
+        <!--<controls:ToolDockPanel DockPanel.Dock="Bottom" Style="{StaticResource ToolDockPanelCompact}">
+        </controls:ToolDockPanel>-->
+
+        <TreeView Name="TreeDatabase"
                   ItemsSource="{Binding Databases}"
-                  Focusable="True"
+                  Focusable="True" Padding="0"
                   HorizontalContentAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="False"

@@ -40,7 +40,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="106" MinHeight="55" />
-                <RowDefinition Height="5" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" MinHeight="50" />
             </Grid.RowDefinitions>
 
@@ -142,9 +142,10 @@
                 </controls:ExtendedTextEditor.ContextMenu>
             </controls:ExtendedTextEditor>
 
-            <GridSplitter Grid.Row="2" Grid.Column="0" HorizontalAlignment="Stretch" />
+            <GridSplitter Grid.Row="2" Height="4" Grid.Column="0" HorizontalAlignment="Stretch" />
 
-            <TabControl Grid.Row="3" Grid.Column="0" x:Name="Items" Padding="0" Margin="0"
+            <TabControl Grid.Row="3" Grid.Column="0" x:Name="Items" 
+                        Padding="0" Margin="0" Background="Transparent" BorderThickness="0,1,0,0"
                         mah:TabControlHelper.Underlined="TabPanel"
                         mah:TabControlHelper.UnderlineBrush="{DynamicResource MaterialDesignDivider}"
                         mah:TabControlHelper.UnderlineSelectedBrush="{DynamicResource MaterialDesignBody}"
@@ -175,7 +176,7 @@
             </TabControl>
         </Grid>
 
-        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch"
+        <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch"
                       Visibility="{Binding Path=ShowHistory, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
         <Border x:Name="QueryHistoryViewBorder" Grid.Column="2"

@@ -27,6 +27,10 @@ namespace LiteDbExplorer.Wpf
                 @"(\/MahApps.Metro;component\/Styles\/Accents\/)((BaseLight)|(BaseDark))",
                 $"pack://application:,,,/MahApps.Metro;component/Styles/Accents/{(isDark ? "BaseDark" : "BaseLight")}.xaml");
 
+            TryFindAndReplaceMergedDictionary(
+                @"(\/LiteDbExplorer.Wpf;component\/Themes\/ApplicationColors\.)((Light)|(Dark))",
+                $"pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/ApplicationColors.{(isDark ? "Dark" : "Light")}.xaml");
+
             /*TryFindAndReplaceMergedDictionary(
                 @"(\/MaterialDesignExtensions;component\/Themes\/MaterialDesign((Light)|(Dark))Theme)",
                 $"pack://application:,,,/MaterialDesignExtensions;component/Themes/{(isDark ? "MaterialDesignDarkTheme" : "MaterialDesignLightTheme")}.xaml");*/

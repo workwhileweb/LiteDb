@@ -5,14 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LiteDbExplorer.Modules.DbQuery"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
-             xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              xmlns:controls="clr-namespace:LiteDbExplorer.Wpf.Controls;assembly=LiteDbExplorer.Wpf"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:framework="clr-namespace:LiteDbExplorer.Framework;assembly=LiteDbExplorer.Wpf"
              xmlns:controls1="clr-namespace:LiteDbExplorer.Controls"
              xmlns:converters1="clr-namespace:LiteDbExplorer.Presentation.Converters"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
              d:DesignHeight="250" d:DesignWidth="400">
     <UserControl.Resources>
@@ -75,7 +75,6 @@
                                     Style="{StaticResource MaterialDesignToolForegroundButton}"
                                     Width="30"
                                     Padding="2,0"
-                                    Opacity="1"
                                     materialDesign:RippleAssist.IsCentered="True"
                                     cal:Message.Attach="InsertQuery($dataContext)"
                                     ToolTip="Inset query in editor">
@@ -85,25 +84,33 @@
                                     Style="{StaticResource MaterialDesignToolForegroundButton}"
                                     Width="30"
                                     Padding="2,0"
-                                    Opacity="1"
                                     materialDesign:RippleAssist.IsCentered="True"
                                     cal:Message.Attach="CopyQuery($dataContext)"
                                     ToolTip="Copy to clipboard">
                                     <materialDesign:PackIcon Kind="ContentCopy" />
                                 </Button>
-                                <materialDesign:PopupBox
-                                    Padding="2,0">
-                                    <StackPanel>
-                                        <Button Content="Delete" 
-                                                ToolTip="Remove query from list"
-                                                cal:Message.Attach="RemoveQuery($dataContext)"
-                                                cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}"/>
-                                    </StackPanel>
-                                </materialDesign:PopupBox>
+                                <Button
+                                    Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                    Width="30"
+                                    Padding="2,0"
+                                    Opacity="1"
+                                    materialDesign:RippleAssist.IsCentered="True"
+                                    ToolTip="More...">
+                                    <materialDesign:PackIcon Kind="DotsVertical" />
+                                    <i:Interaction.Behaviors>
+                                        <behaviors:ButtonClickOpenMenuBehavior/>
+                                    </i:Interaction.Behaviors>
+                                    <Button.ContextMenu>
+                                        <ContextMenu MinWidth="120" 
+                                                     cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
+                                            <MenuItem Header="Delete" cal:Message.Attach="RemoveQuery($dataContext)"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
                             </StackPanel>
 
-                            <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
-                                    Background="{DynamicResource MaterialDesignPaper}"
+                            <controls:ChildScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                                    Background="{DynamicResource TextEditorBackground}"
                                     Margin="0,6,0,0" MaxHeight="208" VerticalScrollBarVisibility="Auto">
                                 <controls1:HighlightTextBlock FontFamily="Consolas"
                                                               FontSize="11pt"
@@ -111,7 +118,7 @@
                                                               HighlightText="{Binding RawQuery}"
                                                               SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.LiteDbCmd.xshd"
                                                               Margin="12,16"/>
-                            </ScrollViewer>
+                            </controls:ChildScrollViewer>
                             
                         </Grid>
 

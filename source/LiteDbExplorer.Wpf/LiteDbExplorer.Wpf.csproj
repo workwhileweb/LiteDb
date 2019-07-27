@@ -66,6 +66,7 @@
     <Compile Include="Behaviors\ScrollViewerHelper.cs" />
     <Compile Include="Behaviors\TreeViewHelper.cs" />
     <Compile Include="Behaviors\WindowOptionsBehavior.cs" />
+    <Compile Include="Controls\ChildScrollViewer.cs" />
     <Compile Include="Controls\ExceptionViewer.xaml.cs">
       <DependentUpon>ExceptionViewer.xaml</DependentUpon>
     </Compile>
@@ -186,6 +187,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Modules\Settings\SettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\ApplicationColors.Dark.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\ApplicationColors.Light.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
