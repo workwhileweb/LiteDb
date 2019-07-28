@@ -28,6 +28,7 @@ namespace LiteDbExplorer.Modules.DbQuery
         private readonly IApplicationInteraction _applicationInteraction;
         private readonly IQueryHistoryProvider _queryHistoryProvider;
         private IQueryEditorView _view;
+        private DatabaseReference _currentDatabase;
 
         [ImportingConstructor]
         public QueryViewModel(IApplicationInteraction applicationInteraction, IQueryHistoryProvider queryHistoryProvider)
@@ -64,14 +65,22 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         public ICommand OpenHelpCommand { get; }
 
-        public Screen QueryHistoryView { get; }
+        public QueryHistoryViewModel QueryHistoryView { get; }
 
         [UsedImplicitly]
         public ObservableCollection<DatabaseReference> Databases => Store.Current.Databases;
 
         public RunQueryContext InitialQueryContext { get; set; }
 
-        public DatabaseReference CurrentDatabase { get; set; }
+        public DatabaseReference CurrentDatabase
+        {
+            get => _currentDatabase;
+            set
+            {
+                _currentDatabase = value;
+                QueryHistoryView?.DefineFilter(CurrentDatabase);
+            }
+        }
 
         public QueryReference QueryReference { get; set; }
 

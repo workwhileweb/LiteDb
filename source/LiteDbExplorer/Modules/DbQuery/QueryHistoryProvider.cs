@@ -22,7 +22,7 @@ namespace LiteDbExplorer.Modules.DbQuery
         void Remove(RawQueryHistory item);
     }
 
-    public class QueryHistoryProvider : INotifyPropertyChanged, IQueryHistoryProvider
+    public class QueryHistoryProvider : INotifyPropertyChanged, IQueryHistoryProvider, IDisposable
     {
         private CompositeDisposable _compositeDisposable;
         readonly ReadOnlyObservableCollection<RawQueryHistory> _queryHistories;
@@ -135,6 +135,11 @@ namespace LiteDbExplorer.Modules.DbQuery
         private static void SaveFileData(IEnumerable<RawQueryHistory> data)
         {
             File.WriteAllText(StorageFilePath, JsonConvert.SerializeObject(data, _serializerSettings));
+        }
+
+        public void Dispose()
+        {
+            _compositeDisposable?.Dispose();
         }
     }
 }

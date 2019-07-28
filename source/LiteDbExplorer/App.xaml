@@ -18,22 +18,15 @@
                 </ResourceDictionary>
 
                 <ResourceDictionary Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/Styles.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Extended.Wpf.Toolkit;component/Themes/ToolkitControls.xaml"/>
 
                 <!-- Local Styles -->
                 <ResourceDictionary Source="Themes/MaterialDesignTheme.Dragablz.xaml"/>
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.Button.xaml" />
                 <ResourceDictionary Source="Themes/Controls.Wpf.Notifications.xaml" />
                 <!--<ResourceDictionary Source="/Enterwell.Clients.Wpf.Notifications;component/Themes/Generic.xaml" />-->
                 <ResourceDictionary Source="pack://application:,,,/Forge.Forms;component/Themes/Material.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/MaterialDesignTheme.TreeViewFullRow.xaml"/>
 
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.ButtonChrome.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.ButtonSpinner.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.ToolkitTextBox.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.NumericUpDown.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.TimePicker.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.TimeSpanUpDown.xaml" />
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.DateTimePicker.xaml" />
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
 
             </ResourceDictionary.MergedDictionaries>

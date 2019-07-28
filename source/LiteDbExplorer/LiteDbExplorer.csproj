@@ -384,43 +384,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\MaterialDesignTheme.ButtonChrome.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.Button.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.ButtonSpinner.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.DateTimePicker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Themes\MaterialDesignTheme.Dragablz.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.DropDownButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.TimePicker.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.TimeSpanUpDown.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.ToolkitTextBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.NumericUpDown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -490,6 +454,10 @@
     <ProjectReference Include="..\LiteDbExplorer.Wpf\LiteDbExplorer.Wpf.csproj">
       <Project>{e61b6d10-9f85-485d-99fa-7bce12315c57}</Project>
       <Name>LiteDbExplorer.Wpf</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MaterialDesignThemes.Extended.Wpf.Toolkit\MaterialDesignThemes.Extended.Wpf.Toolkit.csproj">
+      <Project>{9713b6d9-59ab-4ac1-8990-c77cf1b84637}</Project>
+      <Name>MaterialDesignThemes.Extended.Wpf.Toolkit</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

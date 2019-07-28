@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.Composition;
 using Caliburn.Micro;
 using JetBrains.Annotations;
+using LiteDbExplorer.Core;
 
 namespace LiteDbExplorer.Modules.DbQuery
 {
@@ -62,6 +63,11 @@ namespace LiteDbExplorer.Modules.DbQuery
         public bool CanInsertQuery(RawQueryHistory item)
         {
             return item != null && Parent is IQueryHistoryHandler;
+        }
+
+        public void DefineFilter(DatabaseReference currentDatabase)
+        {
+            // TODO: Filter from database
         }
     }
 }
