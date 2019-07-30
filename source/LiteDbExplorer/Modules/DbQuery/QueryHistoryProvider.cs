@@ -24,7 +24,7 @@ namespace LiteDbExplorer.Modules.DbQuery
 
     public class QueryHistoryProvider : INotifyPropertyChanged, IQueryHistoryProvider, IDisposable
     {
-        private CompositeDisposable _compositeDisposable;
+        private readonly CompositeDisposable _compositeDisposable;
         readonly ReadOnlyObservableCollection<RawQueryHistory> _queryHistories;
         private readonly SourceList<RawQueryHistory> _historySourceList;
 

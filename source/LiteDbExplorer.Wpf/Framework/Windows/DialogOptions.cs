@@ -18,6 +18,8 @@ namespace LiteDbExplorer.Framework.Windows
         private bool _showDialogsOverTitleBar;
         private bool _showIconOnTitleBar = true;
         private bool _showInTaskbar = true;
+        private double _minWidth;
+        private double _minHeight;
 
         public DialogOptions()
         {
@@ -43,6 +45,26 @@ namespace LiteDbExplorer.Framework.Windows
             {
                 _width = value;
                 _value[nameof(Width)] = value;
+            }
+        }
+
+        public double MinHeight
+        {
+            get => _minHeight;
+            set
+            {
+                _minHeight = value;
+                _value[nameof(MinHeight)] = value;
+            }
+        }
+
+        public double MinWidth
+        {
+            get => _minWidth;
+            set
+            {
+                _minWidth = value;
+                _value[nameof(MinWidth)] = value;
             }
         }
 

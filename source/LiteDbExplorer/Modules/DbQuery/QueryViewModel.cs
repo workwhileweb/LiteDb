@@ -57,6 +57,8 @@ namespace LiteDbExplorer.Modules.DbQuery
             QueryHistoryView = IoC.Get<QueryHistoryViewModel>();
 
             QueryHistoryView.Parent = this;
+
+            QueryHistoryView.FilterActiveDatabase = true;
         }
 
         public ICommand RunQueryCommand { get; }
@@ -78,7 +80,7 @@ namespace LiteDbExplorer.Modules.DbQuery
             set
             {
                 _currentDatabase = value;
-                QueryHistoryView?.DefineFilter(CurrentDatabase);
+                QueryHistoryView?.SetActiveDatabase(CurrentDatabase);
             }
         }
 

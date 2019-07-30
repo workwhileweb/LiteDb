@@ -70,6 +70,7 @@
     <Compile Include="Controls\ExceptionViewer.xaml.cs">
       <DependentUpon>ExceptionViewer.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Controls\PathTrimmingTextBlock.cs" />
     <Compile Include="Controls\SearchableTextControl.cs" />
     <Compile Include="Controls\SplitContainer.cs" />
     <Compile Include="Controls\ToolDockPanel.cs" />

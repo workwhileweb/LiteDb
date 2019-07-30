@@ -1,7 +1,9 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 using LiteDbExplorer.Wpf.Modules.AvalonEdit;
 using Serilog;
 
@@ -37,20 +39,31 @@ namespace LiteDbExplorer.Wpf.Modules.Output.UI
 
         public void Clear()
         {
-            outputText.Clear();
+            Dispatcher.BeginInvoke((Action) (() =>
+            {
+                outputText.Clear();
+
+            }), DispatcherPriority.Normal);
         }
 
         public void AppendText(string text)
         {
-            outputText.AppendText(text);
-            ScrollToEnd();
+            Dispatcher.BeginInvoke((Action) (() =>
+            {
+                outputText.AppendText(text);
+                ScrollToEnd();
+
+            }), DispatcherPriority.Normal);
         }
 
         public void SetText(string text)
         {
-            outputText.Document.Text = text;
+            Dispatcher.BeginInvoke((Action) (() =>
+            {
+                outputText.Document.Text = text;
+                ScrollToEnd();
 
-            ScrollToEnd();
+            }), DispatcherPriority.Normal);
         }
     }
 }

@@ -14,6 +14,8 @@ using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.DbDocument;
 using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Help;
+using LiteDbExplorer.Modules.ImportData;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Windows;
 using LiteDbExplorer.Wpf.Framework;
 using Microsoft.Win32;
@@ -45,6 +47,22 @@ namespace LiteDbExplorer.Modules
                 Width = 480,
                 SizeToContent = SizeToContent.Height,
                 ResizeMode = ResizeMode.NoResize
+            };
+            return _windowManager.ShowDialog(vm, null, dialogOptions.Value) == true;
+        }
+
+        public bool ShowImportWizard(ImportDataOptions options = null)
+        {
+            var vm = IoC.Get<ImportDataWizardViewModel>();
+            vm.Init(options);
+            
+            var dialogOptions = new DialogOptions
+            {
+                Width = 600,
+                MinWidth = 520,
+                MinHeight = 520,
+                SizeToContent = SizeToContent.Height,
+                ResizeMode = ResizeMode.CanResizeWithGrip
             };
             return _windowManager.ShowDialog(vm, null, dialogOptions.Value) == true;
         }

@@ -13,7 +13,6 @@ using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using Enterwell.Clients.Wpf.Notifications;
 using Forge.Forms;
-using ICSharpCode.AvalonEdit.Document;
 using LiteDbExplorer.Core;
 using LiteDB;
 using LiteDbExplorer.Modules.Shared;
@@ -674,7 +673,7 @@ namespace LiteDbExplorer.Modules
         public async Task<Maybe<string>> ExportToCsv(DataTable dataTable, string name = "")
         {
             var fileName = ArchiveExtensions.EnsureFileName(name, "export", ".csv", true);
-            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save CSV export", "Excel File|*.xlsx", fileName);
+            var maybeFileName = await _applicationInteraction.ShowSaveFileDialog("Save CSV export", "CSV File|*.csv", fileName);
             if (maybeFileName.HasNoValue)
             {
                 return null;

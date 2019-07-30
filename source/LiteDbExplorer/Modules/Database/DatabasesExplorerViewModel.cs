@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -47,6 +48,7 @@ namespace LiteDbExplorer.Modules.Database
             DropCollectionCommand = new RelayCommand(async _ => await DropCollection(), _ => CanDropCollection());
             ExportCollectionCommand = new RelayCommand(async _ => await ExportCollection(), _ => CanExportCollection());
             EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), _ => CanEditDbProperties());
+            ImportDataCommand = new RelayCommand(_ => ImportData(), _ => CanImportData());
         }
 
         public IRecentFilesProvider PathDefinitions { get; }
@@ -75,8 +77,13 @@ namespace LiteDbExplorer.Modules.Database
 
         public ICommand SaveDatabaseCopyAsCommand { get; }
 
+        public ICommand ImportDataCommand { get; }
+
         [UsedImplicitly]
         public ObservableCollection<DatabaseReference> Databases => Store.Current.Databases;
+
+        [UsedImplicitly]
+        public bool HasAnyDatabaseOpen => Store.Current.Databases.Any();
 
         public DatabaseReference SelectedDatabase { get; private set; }
 
@@ -316,6 +323,29 @@ namespace LiteDbExplorer.Modules.Database
         public bool CanEditDbProperties()
         {
             return SelectedDatabase != null;
+        }
+
+        [UsedImplicitly]
+        public void ImportData()
+        {
+            var options = new ImportDataOptions();
+            if (SelectedCollection != null)
+            {
+                options.DatabaseReference = SelectedCollection.Database;
+                options.CollectionReference = SelectedCollection;
+            } 
+            else if (SelectedDatabase != null)
+            {
+                options.DatabaseReference = SelectedDatabase;
+            }
+
+            _applicationInteraction.ShowImportWizard(options);
+        }
+
+        [UsedImplicitly]
+        public bool CanImportData()
+        {
+            return HasAnyDatabaseOpen;
         }
 
         #endregion

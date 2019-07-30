@@ -28,6 +28,11 @@
         </Grid.RowDefinitions>
 
         <controls:ToolDockPanel Style="{StaticResource ToolDockPanelDefault}">
+            <ToggleButton DockPanel.Dock="Right" ToolTip="Active database filter" 
+                          IsChecked="{Binding FilterActiveDatabase}">
+                <materialDesign:PackIcon Kind="Filter" />
+            </ToggleButton>
+
             <TextBlock Text="Query History" Style="{StaticResource ToolPanelTitle}" />
         </controls:ToolDockPanel>
 
@@ -36,18 +41,20 @@
 
         <ItemsControl x:Name="QueryHistories"
                       Grid.Row="1" MinHeight="80"
-                      ItemsSource="{Binding HistoryProvider.QueryHistories}"
+                      ItemsSource="{Binding QueryHistoriesView.View}"
                       HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top">
             <ItemsControl.Template>
                 <ControlTemplate>
-                    <ScrollViewer x:Name="ScrollViewer">
+                    <ScrollViewer x:Name="ScrollViewer" 
+                                  VerticalScrollBarVisibility="Auto"
+                                  Padding="0,0,0,5">
                         <ItemsPresenter />
                     </ScrollViewer>
                 </ControlTemplate>
             </ItemsControl.Template>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border Padding="8" Margin="14,10,0,4" CornerRadius="4"
+                    <Border Padding="8" Margin="5,5,5,0" CornerRadius="4"
                             Background="{DynamicResource MaterialDesignCardBackground}">
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -56,19 +63,33 @@
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <StackPanel Orientation="Horizontal" Opacity="0.67" VerticalAlignment="Center"
+                            <StackPanel Grid.Row="0" Grid.Column="0" 
+                                        Orientation="Horizontal" Opacity="0.67" VerticalAlignment="Center"
                                         ToolTip="{Binding LastRunAt, Converter={StaticResource DateTimeHumanizeConverter}}">
                                 <materialDesign:PackIcon Kind="Clock" Margin="0,0,4,0" Height="13" />
                                 <TextBlock Text="{Binding LastRunAt}"
                                            Style="{StaticResource MaterialDesignCaptionTextBlock}" />
                             </StackPanel>
 
+
+                            <!--<controls:PathTrimmingTextBlock Grid.Row="1" Grid.Column="0" 
+                                       Margin="20,2,0,0" Opacity="0.67" FontSize="10"
+                                       Path="{Binding DatabaseLocation}" 
+                                       TextBlockStyle="{StaticResource MaterialDesignCaptionTextBlock}"/>-->
+                            <TextBlock Grid.Row="1" Grid.Column="0" 
+                                       Margin="20,2,0,0" Opacity="0.67" FontSize="10"
+                                       Text="{Binding Name}" 
+                                       ToolTip="{Binding DatabaseLocation}"
+                                       Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+
                             <StackPanel
                                 HorizontalAlignment="Right"
-                                Grid.Row="0" Grid.Column="1"
+                                Grid.Row="0" Grid.RowSpan="2" Grid.Column="1"
                                 Orientation="Horizontal"
                                 Margin="8,0">
                                 <Button
@@ -109,7 +130,7 @@
                                 </Button>
                             </StackPanel>
 
-                            <controls:ChildScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" 
+                            <controls:ChildScrollViewer Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" 
                                     Background="{DynamicResource TextEditorBackground}"
                                     Margin="0,6,0,0" MaxHeight="208" VerticalScrollBarVisibility="Auto">
                                 <controls1:HighlightTextBlock FontFamily="Consolas"
@@ -131,7 +152,7 @@
         <TextBlock Grid.Row="1" HorizontalAlignment="Left"
                    VerticalAlignment="Top" Margin="16"
                    Style="{StaticResource MaterialDesignBody1TextBlock}" Opacity="0.6"
-                   Visibility="{Binding Path=HistoryProvider.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+                   Visibility="{Binding Path=QueryHistoriesView.View.IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
             No history items in the list
         </TextBlock>
     </Grid>

@@ -30,6 +30,7 @@
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection" TargetCommand="{Binding ExportCollectionCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" TargetCommand="{Binding EditDbPropertiesCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" TargetCommand="{Binding SaveDatabaseCopyAsCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Import" TargetCommand="{Binding ImportDataCommand}"/>
     </commands:CommandToCommand.Bindings>
     <DockPanel AllowDrop="True"
                behaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">

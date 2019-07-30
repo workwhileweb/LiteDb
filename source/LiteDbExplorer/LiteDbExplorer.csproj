@@ -47,6 +47,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -82,6 +83,10 @@
     <Compile Include="Controls\AutoUpdateTextBlock.cs" />
     <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
+    <Compile Include="Modules\ImportData\ImportDataWizardView.xaml.cs">
+      <DependentUpon>ImportDataWizardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ImportData\ImportDataWizardViewModel.cs" />
     <Compile Include="Modules\DbQuery\IQueryEditorView.cs" />
     <Compile Include="Modules\DbQuery\IQueryHistoryHandler.cs" />
     <Compile Include="Modules\DbQuery\QueryHistoryProvider.cs" />
@@ -103,6 +108,7 @@
     <Compile Include="Modules\Main\ToolPanelSetViewModel.cs" />
     <Compile Include="Modules\Shared\IDocumentExplorer.cs" />
     <Compile Include="Modules\Shared\IDocumentSet.cs" />
+    <Compile Include="Modules\Shared\ImportDataOptions.cs" />
     <Compile Include="Modules\Shared\IOwnerViewLocator.cs" />
     <Compile Include="Modules\Shared\IToolPanelSet.cs" />
     <Compile Include="Modules\Shared\PerformanceSettings.cs" />
@@ -340,6 +346,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Modules\ImportData\ImportDataWizardView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\Main\ToolPanelSetView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -563,6 +573,7 @@
   <ItemGroup>
     <SplashScreen Include="Images\splashscreen.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -3,20 +3,34 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace LiteDbExplorer.Modules.DbQuery
 {
     public class RawQueryHistory : INotifyPropertyChanged
     {
+        private string _databaseLocation;
+
         public string GroupKey { get; set; }
 
-        public string DatabaseLocation { get; set; }
+        public string DatabaseLocation
+        {
+            get => _databaseLocation;
+            set
+            {
+                _databaseLocation = value;
+                Name = System.IO.Path.GetFileName(_databaseLocation);
+            }
+        }
 
         public DateTime? CreatedAt { get; set; }
 
         public DateTime? LastRunAt { get; set; }
 
         public string RawQuery { get; set; }
+
+        [JsonIgnore]
+        public string Name { get; private set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

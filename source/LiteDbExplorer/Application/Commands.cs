@@ -71,21 +71,21 @@ namespace LiteDbExplorer
 
         public static readonly RoutedUICommand Export = new RoutedUICommand
         (
-            "Export as...",
+            "Export...",
             nameof(Export),
             typeof(Commands)
         );
 
         public static readonly RoutedUICommand ExportCollection = new RoutedUICommand
         (
-            "Export as...",
+            "Export Collection...",
             nameof(ExportCollection),
             typeof(Commands)
         );
 
         public static readonly RoutedUICommand EditDbProperties = new RoutedUICommand
         (
-            "Database properties...",
+            "Database Properties...",
             "EditDb",
             typeof(Commands)
         );
@@ -99,7 +99,7 @@ namespace LiteDbExplorer
 
         public static readonly RoutedUICommand SaveCopyAs = new RoutedUICommand
         (
-            "Save copy as...",
+            "Save Copy As...",
             nameof(SaveCopyAs),
             typeof(Commands)
         );
@@ -187,6 +187,17 @@ namespace LiteDbExplorer
             new InputGestureCollection
             {
                 new KeyGesture(Key.F5, ModifierKeys.Shift)
+            }
+        );
+
+        public static readonly RoutedUICommand Import = new RoutedUICommand
+        (
+            "Import...",
+            nameof(Import),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.I, ModifierKeys.Control)
             }
         );
     }

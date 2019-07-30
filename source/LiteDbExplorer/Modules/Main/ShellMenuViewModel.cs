@@ -51,7 +51,6 @@ namespace LiteDbExplorer.Modules.Main
         [UsedImplicitly]
         public void OpenIssuePage()
         {
-            // Process.Start(Config.IssuesUrl);
             _applicationInteraction.ShowIssueHelper();
         }
 
