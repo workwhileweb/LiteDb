@@ -107,12 +107,6 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public async Task OpenDatabases(IEnumerable<string> paths)
-        {
-            await _databaseInteractions.OpenDatabases(paths);
-        }
-
-        [UsedImplicitly]
         public void OnSelectedItemChanged(RoutedPropertyChangedEventArgs<object> e)
         {
             var value = e.NewValue as IReferenceNode;

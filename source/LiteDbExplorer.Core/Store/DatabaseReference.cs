@@ -4,12 +4,18 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
-using DynamicData;
 using LiteDB;
 using Serilog;
 
 namespace LiteDbExplorer.Core
 {
+    public enum ConnectionMode
+    {
+        Exclusive,
+        ReadOnly,
+        Shared
+    }
+
     public sealed class DatabaseReference : ReferenceNode<DatabaseReference>
     {
         private readonly bool _enableLog;
@@ -26,9 +32,19 @@ namespace LiteDbExplorer.Core
             Location = path;
             Name = Path.GetFileName(path);
 
-            LiteDatabase = string.IsNullOrEmpty(password)
-                ? new LiteDatabase(path, log: GetLogger())
-                : new LiteDatabase($"Filename={path};Password={password}", log: GetLogger());
+            var connectionMap = new Dictionary<string, string>
+            {
+                { "Filename", path },
+                { "Password", password },
+                { "Mode", $"{LiteDB.FileMode.Exclusive}" }
+            };
+
+            var connectionString = connectionMap
+                .Where(pair => !string.IsNullOrEmpty(pair.Value))
+                .Select(pair => $"{pair.Key}={pair.Value}")
+                .Aggregate((p, n) => $"{p};{n}");
+
+            LiteDatabase = new LiteDatabase(connectionString, log: GetLogger());
 
             UpdateCollections();
 

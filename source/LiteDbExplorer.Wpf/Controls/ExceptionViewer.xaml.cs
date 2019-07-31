@@ -309,11 +309,11 @@ namespace LiteDbExplorer.Controls
                 var parts = filePathRegex.Split(message);
                 foreach (var part in parts)
                 {
-                    if (filePathRegex.IsMatch(part))
+                    if (filePathRegex.IsMatch(part) && Uri.TryCreate(part, UriKind.Absolute, out var uri))
                     {
                         var hyperLink = new Hyperlink
                         {
-                            NavigateUri = new Uri(part),
+                            NavigateUri = uri,
                             ToolTip = $"Open: {part}",
                             Inlines =
                             {

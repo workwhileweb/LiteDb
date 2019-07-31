@@ -125,6 +125,11 @@ namespace LiteDbExplorer.Modules
                 _applicationInteraction.ShowError("Cannot open database, file not found.", "File not found");
                 return;
             }
+
+            if (ArchiveExtensions.GetDriveType(path) == DriveType.Network)
+            {
+                _applicationInteraction.ShowAlert("Maintaining connection to network files is not guaranteed!", "Network file", UINotificationType.Info);
+            }
             
             try
             {
