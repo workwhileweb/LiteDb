@@ -58,12 +58,15 @@ namespace LiteDbExplorer.Modules
             
             var dialogOptions = new DialogOptions
             {
-                Width = 600,
-                MinWidth = 520,
-                MinHeight = 520,
-                SizeToContent = SizeToContent.Height,
+                Width = 800,
+                MinWidth = 600,
+                Height = 700,
+                MinHeight = 500,
+                SizeToContent = SizeToContent.Manual,
                 ResizeMode = ResizeMode.CanResizeWithGrip
-            };
+            }
+            .SizeToFit();
+
             return _windowManager.ShowDialog(vm, null, dialogOptions.Value) == true;
         }
 

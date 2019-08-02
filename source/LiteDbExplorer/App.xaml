@@ -8,6 +8,8 @@
              xmlns:forge="clr-namespace:Forge.Forms.Controls;assembly=Forge.Forms"
              xmlns:mahapps="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
+             xmlns:modules="clr-namespace:LiteDbExplorer.Modules"
+             xmlns:cal="http://www.caliburnproject.org"
              ShutdownMode="OnExplicitShutdown"
              Startup="Application_Startup" Exit="Application_Exit">
     <Application.Resources>
@@ -63,6 +65,12 @@
             <!-- Dragablz Material Design -->
             <Style TargetType="{x:Type dragablz:TabablzControl}"
                    BasedOn="{StaticResource MaterialDesignTabablzControlStyle}" />
+
+            <DataTemplate DataType="{x:Type modules:ViewModelContentProxy}">
+                <Grid>
+                    <ContentControl cal:View.Model="{Binding Content}" />
+                </Grid>
+            </DataTemplate>
 
         </ResourceDictionary>
     </Application.Resources>

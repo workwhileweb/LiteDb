@@ -5,7 +5,10 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LiteDbExplorer.Modules.ImportData"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:controls="clr-namespace:Forge.Forms.Controls;assembly=Forge.Forms"
+             xmlns:forge="clr-namespace:Forge.Forms.Controls;assembly=Forge.Forms"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+             xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
@@ -37,11 +40,31 @@
         </Border>
 
         <Border Grid.Row="1" Background="{DynamicResource MaterialDesignPaper}" MinHeight="400">
-            <StackPanel>
-                <controls:DynamicForm Model="{Binding FormatSelector}" Padding="20"/>
-                <controls:DynamicForm Model="{Binding TargetSelector}" Padding="20"/>
-                <controls:DynamicForm Model="{Binding FormatSelector.ImportFormat.OptionsSource}" Padding="20"/>
-            </StackPanel>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <forge:DynamicForm Model="{Binding FormatSelector}" Padding="20,5" 
+                                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <i:Interaction.Behaviors>
+                            <behaviors:BubbleScrollEvent />
+                        </i:Interaction.Behaviors>
+                    </forge:DynamicForm>
+                    <forge:DynamicForm Model="{Binding FormatSelector.ImportFormat.SourceOptionsContext}" Padding="20,5"
+                                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <i:Interaction.Behaviors>
+                            <behaviors:BubbleScrollEvent />
+                        </i:Interaction.Behaviors>
+                    </forge:DynamicForm>
+                    <forge:DynamicForm Model="{Binding FormatSelector.ImportFormat.TargetOptionsContext}" Padding="20,5"
+                                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
+                        <i:Interaction.Behaviors>
+                            <behaviors:BubbleScrollEvent />
+                        </i:Interaction.Behaviors>
+                    </forge:DynamicForm>
+
+                    <ContentControl Margin="20,5"
+                                    cal:View.Model="{Binding DocumentMapper}" />
+                </StackPanel>
+            </ScrollViewer>
         </Border>
 
         <Border Grid.Row="2" Height="60"
