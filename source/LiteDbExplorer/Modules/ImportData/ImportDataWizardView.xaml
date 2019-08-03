@@ -22,21 +22,18 @@
                 Height="80"
                 BorderThickness="0,0,0,0"
                 BorderBrush="{StaticResource MaterialDesignDivider}">
-
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-
-                <materialDesign:PackIcon Kind="FileImport" Margin="20,0" Height="56" Width="56" 
+                <materialDesign:PackIcon Kind="FileImport" Margin="20,0" Height="52" Width="52" 
                                          HorizontalAlignment="Center" 
                                          VerticalAlignment="Center" Opacity="0.67"/>
                 <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
                            Style="{StaticResource MaterialDesignTitleTextBlock}"
                            VerticalAlignment="Center"/>
             </Grid>
-
         </Border>
 
         <Border Grid.Row="1" Background="{DynamicResource MaterialDesignPaper}" MinHeight="400">

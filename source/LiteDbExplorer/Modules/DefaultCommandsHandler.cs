@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -62,6 +63,15 @@ namespace LiteDbExplorer.Modules
                 {
                     _applicationInteraction.ShowError("Failed to open database: " + exc.Message, "Database Error");
                 }
+            });
+
+            Add(Commands.Import, (sender, args) =>
+            {
+                _applicationInteraction.ShowImportWizard();
+            }, (sender, args) =>
+            {
+                var hasDatabaseOpen = Store.Current.Databases.Any();
+                args.CanExecute = hasDatabaseOpen;
             });
         }
 

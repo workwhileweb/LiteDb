@@ -11,6 +11,7 @@
     <SolidColorBrush x:Key="AccentColorBrush4" Color="{DynamicResource Primary200}" />
     <SolidColorBrush x:Key="WindowTitleColorBrush"
                      Color="{Binding Source={StaticResource MaterialDesignPaper}, Path=Color}" />
+    
     <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{DynamicResource Primary500Foreground}" />
     <LinearGradientBrush x:Key="ProgressBrush" EndPoint="0.001,0.5" StartPoint="1.002,0.5">
         <GradientStop Color="{DynamicResource Primary700}" Offset="0" />

@@ -5,7 +5,9 @@
     <SolidColorBrush x:Key="NavBackground" Color="#252526"/>
     <SolidColorBrush x:Key="SectionBackground" Color="#383838"/>
 
+
     <SolidColorBrush x:Key="MaterialDesignToolBarBackground" Color="#383838"/>
+    <SolidColorBrush x:Key="NonActiveWindowTitleBrush" Color="#383838"/>
 
     <SolidColorBrush x:Key="TabBackground" Color="#2D2D2D"/>
     <SolidColorBrush x:Key="TabActiveBackground" Color="#1E1E1E"/>
