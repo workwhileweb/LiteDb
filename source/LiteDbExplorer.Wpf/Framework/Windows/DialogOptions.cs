@@ -20,6 +20,7 @@ namespace LiteDbExplorer.Framework.Windows
         private bool _showInTaskbar = true;
         private double _minWidth;
         private double _minHeight;
+        private double _maxHeight;
 
         public DialogOptions()
         {
@@ -55,6 +56,16 @@ namespace LiteDbExplorer.Framework.Windows
             {
                 _minHeight = value;
                 _value[nameof(MinHeight)] = value;
+            }
+        }
+
+        public double MaxHeight
+        {
+            get => _maxHeight;
+            set
+            {
+                _maxHeight = value;
+                _value[nameof(MaxHeight)] = value;
             }
         }
 

@@ -47,8 +47,10 @@ namespace LiteDbExplorer.Modules
                 Width = 480,
                 MinWidth = 480,
                 MinHeight = 740,
+                MaxHeight = SystemParameters.VirtualScreenHeight - 160,
                 SizeToContent = SizeToContent.Height,
-                ResizeMode = ResizeMode.CanResize
+                ResizeMode = ResizeMode.CanResize,
+                ShowMaxRestoreButton = false
             };
             return _windowManager.ShowDialog(vm, null, dialogOptions.Value) == true;
         }

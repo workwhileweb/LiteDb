@@ -43,6 +43,8 @@ namespace LiteDbExplorer.Modules.Database
 
         public IEnumerable<DisplayInfo> DatabaseFileInfo { get; private set; }
 
+        public string MetadataJson { get; private set; }
+
         public ushort UserVersion
         {
             get => _userVersion;
@@ -129,7 +131,10 @@ namespace LiteDbExplorer.Modules.Database
             };
 
             DatabaseFileInfo = databaseFileInfo;
+
+            MetadataJson = JsonSerializer.Serialize(engineInfoDocument, true, false);
         }
+
     }
 
     public class DisplayInfo : INotifyPropertyChanged
