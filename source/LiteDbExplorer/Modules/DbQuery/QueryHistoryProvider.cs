@@ -33,7 +33,7 @@ namespace LiteDbExplorer.Modules.DbQuery
             _historySourceList = new SourceList<RawQueryHistory>();
 
             var counter = _historySourceList.CountChanged.Subscribe(i => IsEmpty = i == 0);
-            
+
             var limiter = _historySourceList.LimitSizeTo(100).Subscribe();
 
             _historySourceList.AddRange(LoadFileData());
@@ -49,12 +49,9 @@ namespace LiteDbExplorer.Modules.DbQuery
             var disposable = _queryHistories
                 .ObserveCollectionChanges()
                 .Throttle(TimeSpan.FromSeconds(2))
-                .Subscribe(pattern =>
-                {
-                    SaveFileData(_queryHistories);
-                });
+                .Subscribe(pattern => { SaveFileData(_queryHistories); });
 
-            _compositeDisposable = new CompositeDisposable(counter, limiter, sharedList,disposable);
+            _compositeDisposable = new CompositeDisposable(counter, limiter, sharedList, disposable);
         }
 
 
@@ -105,31 +102,12 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         private static IEnumerable<RawQueryHistory> LoadFileData()
         {
-            try
-            {
-                if (File.Exists(StorageFilePath))
-                {
-                    var value = File.ReadAllText(StorageFilePath);
-                    var rawQueryHistories = JsonConvert.DeserializeObject<IEnumerable<RawQueryHistory>>(value, _serializerSettings);
-                    return rawQueryHistories ?? Enumerable.Empty<RawQueryHistory>();
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                App.ShowError(e, $"An error occurred while reading the configuration file: '{StorageFilePath}'.\n\nTo avoid this error again a new configuration will be created!");
-                if (File.Exists(StorageFilePath))
-                {
-                    var destFileName = Path.Combine(
-                            Path.GetDirectoryName(StorageFilePath), 
-                            $"{Path.GetFileNameWithoutExtension(StorageFilePath)}_{DateTime.UtcNow.Ticks}_fail.{Path.GetExtension(StorageFilePath).TrimStart('.')}"
-                        );
-                    File.Copy(StorageFilePath, destFileName);
-                    File.WriteAllText(StorageFilePath, JsonConvert.SerializeObject(new List<RawQueryHistory>()));
-                }
-            }
-
-            return Enumerable.Empty<RawQueryHistory>();
+            return ArchiveExtensions.SafeDeserializeJsonFile<IEnumerable<RawQueryHistory>>(StorageFilePath,
+                       tuple =>
+                       {
+                           App.ShowError(tuple.exception,
+                               $"An error occurred while reading the configuration file: '{StorageFilePath}'.\n\nTo avoid this error again a new configuration will be created!");
+                       }) ?? Enumerable.Empty<RawQueryHistory>();
         }
 
         private static void SaveFileData(IEnumerable<RawQueryHistory> data)

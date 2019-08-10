@@ -8,6 +8,7 @@
              xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:modules="clr-namespace:LiteDbExplorer.Modules"
+             xmlns:main="clr-namespace:LiteDbExplorer.Modules.Main"
              mc:Ignorable="d"
              d:DesignHeight="35" d:DesignWidth="500">
     <UserControl.Resources>
@@ -20,6 +21,7 @@
     </UserControl.Resources>
     <StackPanel Name="menuHolder" Orientation="Horizontal">
         <Menu DockPanel.Dock="Top" Style="{StaticResource TopMenuStyle}">
+
             <MenuItem Header="_File" Height="35">
                 <MenuItem Command="New">
                     <MenuItem.Icon>
@@ -53,6 +55,7 @@
                 <Separator />
                 <MenuItem Command="liteDbExplorer:Commands.Exit" />
             </MenuItem>
+
             <MenuItem Header="_Edit" Height="35">
                 <MenuItem Command="liteDbExplorer:Commands.Add">
                     <MenuItem.Icon>
@@ -69,11 +72,11 @@
                         <materialDesign:PackIcon Kind="TableRowRemove" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Command="liteDbExplorer:Commands.Import">
+                <!--<MenuItem Command="liteDbExplorer:Commands.Import">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="FileImport" />
                     </MenuItem.Icon>
-                </MenuItem>
+                </MenuItem>-->
                 <MenuItem Command="liteDbExplorer:Commands.Export">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="FileExport" />
@@ -96,14 +99,10 @@
                         <materialDesign:PackIcon Kind="Search" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <!--<MenuItem Command="liteDbExplorer:Commands.Find">
-                    <MenuItem.Icon>
-                        <materialDesign:PackIcon Kind="DatabaseSearch" />
-                    </MenuItem.Icon>
-                </MenuItem>-->
                 <MenuItem Command="liteDbExplorer:Commands.FindNext" />
                 <MenuItem Command="liteDbExplorer:Commands.FindPrevious" />
             </MenuItem>
+
             <MenuItem Header="View" Height="35">
                 <MenuItem Header="Start Page" x:Name="OpenStartupDocument">
                     <MenuItem.Icon>
@@ -119,17 +118,28 @@
                     <MenuItem Header="Dark" IsCheckable="True"
                               IsChecked="{Binding Path=Settings.ColorTheme, Converter={StaticResource EnumConverter}, ConverterParameter={x:Static liteDbExplorer:ColorTheme.Dark}, Source={x:Static Application.Current}}" />
                 </MenuItem>
-                <MenuItem Header="Output" x:Name="OpenOutput">
-                    <MenuItem.Icon>
-                        <materialDesign:PackIcon Kind="ConsoleLine" />
-                    </MenuItem.Icon>
-                </MenuItem>
                 <MenuItem Header="Options" x:Name="OpenSettings">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="Gear" />
                     </MenuItem.Icon>
                 </MenuItem>
+                <Separator />
+                <MenuItem Command="liteDbExplorer:Commands.ShowNavigationPanel" 
+                          IsCheckable="True" 
+                          IsChecked="{Binding Path=LeftContentIsVisible, Mode=OneWay, Source={x:Static main:ShellLayoutController.Current}}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="PageLayoutSidebarLeft" />
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Command="liteDbExplorer:Commands.ShowToolsPanel"
+                          IsCheckable="True" 
+                          IsChecked="{Binding Path=ToolsPanelIsVisible, Mode=OneWay, Source={x:Static main:ShellLayoutController.Current}}">
+                    <MenuItem.Icon>
+                        <materialDesign:PackIcon Kind="ConsoleLine" />
+                    </MenuItem.Icon>
+                </MenuItem>
             </MenuItem>
+
             <MenuItem Header="Help" Height="35">
                 <MenuItem Header="Homepage..." x:Name="OpenHomepage">
                     <MenuItem.Icon>

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
@@ -49,6 +48,11 @@ namespace LiteDbExplorer.Modules.Database
             ExportCollectionCommand = new RelayCommand(async _ => await ExportCollection(), _ => CanExportCollection());
             EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), _ => CanEditDbProperties());
             ImportDataCommand = new RelayCommand(_ => ImportData(), _ => CanImportData());
+
+            Store.Current.Databases.CollectionChanged += (sender, args) =>
+            {
+                Commands.ShowNavigationPanel.MainExecute(true);
+            };
         }
 
         public IRecentFilesProvider PathDefinitions { get; }

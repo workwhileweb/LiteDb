@@ -6,6 +6,7 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Services;
+using LiteDbExplorer.Modules.Main;
 using Serilog;
 
 namespace LiteDbExplorer.Modules
@@ -72,6 +73,26 @@ namespace LiteDbExplorer.Modules
             {
                 var hasDatabaseOpen = Store.Current.Databases.Any();
                 args.CanExecute = hasDatabaseOpen;
+            });
+
+            Add(Commands.ShowNavigationPanel, (sender, args) =>
+            {
+                var isVisible = !ShellLayoutController.Current.LeftContentIsVisible;
+                if (args.Parameter is bool isVisibleParam)
+                {
+                    isVisible = isVisibleParam;
+                }
+                ShellLayoutController.Current.LeftContentIsVisible = isVisible;
+            });
+
+            Add(Commands.ShowToolsPanel, (sender, args) =>
+            {
+                var isVisible = !ShellLayoutController.Current.ToolsPanelIsVisible;
+                if (args.Parameter is bool isVisibleParam)
+                {
+                    isVisible = isVisibleParam;
+                }
+                ShellLayoutController.Current.ToolsPanelIsVisible = isVisible;
             });
         }
 

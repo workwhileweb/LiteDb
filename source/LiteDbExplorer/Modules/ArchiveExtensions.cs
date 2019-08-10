@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace LiteDbExplorer.Modules
 {
@@ -117,6 +117,48 @@ namespace LiteDbExplorer.Modules
             }
 
             return DriveType.Unknown;
+        }
+
+        public static T SafeDeserializeJsonFile<T>(string path,
+            Action<(string recoveryPath, Exception exception)> errorCallback = null,
+            JsonSerializerSettings serializerSettings = null)
+        {
+            if (serializerSettings == null)
+            {
+                serializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new IgnoreParentPropertiesResolver(true),
+                    Formatting = Formatting.Indented
+                };
+            }
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    var value = File.ReadAllText(path);
+                    var rawQueryHistories = JsonConvert.DeserializeObject<T>(value, serializerSettings);
+                    return rawQueryHistories;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                string recoveryPath = null;
+                if (File.Exists(path))
+                {
+                    recoveryPath = Path.Combine(
+                        Path.GetDirectoryName(path), 
+                        $"{Path.GetFileNameWithoutExtension(path)}_{DateTime.UtcNow.Ticks}_fail.{Path.GetExtension(path).TrimStart('.')}"
+                    );
+                    File.Copy(path, recoveryPath);
+                    File.WriteAllText(path, JsonConvert.SerializeObject(default(T)));
+                }
+
+                errorCallback?.Invoke((recoveryPath, e));
+            }
+
+            return default(T);
         }
     }
 }

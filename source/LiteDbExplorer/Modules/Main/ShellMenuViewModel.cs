@@ -85,12 +85,6 @@ namespace LiteDbExplorer.Modules.Main
         }
 
         [UsedImplicitly]
-        public void OpenOutput()
-        {
-            _eventAggregator.BeginPublishOnUIThread(new ToolSetPanelActionRequest(ToolSetPanelAction.Open));
-        }
-
-        [UsedImplicitly]
         public async Task ViewErrorLogs()
         {
             var lastErrorLogPath = Paths.GetLastErrorLogPath();

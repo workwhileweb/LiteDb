@@ -98,6 +98,7 @@
     </Compile>
     <Compile Include="Modules\DbQuery\QueryHistoryViewModel.cs" />
     <Compile Include="Modules\DbQuery\RawQueryHistory.cs" />
+    <Compile Include="Modules\Main\ShellLayoutController.cs" />
     <Compile Include="Modules\ViewModelContentProxy.cs" />
     <Compile Include="Modules\Shared\CollectionExportOptions.cs" />
     <Compile Include="Modules\DbCollection\CollectionReferencePayload.cs" />
@@ -264,10 +265,10 @@
     <Compile Include="Application\PipeServer.cs" />
     <Compile Include="Presentation\ThemeManager.cs" />
     <Compile Include="Application\Settings.cs" />
-    <Compile Include="Windows\DialogWindow.xaml.cs">
+    <Compile Include="Presentation\Windows\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\InputBoxWindow.xaml.cs">
+    <Compile Include="Presentation\Windows\InputBoxWindow.xaml.cs">
       <DependentUpon>InputBoxWindow.xaml</DependentUpon>
     </Compile>
     <Page Include="Controls\ArrayEntryControl.xaml">
@@ -411,11 +412,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Presentation\Converters\BsonValueToStringConverter.cs" />
-    <Page Include="Windows\DialogWindow.xaml">
+    <Page Include="Presentation\Windows\DialogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Windows\InputBoxWindow.xaml">
+    <Page Include="Presentation\Windows\InputBoxWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -498,7 +499,7 @@
       <Version>0.0.3.203</Version>
     </PackageReference>
     <PackageReference Include="DynamicData">
-      <Version>6.12.10</Version>
+      <Version>6.12.13</Version>
     </PackageReference>
     <PackageReference Include="Enterwell.Clients.Wpf.Notifications">
       <Version>1.4.2</Version>
@@ -536,7 +537,7 @@
       <Version>1.2.0</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignExtensions">
-      <Version>2.6.0</Version>
+      <Version>2.7.0</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>2.6.0</Version>
@@ -572,7 +573,7 @@
       <Version>4.0.0</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
-      <Version>4.1.5</Version>
+      <Version>4.1.6</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>
