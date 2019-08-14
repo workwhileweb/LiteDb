@@ -40,7 +40,7 @@
                 <TextBox Grid.Column="1" Margin="5,0,5,5"
                          Background="Transparent" FontSize="13"
                          materialDesign:TextFieldAssist.DecorationVisibility="Collapsed"
-                         BorderThickness="0" 
+                         BorderThickness="0"
                          Text="{Binding Content, Mode=OneWay}"
                          IsReadOnly="True"
                          TextWrapping="Wrap" />
@@ -103,90 +103,93 @@
                 </Style>
             </TabControl.Resources>
             <TabItem Header="General">
-                <Border Name="generalBorder" 
-                        DockPanel.Dock="Top" Background="{DynamicResource MaterialDesignPaper}" Padding="20">
-                    <StackPanel>
-                        <ItemsControl Grid.IsSharedSizeScope="True" SnapsToDevicePixels="True"
-                                      ItemsSource="{Binding DatabaseInfo}"
-                                      HorizontalContentAlignment="Stretch"
-                                      ItemTemplate="{StaticResource CollectionInfoDataTemplate}" />
+                <Border Name="generalBorder"
+                        DockPanel.Dock="Top" Background="{DynamicResource MaterialDesignPaper}">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel Margin="20">
+                            <ItemsControl Grid.IsSharedSizeScope="True" SnapsToDevicePixels="True"
+                                          ItemsSource="{Binding DatabaseInfo}"
+                                          HorizontalContentAlignment="Stretch"
+                                          ItemTemplate="{StaticResource CollectionInfoDataTemplate}" />
 
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="User version:" Margin="5,5,0,5" MinWidth="100"
-                                       VerticalAlignment="Center"
-                                       Style="{StaticResource MaterialDesignBody2TextBlock}" />
-                            <xctk:ShortUpDown TextAlignment="Left" Margin="0" Name="UserVersion" Width="80"
-                                              HorizontalAlignment="Left"
-                                              Value="{Binding UserVersion, Mode=TwoWay}" Minimum="0" />
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="User version:" Margin="5,5,0,5" MinWidth="100"
+                                           VerticalAlignment="Center"
+                                           Style="{StaticResource MaterialDesignBody2TextBlock}" />
+                                <xctk:ShortUpDown TextAlignment="Left" Margin="0" Name="UserVersion" Width="80"
+                                                  HorizontalAlignment="Left"
+                                                  Value="{Binding UserVersion, Mode=TwoWay}" Minimum="0" />
+                            </StackPanel>
+
+                            <Border Height="1" Margin="0,20" BorderThickness="0,0,0,1"
+                                    BorderBrush="{StaticResource MaterialDesignDivider}" />
+
+                            <ItemsControl Grid.IsSharedSizeScope="True" SnapsToDevicePixels="True"
+                                          ItemsSource="{Binding DatabaseFileInfo}"
+                                          HorizontalContentAlignment="Stretch"
+                                          ItemTemplate="{StaticResource CollectionInfoDataTemplate}" />
+
+                            <Border Height="1" Margin="0,20" BorderThickness="0,0,0,1"
+                                    BorderBrush="{StaticResource MaterialDesignDivider}" />
+
+                            <StackPanel>
+                                <Button x:Name="ShrinkDatabase"
+                                        Style="{StaticResource ActionDetailButton}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <materialDesign:PackIcon Kind="DataUsage" Height="26" Width="26"
+                                                                 Grid.RowSpan="2"
+                                                                 VerticalAlignment="Top" HorizontalAlignment="Center" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1"
+                                                   Text="Shrink"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Style="{StaticResource MaterialDesignSubheadingTextBlock}" />
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,4,0,0"
+                                                   Text="Reduce database removing empty pages."
+                                                   TextWrapping="Wrap"
+                                                   Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    </Grid>
+                                </Button>
+
+                                <Button x:Name="SetPassword"
+                                        Style="{StaticResource ActionDetailButton}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="50" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <materialDesign:PackIcon Kind="PasswordReset" Height="26" Width="26"
+                                                                 Grid.RowSpan="2"
+                                                                 VerticalAlignment="Top" HorizontalAlignment="Center" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1"
+                                                   Text="Change Password"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   Style="{StaticResource MaterialDesignSubheadingTextBlock}" />
+                                        <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,4,0,0"
+                                                   Text="Shrink and change password.&#x0a;Set empty string to remove password."
+                                                   TextWrapping="Wrap"
+                                                   Style="{StaticResource MaterialDesignCaptionTextBlock}" />
+                                    </Grid>
+                                </Button>
+                            </StackPanel>
+
                         </StackPanel>
-
-                        <Border Height="1" Margin="0,20" BorderThickness="0,0,0,1"
-                                BorderBrush="{StaticResource MaterialDesignDivider}" />
-
-                        <ItemsControl Grid.IsSharedSizeScope="True" SnapsToDevicePixels="True"
-                                      ItemsSource="{Binding DatabaseFileInfo}"
-                                      HorizontalContentAlignment="Stretch"
-                                      ItemTemplate="{StaticResource CollectionInfoDataTemplate}" />
-
-                        <Border Height="1" Margin="0,20" BorderThickness="0,0,0,1"
-                                BorderBrush="{StaticResource MaterialDesignDivider}" />
-
-                        <StackPanel>
-                            <Button x:Name="ShrinkDatabase"
-                                    Style="{StaticResource ActionDetailButton}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="50" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <materialDesign:PackIcon Kind="DataUsage" Height="26" Width="26" Grid.RowSpan="2"
-                                                             VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                    <TextBlock Grid.Row="0" Grid.Column="1"
-                                               Text="Shrink"
-                                               TextTrimming="CharacterEllipsis"
-                                               Style="{StaticResource MaterialDesignSubheadingTextBlock}" />
-                                    <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,4,0,0"
-                                               Text="Reduce database removing empty pages."
-                                               TextWrapping="Wrap"
-                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
-                                </Grid>
-                            </Button>
-
-                            <Button x:Name="SetPassword"
-                                    Style="{StaticResource ActionDetailButton}">
-                                <Grid>
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="50" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <materialDesign:PackIcon Kind="PasswordReset" Height="26" Width="26"
-                                                             Grid.RowSpan="2"
-                                                             VerticalAlignment="Top" HorizontalAlignment="Center" />
-                                    <TextBlock Grid.Row="0" Grid.Column="1"
-                                               Text="Change Password"
-                                               TextTrimming="CharacterEllipsis"
-                                               Style="{StaticResource MaterialDesignSubheadingTextBlock}" />
-                                    <TextBlock Grid.Column="1" Grid.Row="1" Margin="0,4,0,0"
-                                               Text="Shrink and change password.&#x0a;Set empty string to remove password."
-                                               TextWrapping="Wrap"
-                                               Style="{StaticResource MaterialDesignCaptionTextBlock}" />
-                                </Grid>
-                            </Button>
-                        </StackPanel>
-
-                    </StackPanel>
+                    </ScrollViewer>
                 </Border>
             </TabItem>
             <TabItem Header="Metadata">
-                <Border Padding="0" 
+                <Border Padding="0"
                         Height="{Binding ActualHeight, ElementName=generalBorder}">
                     <controls:ExtendedTextEditor
                         Padding="20" BorderThickness="0"
@@ -199,7 +202,7 @@
                         SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.Json.xshd">
                         <i:Interaction.Behaviors>
                             <controls:AvalonEditBehaviour
-                                BindingText="{Binding MetadataJson, Mode=OneWay}"/>
+                                BindingText="{Binding MetadataJson, Mode=OneWay}" />
                         </i:Interaction.Behaviors>
                         <controls:ExtendedTextEditor.ContextMenu>
                             <ContextMenu>

@@ -12,11 +12,15 @@
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
+             xmlns:dbQuery="clr-namespace:LiteDbExplorer.Modules.DbQuery"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
-        <converters:BooleanToIntegerConverter x:Key="ShowHistoryColumnSpanConverter" TrueValue="0" FalseValue="3" />
+        <converters:BooleanToIntegerConverter x:Key="ShowHistoryColumnSpanConverter" TrueValue="1" FalseValue="3" />
+        <!--<Style TargetType="dbQuery:QueryView">
+            <Setter Property="RightContentIsVisible" Value="{Binding ShowHistory}"/>
+        </Style>-->
     </UserControl.Resources>
 
     <commands:CommandToCommand.Bindings>
@@ -27,15 +31,16 @@
         <commands:CommandToCommandBinding SourceCommand="Help"
                                           TargetCommand="{Binding OpenHelpCommand}" />
     </commands:CommandToCommand.Bindings>
+    
     <Grid>
-
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="1*" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="0.38*" MinWidth="285" />
+            <ColumnDefinition Width="0.38*" MinWidth="280"/>
         </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="0"
+        <Grid x:Name="MainContentContainer" 
+              Grid.Column="0"
               Grid.ColumnSpan="{Binding ShowHistory, Converter={StaticResource ShowHistoryColumnSpanConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -176,10 +181,11 @@
             </TabControl>
         </Grid>
 
-        <GridSplitter Grid.Column="1" Width="4" HorizontalAlignment="Stretch"
+        <GridSplitter x:Name="RightContentGridSplitter" 
+                      Grid.Column="1" Width="4" HorizontalAlignment="Stretch"
                       Visibility="{Binding Path=ShowHistory, Converter={StaticResource BooleanToVisibilityConverter}}" />
 
-        <Border x:Name="QueryHistoryViewBorder" Grid.Column="2"
+        <Border x:Name="RightContentContainer" Grid.Column="2"
                 BorderBrush="{DynamicResource MaterialDesignDivider}"
                 Visibility="{Binding Path=ShowHistory, Converter={StaticResource BooleanToVisibilityConverter}}">
             <ContentControl x:Name="QueryHistoryView"

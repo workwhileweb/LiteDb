@@ -51,7 +51,9 @@ namespace LiteDbExplorer.Modules
                 SizeToContent = SizeToContent.Height,
                 ResizeMode = ResizeMode.CanResize,
                 ShowMaxRestoreButton = false
-            };
+            }
+            .SizeToFit();
+
             return _windowManager.ShowDialog(vm, null, dialogOptions.Value) == true;
         }
 
