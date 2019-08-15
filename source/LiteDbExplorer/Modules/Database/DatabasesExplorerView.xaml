@@ -12,6 +12,7 @@
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
              xmlns:core="clr-namespace:LiteDbExplorer.Core;assembly=LiteDbExplorer.Core"
+             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Focusable="True">
@@ -44,31 +45,32 @@
 
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}" Height="43">
-                <Button x:Name="OpenDatabase" ContextMenuService.IsEnabled="False" Padding="0">
+                <Button x:Name="OpenDatabase" ToolTip="Open..."
+                        ContextMenuService.IsEnabled="False" 
+                        Padding="0" VerticalContentAlignment="Stretch">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="FolderOpen" Margin="10" Height="18"/>
-                            <Border Background="{DynamicResource MaterialDesignToolBarBackground}" Width="1" />
-                            <Border x:Name="SplitBorder" Background="Transparent" Padding="3,0" Margin="0,-2" BorderThickness="1" CornerRadius="2"
-                                    PreviewMouseLeftButtonDown="RecentItemMoreBorder_MouseLeftButtonDown">
+                            <controls:AppPackIcon Kind="FolderOutline" Margin="10,0" Height="18" VerticalAlignment="Center"/>
+                            <!--<materialDesign:PackIcon Kind="FolderOpen" Margin="10" Height="18"/>-->
+                            <Border Background="{DynamicResource MaterialDesignToolBarBackground}" Width="1" VerticalAlignment="Stretch"/>
+                            <Border x:Name="SplitBorder" Background="Transparent" Padding="3,0" Margin="0" BorderThickness="1" CornerRadius="0"
+                                    PreviewMouseLeftButtonDown="RecentItemMoreBorder_MouseLeftButtonDown" ClipToBounds="True">
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="BorderBrush"
-                                                        Value="{DynamicResource MaterialDesignDivider}" />
-                                                <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}"/>
+                                                <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentBaseColorBrush}"/>
+                                                <Setter Property="Opacity" Value="1"/>
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="False">
-                                                <Setter Property="BorderBrush" Value="Transparent" />
-                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="Opacity" Value="0.67"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
                                 <Path Margin="4" VerticalAlignment="Center" Width="6"
-                                      Fill="{DynamicResource MaterialDesignBody}" Stretch="Uniform"
-                                      HorizontalAlignment="Right"
+                                      Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" 
+                                      Stretch="Uniform" HorizontalAlignment="Right"
                                       Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " />
                             </Border>
                         </StackPanel>

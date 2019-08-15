@@ -23,6 +23,11 @@ namespace LiteDbExplorer.Wpf.Behaviors
             target.SetValue(CommandProperty, value);
         }
 
+        public static ICommand GetCommand(UIElement inUIElement)
+        {
+            return inUIElement.GetValue(CommandProperty) as ICommand;
+        }
+
         public static void SetCommandParameter(DependencyObject target, object value)
         {
             target.SetValue(CommandParameterProperty, value);
