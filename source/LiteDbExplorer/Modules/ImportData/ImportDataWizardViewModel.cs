@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using Caliburn.Micro;
 using Forge.Forms;
 using Forge.Forms.Annotations;
@@ -13,32 +14,105 @@ using LiteDbExplorer.Core;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
 using MaterialDesignThemes.Wpf;
+using ReactiveUI;
 
 namespace LiteDbExplorer.Modules.ImportData
 {
     [Export(typeof(ImportDataWizardViewModel))]
-    public class ImportDataWizardViewModel : Screen, INavigationTarget<ImportDataOptions>
+    public class ImportDataWizardViewModel : Conductor<IStepsScreen>.Collection.OneActive, INavigationTarget<ImportDataOptions>
     {
+        private IDisposable _activeItemObservable;
+        private bool _supressPreviousPush;
+
         public ImportDataWizardViewModel()
         {
             DisplayName = "Import Wizard";
 
-            FormatSelector = new ImportFormatSelector();
-
-            DocumentMapper = IoC.Get<DocumentMapperViewModel>();
+            ActivateItem(IoC.Get<ImportFormatSelector>());
         }
 
         public void Init(ImportDataOptions modelParams)
         {
-            
         }
 
-        public ImportFormatSelector FormatSelector { get; set; }
+        public Stack<IStepsScreen> PreviousItems { get; } = new Stack<IStepsScreen>();
 
-        public DocumentMapperViewModel DocumentMapper { get; set; }
+        public bool CanNext => ActiveItem?.HasNext ?? false;
+
+        public bool CanPrevious => PreviousItems.Count > 1;
+
+        public override void ActivateItem(IStepsScreen item)
+        {
+            _activeItemObservable?.Dispose();
+
+            if (!_supressPreviousPush)
+            {
+                PreviousItems.Push(ActiveItem);
+            }
+            
+            base.ActivateItem(item);
+            
+            _activeItemObservable = item
+                .ObservableForProperty(screen => screen.HasNext)
+                .Subscribe(args => NotifyOfPropertyChange(nameof(CanNext)));
+
+            NotifyOfPropertyChange(nameof(CanNext));
+            NotifyOfPropertyChange(nameof(CanPrevious));
+        }
+
+        public override void DeactivateItem(IStepsScreen item, bool close)
+        {
+            base.DeactivateItem(item, close);
+
+            PreviousItems.Push(item);
+
+            NotifyOfPropertyChange(nameof(CanNext));
+            NotifyOfPropertyChange(nameof(CanPrevious));
+        }
+
+        [UsedImplicitly]
+        public void Next()
+        {
+            if (ActiveItem?.Next() is IStepsScreen next)
+            {
+                ActivateItem(next);
+            }
+        }
+
+        [UsedImplicitly]
+        public void Previous()
+        {
+            var previous = PreviousItems.Pop();
+            if (previous != null)
+            {
+                _supressPreviousPush = true;
+                ActivateItem(previous);
+                _supressPreviousPush = false;
+            }
+
+            NotifyOfPropertyChange(nameof(CanNext));
+            NotifyOfPropertyChange(nameof(CanPrevious));
+        }
     }
 
-    public class ImportFormatSelector
+    public interface IDataImportTaskHandler
+    {
+        string DisplayName { get; }
+        int DisplayOrder { get; }
+        object SourceOptionsContext { get; }
+        object TargetOptionsContext { get; }
+    }
+
+    public interface IStepsScreen : INotifyPropertyChanged
+    {
+        bool HasNext { get; }
+        object Next();
+    }
+
+    [Export(typeof(ImportFormatSelector))]
+    [PartCreationPolicy(CreationPolicy.NonShared)]
+    [Form(Mode = DefaultFields.None)]
+    public class ImportFormatSelector : PropertyChangedBase, IStepsScreen, IOwnerViewLocator
     {
         public ImportFormatSelector()
         {
@@ -49,42 +123,55 @@ namespace LiteDbExplorer.Modules.ImportData
 
         public IEnumerable<IDataImportTaskHandler> DataImportHandlers { get; }
 
+        [Field]
         [Value(Must.NotBeEmpty)]
         [SelectFrom("{Binding DataImportHandlers}", SelectionType = SelectionType.RadioButtons, DisplayPath = nameof(IDataImportTaskHandler.DisplayName))]
         public IDataImportTaskHandler ImportFormat { get; set; }
+
+        public bool HasNext => ImportFormat != null;
+
+        public object Next()
+        {
+            return ImportFormat;
+        }
+
+        public UIElement GetView(object context)
+        {
+            return new DynamicFormView(this);
+        }
     }
 
-    public enum RecordInsertMode
+    public enum RecordIdHandlerPolice
     {
         [EnumDisplay("Insert with new _id if exists")]
-        Opt1,
+        InsertNewIfExists,
 
         [EnumDisplay("Overwrite documents with some _id")]
-        Opt2,
+        OverwriteDocuments,
 
         [EnumDisplay("Skip documents with some _id")]
-        Opt3,
+        SkipDocuments,
 
         [EnumDisplay("Always insert with new _id")]
-        Opt4,
+        AlwaysInsertNew,
 
         [EnumDisplay("Drop collection first if already exists")]
-        Opt5,
+        DropCollectionIfExists,
 
         [EnumDisplay("Abort if id already exists")]
-        Opt6,
+        AbortIfExists,
     }
 
-    public enum RecordInsertEmptyFieldMode
+    public enum RecordNullOrEmptyHandlerPolice
     {
         [EnumDisplay("Import as Null")]
-        Opt1,
+        ImportAsNull,
 
-        [EnumDisplay("Import as Empty String")]
-        Opt2,
+        [EnumDisplay("Import as Default Type Value")]
+        ImportAsDefaultTypeValue,
 
         [EnumDisplay("Exclude")]
-        Opt3,
+        Exclude,
     }
 
     [Form(Grid = new[] { 1d, 1d })]
@@ -110,12 +197,12 @@ namespace LiteDbExplorer.Modules.ImportData
         [Break]
 
         [Field(Row = "1")]
-        [SelectFrom(typeof(RecordInsertMode))]
-        public RecordInsertMode InsertMode { get; set; }
+        [SelectFrom(typeof(RecordIdHandlerPolice))]
+        public RecordIdHandlerPolice InsertMode { get; set; }
 
         [Field(Row = "1")]
-        [SelectFrom(typeof(RecordInsertEmptyFieldMode))]
-        public RecordInsertEmptyFieldMode EmptyFieldsMode { get; set; }
+        [SelectFrom(typeof(RecordNullOrEmptyHandlerPolice))]
+        public RecordNullOrEmptyHandlerPolice EmptyFieldsMode { get; set; }
     }
 
     public class ImportSourceFileOptions : IActionHandler, INotifyPropertyChanged
@@ -165,17 +252,10 @@ namespace LiteDbExplorer.Modules.ImportData
         }
     }
 
-    public interface IDataImportTaskHandler
-    {
-        string DisplayName { get; }
-        int DisplayOrder { get; }
-        object SourceOptionsContext { get; }
-        object TargetOptionsContext { get; }
-    }
-
     [Export(typeof(IDataImportTaskHandler))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class JsonDataImportTaskHandler : IDataImportTaskHandler
+    [Form(Mode = DefaultFields.None)]
+    public class JsonDataImportTaskHandler : PropertyChangedBase, IDataImportTaskHandler, IStepsScreen, IOwnerViewLocator
     {
         private readonly SourceOptions _sourceOptions;
         private readonly TargetOptions _targetOptions;
@@ -191,8 +271,10 @@ namespace LiteDbExplorer.Modules.ImportData
 
         public int DisplayOrder => 10;
 
+        [Field]
         public object SourceOptionsContext => _sourceOptions;
 
+        [Field]
         public object TargetOptionsContext => _targetOptions;
 
         [Heading("Source Options")]
@@ -211,7 +293,7 @@ namespace LiteDbExplorer.Modules.ImportData
         [Heading("Target Options")]
         public class TargetOptions : ImportTargetDefaultOptions
         {
-            private readonly DocumentMapperViewModel _documentMapper;
+            /*private readonly DocumentMapperViewModel _documentMapper;
 
             public TargetOptions()
             {
@@ -220,8 +302,19 @@ namespace LiteDbExplorer.Modules.ImportData
 
             [Field]
             [DirectContent]
-            public ViewModelContentProxy Map => new ViewModelContentProxy(_documentMapper);
+            public ViewModelContentProxy Map => new ViewModelContentProxy(_documentMapper);*/
+        }
 
+        public bool HasNext => true;
+
+        public object Next()
+        {
+            return IoC.Get<DocumentMapperViewModel>();
+        }
+
+        public UIElement GetView(object context)
+        {
+            return new ImportDynamicFormOptionsView();
         }
     }
 
@@ -430,7 +523,7 @@ namespace LiteDbExplorer.Modules.ImportData
 
     [Export(typeof(DocumentMapperViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class DocumentMapperViewModel : Screen
+    public class DocumentMapperViewModel : Screen, IStepsScreen
     {
         public DocumentMapperViewModel()
         {
@@ -508,5 +601,11 @@ namespace LiteDbExplorer.Modules.ImportData
             MappingSet = mappingSet;
         }
 
+        public bool HasNext => false;
+
+        public object Next()
+        {
+            return null;
+        }
     }
 }

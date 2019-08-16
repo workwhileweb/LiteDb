@@ -38,29 +38,7 @@
 
         <Border Grid.Row="1" Background="{DynamicResource MaterialDesignPaper}" MinHeight="400">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <forge:DynamicForm Model="{Binding FormatSelector}" Padding="20,5" 
-                                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                        <i:Interaction.Behaviors>
-                            <behaviors:BubbleScrollEvent />
-                        </i:Interaction.Behaviors>
-                    </forge:DynamicForm>
-                    <forge:DynamicForm Model="{Binding FormatSelector.ImportFormat.SourceOptionsContext}" Padding="20,5"
-                                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                        <i:Interaction.Behaviors>
-                            <behaviors:BubbleScrollEvent />
-                        </i:Interaction.Behaviors>
-                    </forge:DynamicForm>
-                    <forge:DynamicForm Model="{Binding FormatSelector.ImportFormat.TargetOptionsContext}" Padding="20,5"
-                                       ScrollViewer.VerticalScrollBarVisibility="Disabled">
-                        <i:Interaction.Behaviors>
-                            <behaviors:BubbleScrollEvent />
-                        </i:Interaction.Behaviors>
-                    </forge:DynamicForm>
-
-                    <ContentControl Margin="20,5"
-                                    cal:View.Model="{Binding DocumentMapper}" />
-                </StackPanel>
+                <ContentControl Margin="20,10" cal:View.Model="{Binding ActiveItem}" />
             </ScrollViewer>
         </Border>
 
@@ -68,7 +46,16 @@
                 Background="{DynamicResource MaterialDesignPaper}"
                 BorderThickness="0,1,0,0"
                 BorderBrush="{StaticResource MaterialDesignDivider}">
-
+            <DockPanel LastChildFill="False">
+                
+                <Button Name="Next" Content="Next" IsCancel="False"
+                        DockPanel.Dock="Right" MinWidth="80" Margin="10"
+                        Style="{StaticResource MaterialDesignFlatButton}"/>
+                <Button Name="Previous" Content="Previous" IsCancel="False"
+                        DockPanel.Dock="Right" MinWidth="80" Margin="10"
+                        Style="{StaticResource MaterialDesignFlatButton}"/>
+                <Canvas />
+            </DockPanel>
         </Border>
 
     </Grid>

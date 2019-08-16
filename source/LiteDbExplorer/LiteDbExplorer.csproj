@@ -99,7 +99,13 @@
     </Compile>
     <Compile Include="Modules\DbQuery\QueryHistoryViewModel.cs" />
     <Compile Include="Modules\DbQuery\RawQueryHistory.cs" />
+    <Compile Include="Modules\ImportData\ImportDynamicFormOptionsView.xaml.cs">
+      <DependentUpon>ImportDynamicFormOptionsView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Main\ShellLayoutController.cs" />
+    <Compile Include="Modules\Shared\DynamicFormView.xaml.cs">
+      <DependentUpon>DynamicFormView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Modules\ViewModelContentProxy.cs" />
     <Compile Include="Modules\Shared\CollectionExportOptions.cs" />
     <Compile Include="Modules\DbCollection\CollectionReferencePayload.cs" />
@@ -360,6 +366,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Modules\ImportData\ImportDynamicFormOptionsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\Main\ToolPanelSetView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -385,6 +395,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Modules\Main\ShellView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\Shared\DynamicFormView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -563,6 +577,9 @@
     </PackageReference>
     <PackageReference Include="PropertyTools.Wpf">
       <Version>2.0.1</Version>
+    </PackageReference>
+    <PackageReference Include="ReactiveUI">
+      <Version>9.20.1</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.8.0</Version>
