@@ -14,7 +14,7 @@ namespace LiteDbExplorer.Modules.Shared
         {
             InitializeComponent();
 
-            dynamicForm.SetBinding(DynamicForm.ModelProperty, new Binding()
+            dynamicForm.SetBinding(DynamicForm.ModelProperty, new Binding
             {
                 Path = new PropertyPath(nameof(FormModelContext)),
                 Source = this

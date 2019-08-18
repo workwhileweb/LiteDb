@@ -30,9 +30,12 @@
                 <materialDesign:PackIcon Kind="FileImport" Margin="20,0" Height="52" Width="52" 
                                          HorizontalAlignment="Center" 
                                          VerticalAlignment="Center" Opacity="0.67"/>
-                <TextBlock Grid.Column="1" Text="{Binding DisplayName}"
-                           Style="{StaticResource MaterialDesignTitleTextBlock}"
-                           VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding DisplayName}"
+                               Style="{StaticResource MaterialDesignTitleTextBlock}"/>
+                    <TextBlock Text="{Binding ActiveItem.DisplayName}"
+                               Style="{StaticResource MaterialDesignSubheadingTextBlock}"/>
+                </StackPanel>
             </Grid>
         </Border>
 

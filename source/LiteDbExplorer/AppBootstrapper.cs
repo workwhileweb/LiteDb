@@ -140,7 +140,7 @@ namespace LiteDbExplorer
                 switch (model)
                 {
                     case IOwnerViewLocator ownerViewLocator:
-                        element = ownerViewLocator.GetView(context);
+                        element = ownerViewLocator.GetOwnView(context);
                         break;
                     case IAutoGenSettingsView _:
                         element = new AutoSettingsView();

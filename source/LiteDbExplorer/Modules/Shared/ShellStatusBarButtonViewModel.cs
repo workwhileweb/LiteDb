@@ -45,7 +45,7 @@ namespace LiteDbExplorer.Modules.Shared
             ContentId = contentId;
         }
 
-        public UIElement GetView(object context)
+        public UIElement GetOwnView(object context)
         {
             var view = CreateView(context);
 

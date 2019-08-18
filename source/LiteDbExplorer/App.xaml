@@ -66,7 +66,13 @@
             <Style TargetType="{x:Type dragablz:TabablzControl}"
                    BasedOn="{StaticResource MaterialDesignTabablzControlStyle}" />
 
-            <DataTemplate DataType="{x:Type modules:ViewModelContentProxy}">
+            <DataTemplate DataType="{x:Type localControls:ViewContentProxy}">
+                <Grid>
+                    <ContentControl Content="{Binding Content}"/>
+                </Grid>
+            </DataTemplate>
+
+            <DataTemplate DataType="{x:Type localControls:ViewModelContentProxy}">
                 <Grid>
                     <ContentControl cal:View.Model="{Binding Content}" />
                 </Grid>

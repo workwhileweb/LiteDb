@@ -84,9 +84,16 @@
     <Compile Include="Controls\AutoUpdateTextBlock.cs" />
     <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
+    <Compile Include="Controls\ViewContentProxy.cs" />
     <Compile Include="Modules\ImportData\DocumentMapperView.xaml.cs">
       <DependentUpon>DocumentMapperView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Modules\ImportData\DocumentMapperViewModel.cs" />
+    <Compile Include="Modules\ImportData\Handlers\CsvDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\Handlers\ExcelDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\Handlers\JsonDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\Handlers\OtherCollectionDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\ImportDataHandlerSelector.cs" />
     <Compile Include="Modules\ImportData\ImportDataWizardView.xaml.cs">
       <DependentUpon>ImportDataWizardView.xaml</DependentUpon>
     </Compile>
@@ -99,14 +106,14 @@
     </Compile>
     <Compile Include="Modules\DbQuery\QueryHistoryViewModel.cs" />
     <Compile Include="Modules\DbQuery\RawQueryHistory.cs" />
-    <Compile Include="Modules\ImportData\ImportDynamicFormOptionsView.xaml.cs">
-      <DependentUpon>ImportDynamicFormOptionsView.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Modules\ImportData\Models.cs" />
+    <Compile Include="Modules\ImportData\ViewModels.cs" />
     <Compile Include="Modules\Main\ShellLayoutController.cs" />
+    <Compile Include="Modules\Shared\DynamicFormStackView.cs" />
     <Compile Include="Modules\Shared\DynamicFormView.xaml.cs">
       <DependentUpon>DynamicFormView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Modules\ViewModelContentProxy.cs" />
+    <Compile Include="Controls\ViewModelContentProxy.cs" />
     <Compile Include="Modules\Shared\CollectionExportOptions.cs" />
     <Compile Include="Modules\DbCollection\CollectionReferencePayload.cs" />
     <Compile Include="Modules\DbDocument\DocumentReferencePayload.cs" />
@@ -366,10 +373,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Modules\ImportData\ImportDynamicFormOptionsView.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Modules\Main\ToolPanelSetView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -509,6 +512,9 @@
     </PackageReference>
     <PackageReference Include="CSharpFunctionalExtensions">
       <Version>1.19.1</Version>
+    </PackageReference>
+    <PackageReference Include="CsvHelper">
+      <Version>12.1.2</Version>
     </PackageReference>
     <PackageReference Include="Dragablz">
       <Version>0.0.3.203</Version>

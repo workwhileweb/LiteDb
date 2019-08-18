@@ -22,7 +22,7 @@ namespace LiteDbExplorer.Modules.Shared
 
         public object ToolTip { get; set; }
 
-        public UIElement GetView(object context)
+        public UIElement GetOwnView(object context)
         {
             var view = CreateView(context);
 

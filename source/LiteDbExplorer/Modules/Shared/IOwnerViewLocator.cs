@@ -4,6 +4,6 @@ namespace LiteDbExplorer.Modules.Shared
 {
     public interface IOwnerViewLocator
     {
-        UIElement GetView(object context);
+        UIElement GetOwnView(object context);
     }
 }
