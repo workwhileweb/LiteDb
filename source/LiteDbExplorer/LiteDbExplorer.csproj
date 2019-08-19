@@ -78,6 +78,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Application\DataProtectionProvider.cs" />
     <Compile Include="Application\IRecentFilesProvider.cs" />
     <Compile Include="Application\RecentFileInfo.cs" />
     <Compile Include="Controls\AppPackIcon.cs" />
@@ -130,6 +131,7 @@
     <Compile Include="Modules\Shared\ImportDataOptions.cs" />
     <Compile Include="Modules\Shared\IOwnerViewLocator.cs" />
     <Compile Include="Modules\Shared\IToolPanelSet.cs" />
+    <Compile Include="Modules\Shared\PasswordInput.cs" />
     <Compile Include="Modules\Shared\PerformanceSettings.cs" />
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Controls\AvalonEditBehaviour.cs" />

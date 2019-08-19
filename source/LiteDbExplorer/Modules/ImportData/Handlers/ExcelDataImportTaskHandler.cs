@@ -73,7 +73,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
             IsBusy = true;
             
-            var dataTable = await Task.Factory.StartNew(() => ToDataTable(maybeFilePath.Value));
+            var dataTable = await Task.Factory.StartNew(() => ToDataTable(maybeFilePath.Value, _sourceOptions));
 
             var dataPreview = new DataGrid
             {
@@ -89,8 +89,9 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
             IsBusy = false;
         }
 
-        public static DataTable ToDataTable(string path, bool hasHeader = true)
+        public static DataTable ToDataTable(string path, SourceOptions options)
         {
+            var hasHeader = options.FileContainsHeaders;
             using (var pck = new OfficeOpenXml.ExcelPackage())
             {
                 using (var stream = File.OpenRead(path))
@@ -128,6 +129,9 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
                 _handler = handler;
             }
 
+            [Field(Row = "1")]
+            public bool FileContainsHeaders { get; set; } = true;
+
             protected override (string title, string filter) GetFileFilter()
             {
                 return ("Open Excel File", "Excel File|*.xlsx");
@@ -150,7 +154,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
         {
             [Field]
             [DirectContent]
-            public ViewContentProxy DataPreview { get; set; } = new ViewContentProxy("No Preview");
+            public ViewContentProxy DataPreview { get; set; } = new ViewContentProxy("No Preview") { Margin = new Thickness(10,0,10,0) };
 
             public void SetContent(object content)
             {

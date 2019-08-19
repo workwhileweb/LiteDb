@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Caliburn.Micro;
@@ -33,7 +34,7 @@ namespace LiteDbExplorer.Modules.ImportData
     }
 
     [Form(Grid = new[] { 1d, 1d })]
-    public class ImportTargetDefaultOptions
+    public class ImportTargetDefaultOptions : INotifyPropertyChanged
     {
         public ImportTargetDefaultOptions()
         {
@@ -42,6 +43,22 @@ namespace LiteDbExplorer.Modules.ImportData
 
         public IEnumerable<DatabaseReference> Databases { get; }
 
+        [UsedImplicitly]
+        public IEnumerable<string> TargetDatabaseCollections
+        {
+            get
+            {
+                if (TargetDatabase == null)
+                {
+                    return Enumerable.Empty<string>();
+                }
+
+                return TargetDatabase.Collections
+                    .Where(p => !p.IsFilesOrChunks)
+                    .Select(p => p.Name);
+            }
+        }
+
         [Field(Row = "0")]
         [Value(Must.NotBeEmpty)]
         [SelectFrom("{Binding Databases}", SelectionType = SelectionType.ComboBox, DisplayPath = nameof(DatabaseReference.Name))]
@@ -49,7 +66,7 @@ namespace LiteDbExplorer.Modules.ImportData
 
         [Field(Row = "0")]
         [Value(Must.NotBeEmpty)]
-        [SelectFrom("{Binding TargetDatabase.Collections}", SelectionType = SelectionType.ComboBoxEditable, DisplayPath = nameof(CollectionReference.Name))]
+        [SelectFrom("{Binding TargetDatabaseCollections}", SelectionType = SelectionType.ComboBoxEditable)]
         public string TargetCollection { get; set; }
         
         [Break]
@@ -61,6 +78,15 @@ namespace LiteDbExplorer.Modules.ImportData
         [Field(Row = "1")]
         [SelectFrom(typeof(RecordNullOrEmptyHandlerPolice))]
         public RecordNullOrEmptyHandlerPolice EmptyFieldsMode { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [UsedImplicitly]
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 
     public class ImportSourceFileOptions : INotifyPropertyChanged, IActionHandler

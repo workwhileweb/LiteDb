@@ -53,6 +53,9 @@ namespace LiteDbExplorer.Modules
             IScreen context, 
             QueryResult queryResult,
             string name = "");
+
+        Task ShrinkDatabase(DatabaseReference database);
+        Task ResetPassword(DatabaseReference database, string password);
     }
 
     [Export(typeof(IDatabaseInteractions))]
@@ -133,20 +136,35 @@ namespace LiteDbExplorer.Modules
             
             try
             {
+                var rememberMe = false;
                 if (DatabaseReference.IsDbPasswordProtected(path))
                 {
-                    var maybePassword = await _applicationInteraction.ShowInputDialog("Database is password protected, enter password:", "Database password.", password);
-                    if (maybePassword.HasNoValue)
+                    if (string.IsNullOrWhiteSpace(password) && _recentFilesProvider.TryGetPassword(path, out var storedPassword))
                     {
-                        return;    
+                        password = storedPassword;
+                        rememberMe = true;
                     }
-                    
-                    password = maybePassword.Value;
+
+                    var maybePasswordInput = await _applicationInteraction.ShowPasswordInputDialog("Database is password protected, enter password:", "Database password.", password, rememberMe);
+                    if (maybePasswordInput.HasNoValue)
+                    {
+                        return;
+                    }
+
+                    password = maybePasswordInput.Value.Password;
+                    rememberMe = maybePasswordInput.Value.RememberMe;
                 }
 
                 Store.Current.AddDatabase(new DatabaseReference(path, password));
 
-                _recentFilesProvider.InsertRecentFile(path);
+                if (!string.IsNullOrEmpty(password) && rememberMe)
+                {
+                    _recentFilesProvider.InsertRecentFile(path, password);
+                }
+                else
+                {
+                    _recentFilesProvider.InsertRecentFile(path);   
+                }
             }
             catch (LiteException liteException)
             {
@@ -169,7 +187,7 @@ namespace LiteDbExplorer.Modules
             {
                 if (!string.IsNullOrEmpty(password))
                 {
-                    _applicationInteraction.ShowError(liteException,"Failed to open database [LiteException]:" + Environment.NewLine + liteException.Message);
+                    _applicationInteraction.ShowAlert("Failed to open database [LiteException]:" + Environment.NewLine + liteException.Message, null, UINotificationType.Error);
                 }
                     
                 await OpenDatabase(path, password).ConfigureAwait(false);
@@ -181,6 +199,24 @@ namespace LiteDbExplorer.Modules
             Store.Current.CloseDatabase(database);
 
             return Task.CompletedTask;
+        }
+
+        public async Task ShrinkDatabase(DatabaseReference database)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                database.LiteDatabase.Shrink();
+            });
+        }
+
+        public async Task ResetPassword(DatabaseReference database, string password)
+        {
+            await Task.Factory.StartNew(() =>
+            {
+                database.LiteDatabase.Shrink(string.IsNullOrEmpty(password) ? null : password);
+            });
+
+            _recentFilesProvider.ResetPassword(database.Location, password, true);
         }
 
         public async Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database)

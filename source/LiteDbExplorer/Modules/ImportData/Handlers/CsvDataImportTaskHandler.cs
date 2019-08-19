@@ -170,7 +170,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
         {
             [Field]
             [DirectContent]
-            public ViewContentProxy DataPreview { get; set; } = new ViewContentProxy("No Preview");
+            public ViewContentProxy DataPreview { get; set; } = new ViewContentProxy("No Preview"){ Margin = new Thickness(10,0,10,0) };
 
             public void SetContent(object content)
             {

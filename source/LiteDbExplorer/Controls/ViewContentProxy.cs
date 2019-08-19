@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows;
 using JetBrains.Annotations;
 
 namespace LiteDbExplorer.Controls
@@ -16,6 +17,8 @@ namespace LiteDbExplorer.Controls
         }
 
         public object Content { get; set; }
+
+        public Thickness Margin { get; set; } = new Thickness();
 
         public event PropertyChangedEventHandler PropertyChanged;
 

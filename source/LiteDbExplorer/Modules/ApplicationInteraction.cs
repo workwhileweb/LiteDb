@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
+using Forge.Forms;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Windows;
@@ -20,6 +21,7 @@ using LiteDbExplorer.Windows;
 using LiteDbExplorer.Wpf.Framework;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using DialogOptions = LiteDbExplorer.Framework.Windows.DialogOptions;
 
 namespace LiteDbExplorer.Modules
 {
@@ -358,16 +360,23 @@ namespace LiteDbExplorer.Modules
         {
             var completionSource = new TaskCompletionSource<Maybe<string>>();
 
-            if (InputBoxWindow.ShowDialog(message, caption, predefined, validationFunc, out var inputText) == true)
-            {
-                completionSource.SetResult(inputText);
-            }
-            else
-            {
-                completionSource.SetResult(Maybe<string>.None);
-            }
+            completionSource.SetResult(
+                InputBoxWindow.ShowDialog(message, caption, predefined, validationFunc, out var inputText) == true
+                    ? inputText
+                    : Maybe<string>.None);
 
             return completionSource.Task;
+        }
+
+        public async Task<Maybe<PasswordInput>> ShowPasswordInputDialog(string message, string caption = "", string predefined = "", bool rememberMe = false)
+        {
+            var passwordInput = new PasswordInput(message, caption, predefined, rememberMe);
+            var result = await Show.Dialog(AppConstants.DialogHosts.Shell).For(passwordInput);
+            if (result.Action is PasswordInput.CANCEL_ACTION)
+            {
+                return Maybe<PasswordInput>.None;
+            }
+            return result.Model;
         }
 
     }

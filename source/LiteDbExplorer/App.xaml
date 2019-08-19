@@ -68,7 +68,8 @@
 
             <DataTemplate DataType="{x:Type localControls:ViewContentProxy}">
                 <Grid>
-                    <ContentControl Content="{Binding Content}"/>
+                    <ContentControl Content="{Binding Content}" 
+                                    Margin="{Binding Margin}"/>
                 </Grid>
             </DataTemplate>
 

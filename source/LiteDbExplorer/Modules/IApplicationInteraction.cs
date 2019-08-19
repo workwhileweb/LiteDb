@@ -33,5 +33,6 @@ namespace LiteDbExplorer.Modules
         Task<bool> OpenFileWithAssociatedApplication(string filePath);
         void ShowAlert(string message, string title = null, UINotificationType type = UINotificationType.None);
         bool ShowImportWizard(ImportDataOptions options = null);
+        Task<Maybe<PasswordInput>> ShowPasswordInputDialog(string message, string caption = "", string predefined = "", bool rememberMe = false);
     }
 }

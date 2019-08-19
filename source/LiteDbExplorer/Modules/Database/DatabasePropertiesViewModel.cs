@@ -5,7 +5,7 @@ using System.ComponentModel.Composition;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using Humanizer;
 using JetBrains.Annotations;
@@ -18,12 +18,18 @@ namespace LiteDbExplorer.Modules.Database
     [Export(typeof(IDatabasePropertiesView))]
     public class DatabasePropertiesViewModel : Screen, IDatabasePropertiesView
     {
+        private readonly IApplicationInteraction _applicationInteraction;
+        private readonly IDatabaseInteractions _databaseInteractions;
         private LiteDatabase _database;
         private ushort _userVersion;
         private DatabaseReference _databaseReference;
 
-        public DatabasePropertiesViewModel()
+        [ImportingConstructor]
+        public DatabasePropertiesViewModel(IApplicationInteraction applicationInteraction, IDatabaseInteractions databaseInteractions)
         {
+            _applicationInteraction = applicationInteraction;
+            _databaseInteractions = databaseInteractions;
+
             DisplayName = "Database Properties";
         }
 
@@ -77,11 +83,12 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public void ShrinkDatabase()
+        public async Task ShrinkDatabase()
         {
             var oldSizeInfo = DatabaseFileInfo.FirstOrDefault(p => p.HasTag("FileSize"));
 
-            _database.Shrink();
+            await _databaseInteractions.ShrinkDatabase(_databaseReference);
+
             SetDatabaseInfo();
 
             var newSizeInfo = DatabaseFileInfo.FirstOrDefault(p => p.HasTag("FileSize"));
@@ -92,15 +99,15 @@ namespace LiteDbExplorer.Modules.Database
                 message += $"From {oldSizeInfo.Content} to {newSizeInfo.Content}";
             }
 
-            MessageBox.Show(message, "Shrink Database", MessageBoxButton.OK, MessageBoxImage.Information);
+            _applicationInteraction.ShowAlert(message, "Shrink Database", UINotificationType.Info);
         }
         
         [UsedImplicitly]
-        public void SetPassword()
+        public async Task SetPassword()
         {
             if (InputBoxWindow.ShowDialog("New password, enter empty string to remove password.", "", "", null, out string password) == true)
             {
-                _database.Shrink(string.IsNullOrEmpty(password) ? null : password);
+                await _databaseInteractions.ResetPassword(_databaseReference, password);
                 SetDatabaseInfo();
             }
         }

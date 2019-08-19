@@ -7,18 +7,19 @@
         mc:Ignorable="d"
         Title="InputBoxWindow"
         SizeToContent="WidthAndHeight"
-        MinWidth="300" ResizeMode="NoResize"
+        MinWidth="320" ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
         TitleAlignment="Left"
         Loaded="Window_Loaded"
         Style="{StaticResource DialogWindowStyle}">
     <DockPanel>
-        <TextBlock Name="TextMessage" DockPanel.Dock="Top" Margin="15,8"/>
-        <TextBox Name="ValueTextBox" Text="" DockPanel.Dock="Top" Margin="15,8"/>
-        <TextBlock Name="ErrorTextBlock" DockPanel.Dock="Top" Margin="15,2"
+        <TextBlock Name="TextMessage" DockPanel.Dock="Top" Margin="20,20,20,8"/>
+        <TextBox Name="ValueTextBox" Text="" DockPanel.Dock="Top" Margin="20,8"/>
+        <TextBlock Name="ErrorTextBlock" DockPanel.Dock="Top" Margin="20,2"
                    Foreground="Red" FontSize="12" TextWrapping="Wrap"/>
 
-        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="5,0">
+        
+        <DockPanel DockPanel.Dock="Bottom" LastChildFill="False" Margin="0">
             <Button Name="ButtonCancel" Content="CANCEL" IsCancel="True"
                     Click="ButtonCancel_Click"
                     DockPanel.Dock="Right" MinWidth="80" Margin="10"
@@ -28,5 +29,7 @@
                     DockPanel.Dock="Right" MinWidth="80" Margin="10"
                     Style="{StaticResource MaterialDesignFlatButton}"/>
         </DockPanel>
+        <Border DockPanel.Dock="Bottom" Height="1" Margin="0,20,0,0" BorderThickness="0,0,0,1"
+                BorderBrush="{StaticResource MaterialDesignDivider}" />
     </DockPanel>
 </mah:MetroWindow>

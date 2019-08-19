@@ -156,10 +156,11 @@ namespace LiteDbExplorer
             return lastLogFile?.FullName;
         }
 
-        public void InsertRecentFile(string path)
+        public void InsertRecentFile(string path, string password = null)
         {
             var recentFileInfo =
                 RecentFiles.FirstOrDefault(p => p.FullPath.Equals(path, StringComparison.OrdinalIgnoreCase));
+            
             if (recentFileInfo != null)
             {
                 RecentFiles.Remove(recentFileInfo);
@@ -167,6 +168,15 @@ namespace LiteDbExplorer
             else
             {
                 recentFileInfo = new RecentFileInfo(path);
+            }
+
+            if (!string.IsNullOrEmpty(password))
+            {
+                recentFileInfo.ProtectedPassword = DataProtectionProvider.TryProtectPassword(password, out var securePassword) ? securePassword : null;
+            }
+            else
+            {
+                recentFileInfo.ProtectedPassword = null;
             }
 
             recentFileInfo.LastOpenedAt = DateTime.Now;
@@ -200,6 +210,50 @@ namespace LiteDbExplorer
 
                 ReorderRecentFiles(RecentFiles);
             }
+        }
+
+        public bool TryGetPassword(string path, out string storedPassword)
+        {
+            storedPassword = null;
+            var recentFileInfo = RecentFiles.FirstOrDefault(p => p.FullPath.Equals(path, StringComparison.OrdinalIgnoreCase));
+            
+            if (recentFileInfo != null && 
+                !string.IsNullOrEmpty(recentFileInfo.ProtectedPassword) && 
+                DataProtectionProvider.TryUnprotectPassword(recentFileInfo.ProtectedPassword, out var insecurePassword))
+            {
+                storedPassword = insecurePassword;
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool ResetPassword(string path, string password, bool onlyIfStored)
+        {
+            var recentFileInfo =
+                RecentFiles.FirstOrDefault(p => p.FullPath.Equals(path, StringComparison.OrdinalIgnoreCase));
+            if (recentFileInfo != null)
+            {
+                if (onlyIfStored && string.IsNullOrEmpty(recentFileInfo.ProtectedPassword))
+                {
+                    return false;
+                }
+
+                if (!string.IsNullOrEmpty(password))
+                {
+                    recentFileInfo.ProtectedPassword = DataProtectionProvider.TryProtectPassword(password, out var securePassword) ? securePassword : null;
+                }
+                else
+                {
+                    recentFileInfo.ProtectedPassword = null;
+                }
+
+                ReorderRecentFiles(RecentFiles);
+
+                return true;
+            }
+
+            return false;
         }
 
         private static void ReorderRecentFiles(IObservableCollection<RecentFileInfo> target)
@@ -242,7 +296,6 @@ namespace LiteDbExplorer
 
                 if (File.Exists(LegacyRecentFilesPath))
                 {
-                    // File.WriteAllLines(LegacyRecentFilesPath, collection.Select(p => p.FullPath));
                     File.Delete(LegacyRecentFilesPath);
                 }
             }

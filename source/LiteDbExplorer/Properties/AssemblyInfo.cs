@@ -55,7 +55,7 @@ using System.Windows.Markup;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.8.4.4")]
 [assembly: AssemblyFileVersion("0.8.4.4")]
-
+[assembly: Guid("AB410213-FF0A-400D-AA1E-AA93C25F0AEE")]
 
 [assembly: XmlnsDefinition("http://schemas.litedbexplorer.io/winfx/xaml", "LiteDbExplorer")]
 [assembly: XmlnsDefinition("http://schemas.litedbexplorer.io/winfx/xaml/controls", "LiteDbExplorer.Controls")]
@@ -63,3 +63,4 @@ using System.Windows.Markup;
 [assembly: XmlnsDefinition("http://schemas.litedbexplorer.io/winfx/xaml/presentation/behaviors", "LiteDbExplorer.Presentation.Behaviors")]
 [assembly: XmlnsDefinition("http://schemas.litedbexplorer.io/winfx/xaml/presentation/converters", "LiteDbExplorer.Presentation.Converters")]
 [assembly: XmlnsDefinition("http://schemas.litedbexplorer.io/winfx/xaml/presentation/controls", "LiteDbExplorer.Presentation.Controls")]
+

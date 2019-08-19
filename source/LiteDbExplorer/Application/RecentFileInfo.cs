@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using Newtonsoft.Json;
+using PropertyChanged;
 
 namespace LiteDbExplorer
 {
@@ -27,8 +28,13 @@ namespace LiteDbExplorer
         }
         
         public string FullPath { get; set; }
+        
         public DateTime? LastOpenedAt { get; set; }
+
         public DateTime? FixedAt { get; set; }
+
+        [DoNotNotify]
+        public string ProtectedPassword { get; set; }
 
         [JsonIgnore]
         public string FileName { get; set; }
@@ -44,6 +50,7 @@ namespace LiteDbExplorer
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        [UsedImplicitly]
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
