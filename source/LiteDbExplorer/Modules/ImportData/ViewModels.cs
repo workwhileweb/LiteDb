@@ -17,7 +17,7 @@ namespace LiteDbExplorer.Modules.ImportData
     public interface IStepsScreen : INotifyPropertyChanged
     {
         bool HasNext { get; }
-        object Next();
+        Task<object> Next();
         bool Validate();
     }
 
@@ -25,7 +25,7 @@ namespace LiteDbExplorer.Modules.ImportData
     {
         public virtual bool HasNext { get; }
 
-        public abstract object Next();
+        public abstract Task<object> Next();
 
         public virtual bool Validate()
         {
@@ -78,6 +78,11 @@ namespace LiteDbExplorer.Modules.ImportData
         [Field(Row = "1")]
         [SelectFrom(typeof(RecordNullOrEmptyHandlerPolice))]
         public RecordNullOrEmptyHandlerPolice EmptyFieldsMode { get; set; }
+
+        public CollectionReference GetTargetCollection()
+        {
+            return TargetDatabase?.Collections.FirstOrDefault(p => p.Name.Equals(TargetCollection));
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using Forge.Forms;
@@ -38,9 +39,10 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
         public bool HasNext => true;
 
-        public object Next()
+        public Task<object> Next()
         {
-            return IoC.Get<DocumentMapperViewModel>();
+            var viewModel = IoC.Get<DocumentMapperViewModel>();
+            return Task.FromResult<object>(viewModel);
         }
 
         public bool Validate()

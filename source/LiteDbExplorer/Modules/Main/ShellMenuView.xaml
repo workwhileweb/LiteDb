@@ -72,11 +72,11 @@
                         <materialDesign:PackIcon Kind="TableRowRemove" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <!--<MenuItem Command="liteDbExplorer:Commands.Import">
+                <MenuItem Command="liteDbExplorer:Commands.Import">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="FileImport" />
                     </MenuItem.Icon>
-                </MenuItem>-->
+                </MenuItem>
                 <MenuItem Command="liteDbExplorer:Commands.Export">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="FileExport" />

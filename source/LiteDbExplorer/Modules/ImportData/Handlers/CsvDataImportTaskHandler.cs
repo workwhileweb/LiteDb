@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using CsvHelper;
@@ -23,7 +24,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class CsvDataImportTaskHandler : Screen, IDataImportTaskHandler, IStepsScreen, IOwnerViewLocator
     {
-        private readonly SourceOptions _sourceSourceOptions;
+        private readonly SourceOptions _sourceOptions;
         private readonly TargetOptions _targetOptions;
         private readonly DataPreviewHolder _dataPreviewHolder;
 
@@ -32,7 +33,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
         {
             DisplayName = "Import CSV Options";
 
-            _sourceSourceOptions = new SourceOptions(this, lazyApplicationInteraction);
+            _sourceOptions = new SourceOptions(this, lazyApplicationInteraction);
             _targetOptions = new TargetOptions();
             _dataPreviewHolder = new DataPreviewHolder();
         }
@@ -41,7 +42,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
         public int HandlerDisplayOrder => 30;
 
-        public object SourceOptionsContext => _sourceSourceOptions;
+        public object SourceOptionsContext => _sourceOptions;
 
         public object TargetOptionsContext => _targetOptions;
 
@@ -49,9 +50,24 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
         public bool HasNext => true;
 
-        public object Next()
+        public DataTable ItemsSource { get; private set; }
+
+        public Task<object> Next()
         {
-            return IoC.Get<DocumentMapperViewModel>();
+            var viewModel = IoC.Get<DocumentMapperViewModel>();
+
+            IEnumerable<string> sourceFields = null;
+            
+            if (ItemsSource != null)
+            {
+                sourceFields = ItemsSource.Columns.OfType<DataColumn>().Select(p => p.ColumnName);
+            }
+
+            var collectionReference = _targetOptions.GetTargetCollection();
+
+            viewModel.Init(sourceFields, collectionReference);
+
+            return Task.FromResult<object>(viewModel);
         }
 
         public bool Validate()
@@ -66,24 +82,9 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
         public Task ProcessFile(Maybe<string> maybeFilePath)
         {
-            if (maybeFilePath.HasNoValue)
-            {
-                _dataPreviewHolder.SetContent("No Preview");
-                return Task.CompletedTask;
-            }
+            ItemsSource = maybeFilePath.HasValue ? ToDataTable(maybeFilePath.Value, _sourceOptions) : null;
 
-            var dataTable = ToDataTable(maybeFilePath.Value, _sourceSourceOptions);
-
-            var dataPreview = new DataGrid
-            {
-                ItemsSource = dataTable.DefaultView,
-                AutoGenerateColumns = true,
-                CanUserAddRows = false,
-                IsReadOnly = true,
-                SelectionUnit = DataGridSelectionUnit.FullRow
-            };
-
-            _dataPreviewHolder.SetContent(dataPreview);
+            _dataPreviewHolder.RefreshView(ItemsSource);
 
             return Task.CompletedTask;
         }
@@ -168,13 +169,30 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
         [Form(Mode = DefaultFields.None)]
         public class DataPreviewHolder : PropertyChangedBase
         {
+            private readonly DataGrid _dataGrid;
+
+            public DataPreviewHolder()
+            {
+                _dataGrid = new DataGrid
+                {
+                    AutoGenerateColumns = true,
+                    CanUserAddRows = false,
+                    IsReadOnly = true,
+                    SelectionUnit = DataGridSelectionUnit.FullRow,
+                    GridLinesVisibility = DataGridGridLinesVisibility.All,
+                    MaxHeight = 200
+                };
+
+                DataPreview = new ViewContentProxy(_dataGrid);
+            }
+
             [Field]
             [DirectContent]
-            public ViewContentProxy DataPreview { get; set; } = new ViewContentProxy("No Preview"){ Margin = new Thickness(10,0,10,0) };
+            public ViewContentProxy DataPreview { get; set; }
 
-            public void SetContent(object content)
+            public void RefreshView(DataTable itemsSource)
             {
-                DataPreview.Content = content;
+                _dataGrid.ItemsSource = itemsSource?.DefaultView;
             }
         }
 

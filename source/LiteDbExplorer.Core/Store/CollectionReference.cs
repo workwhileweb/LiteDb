@@ -59,6 +59,14 @@ namespace LiteDbExplorer.Core
             }
         }
 
+        public IEnumerable<DocumentReference> this[string name]
+        {
+            get
+            {
+                return Items == null ? Enumerable.Empty<DocumentReference>() : Items.Where(p => p.LiteDocument.ContainsKey(name));
+            }
+        }
+
         public bool IsFilesOrChunks => this.IsFilesOrChunksCollection();
 
         public event EventHandler<CollectionReferenceChangedEventArgs<DocumentReference>> DocumentsCollectionChanged;

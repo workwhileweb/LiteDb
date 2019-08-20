@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Composition;
+using System.Threading.Tasks;
 using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDbExplorer.Modules.Shared;
@@ -33,6 +34,8 @@ namespace LiteDbExplorer.Modules.ImportData
 
         public bool CanPrevious => PreviousItems.Count > 1;
 
+        public bool IsBusy { get; private set; }
+
         public override void ActivateItem(IStepsScreen item)
         {
             _activeItemObservable?.Dispose();
@@ -61,17 +64,21 @@ namespace LiteDbExplorer.Modules.ImportData
         }
 
         [UsedImplicitly]
-        public void Next()
+        public async Task Next()
         {
             if (ActiveItem == null || !ActiveItem.Validate())
             {
                 return;
             }
 
-            if (ActiveItem?.Next() is IStepsScreen next)
+            IsBusy = true;
+
+            if (await ActiveItem?.Next() is IStepsScreen next)
             {
                 ActivateItem(next);
             }
+
+            IsBusy = false;
         }
 
         [UsedImplicitly]

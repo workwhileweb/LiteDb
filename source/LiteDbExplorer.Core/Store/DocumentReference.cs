@@ -19,6 +19,12 @@ namespace LiteDbExplorer.Core
 
         public CollectionReference Collection { get; set; }
 
+        public BsonValue this[string name]
+        {
+            get => LiteDocument[name];
+            set => LiteDocument[name] = value;
+        }
+
         public bool ContainsReference(CollectionReference collectionReference)
         {
             if (Collection == null)
