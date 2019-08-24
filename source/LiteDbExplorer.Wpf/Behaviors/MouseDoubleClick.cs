@@ -8,9 +8,9 @@ namespace LiteDbExplorer.Wpf.Behaviors
     {
         public static DependencyProperty CommandProperty =
             DependencyProperty.RegisterAttached("Command",
-                typeof(ICommand),
+                typeof(object),
                 typeof(MouseDoubleClick),
-                new UIPropertyMetadata(CommandChanged));
+                new UIPropertyMetadata(OnCommandChanged));
 
         public static DependencyProperty CommandParameterProperty =
             DependencyProperty.RegisterAttached("CommandParameter",
@@ -18,12 +18,12 @@ namespace LiteDbExplorer.Wpf.Behaviors
                 typeof(MouseDoubleClick),
                 new UIPropertyMetadata(null));
 
-        public static void SetCommand(DependencyObject target, ICommand value)
+        public static void SetCommand(DependencyObject target, object value)
         {
             target.SetValue(CommandProperty, value);
         }
 
-        public static ICommand GetCommand(UIElement inUIElement)
+        public static object GetCommand(UIElement inUIElement)
         {
             return inUIElement.GetValue(CommandProperty) as ICommand;
         }
@@ -37,7 +37,7 @@ namespace LiteDbExplorer.Wpf.Behaviors
             return target.GetValue(CommandParameterProperty);
         }
 
-        private static void CommandChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
+        private static void OnCommandChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
         {
             if (target is Control control)
             {
@@ -54,11 +54,11 @@ namespace LiteDbExplorer.Wpf.Behaviors
 
         private static void OnMouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            if (sender is Control control)
+            if (sender is Control control && control.GetValue(CommandProperty) is ICommand command)
             {
-                ICommand command = (ICommand)control.GetValue(CommandProperty);
-                object commandParameter = control.GetValue(CommandParameterProperty);
+                var commandParameter = control.GetValue(CommandParameterProperty);
                 command.Execute(commandParameter);
+                e.Handled = true;
             }
         }
     }

@@ -21,17 +21,40 @@
         <converters:GroupDisplayColorToForegroundConverter x:Key="GroupDisplayColorToForegroundConverter"/>
     </UserControl.Resources>
     <commands:CommandToCommand.Bindings>
-        <commands:CommandToCommandBinding SourceCommand="Close" TargetCommand="{Binding CloseDatabaseCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddFile" TargetCommand="{Binding AddFileCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddCollection" TargetCommand="{Binding AddCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshDatabase" TargetCommand="{Binding RefreshDatabaseCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RevealInExplorer" TargetCommand="{Binding RevealInExplorerCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RenameCollection" TargetCommand="{Binding RenameCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.DropCollection" TargetCommand="{Binding DropCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection" TargetCommand="{Binding ExportCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" TargetCommand="{Binding EditDbPropertiesCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" TargetCommand="{Binding SaveDatabaseCopyAsCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Import" TargetCommand="{Binding ImportDataCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Close" 
+                                          TargetCommand="{Binding CloseDatabaseCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" 
+                                          TargetCommand="{Binding EditDbPropertiesCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" 
+                                          TargetCommand="{Binding SaveDatabaseCopyAsCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddFile" 
+                                          TargetCommand="{Binding AddFileCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddCollection" 
+                                          TargetCommand="{Binding AddCollectionCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshDatabase" 
+                                          TargetCommand="{Binding RefreshDatabaseCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RevealInExplorer" 
+                                          TargetCommand="{Binding RevealInExplorerCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RenameCollection" 
+                                          TargetCommand="{Binding RenameCollectionCommand}"
+                                          CommandParameter="{Binding SelectedCollection}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.DropCollection" 
+                                          TargetCommand="{Binding DropCollectionCommand}"
+                                          CommandParameter="{Binding SelectedCollection}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection" 
+                                          TargetCommand="{Binding ExportCollectionCommand}"
+                                          CommandParameter="{Binding SelectedCollection}"/>
+        
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Import" 
+                                          TargetCommand="{Binding ImportDataCommand}"/>
     </commands:CommandToCommand.Bindings>
     <DockPanel AllowDrop="True"
                behaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">
@@ -92,9 +115,6 @@
             </ToolBar>
         </ToolBarTray>
 
-        <!--<controls:ToolDockPanel DockPanel.Dock="Bottom" Style="{StaticResource ToolDockPanelCompact}">
-        </controls:ToolDockPanel>-->
-
         <TreeView Name="TreeDatabase"
                   ItemsSource="{Binding Databases}"
                   Focusable="True" Padding="0"
@@ -102,11 +122,18 @@
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="False"
                   cal:Message.Attach="[Event SelectedItemChanged] = [OnSelectedItemChanged($eventArgs)];"
-                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.IsVirtualizing="False"
                   VirtualizingStackPanel.VirtualizationMode="Standard">
             <TreeView.Resources>
                 <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
                     <Setter Property="IsExpanded" Value="True" />
+                    <Setter Property="behaviors:MouseDoubleClick.Command"
+                            Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}"/>
+                    <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
+                            Value="{Binding}"/>
+                    <Setter Property="cal:Message.Attach"
+                            Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]"/>
+                    <Setter Property="ToolTip" Value="{Binding Name}" />
                     <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnPreviewMouseRightButtonDown" />
                     <Setter Property="ContextMenu">
                         <Setter.Value>
@@ -172,9 +199,11 @@
                     <HierarchicalDataTemplate.ItemContainerStyle>
                         <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
                             <Setter Property="behaviors:MouseDoubleClick.Command"
-                                    Value="{Binding Path=Data.ItemDoubleClickCommand, Source={StaticResource DataContextProxy}}"/>
+                                    Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}"/>
                             <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
                                     Value="{Binding}"/>
+                            <Setter Property="cal:Message.Attach"
+                                    Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]"/>
                             <Setter Property="ToolTip" Value="{Binding Name}" />
                             <Setter Property="ContextMenu">
                                 <Setter.Value>

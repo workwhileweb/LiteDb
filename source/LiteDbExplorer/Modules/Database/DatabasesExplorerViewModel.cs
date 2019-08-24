@@ -1,4 +1,6 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,10 +20,11 @@ namespace LiteDbExplorer.Modules.Database
 {
     [Export(typeof(IDocumentExplorer))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public class DatabasesExplorerViewModel : Screen, IDocumentExplorer
+    public class DatabasesExplorerViewModel : Screen, IDocumentExplorer, IErrorHandler
     {
         private readonly IDatabaseInteractions _databaseInteractions;
         private readonly IApplicationInteraction _applicationInteraction;
+        private IDatabasesExplorerView _view;
 
         [ImportingConstructor]
         public DatabasesExplorerViewModel(
@@ -34,34 +37,34 @@ namespace LiteDbExplorer.Modules.Database
 
             PathDefinitions = recentFilesProvider;
 
-            OpenRecentItemCommand = new RelayCommand<RecentFileInfo>(async info => await OpenRecentItem(info));
-            ItemDoubleClickCommand = new RelayCommand<CollectionReference>( async reference => await NodeDoubleClick(reference));
+            CloseDatabaseCommand = new AsyncCommand<DatabaseReference>(CloseDatabase, CanCloseDatabase, this);
+            EditDbPropertiesCommand = new AsyncCommand<DatabaseReference>(EditDbProperties, CanEditDbProperties, this);
+            SaveDatabaseCopyAsCommand = new AsyncCommand<DatabaseReference>(SaveDatabaseCopyAs, CanSaveDatabaseCopyAs, this);
+            AddFileCommand = new AsyncCommand<DatabaseReference>(AddFile, CanAddFile, this);
+            AddCollectionCommand = new AsyncCommand<DatabaseReference>(AddCollection, CanAddCollection, this);
+            RefreshDatabaseCommand = new AsyncCommand<DatabaseReference>(RefreshDatabase, CanRefreshDatabase, this);
+            RevealInExplorerCommand = new AsyncCommand<DatabaseReference>(RevealInExplorer, CanRevealInExplorer, this);
 
-            SaveDatabaseCopyAsCommand = new RelayCommand(async _ => await SaveDatabaseCopyAs(), o => CanSaveDatabaseCopyAs());
-            CloseDatabaseCommand = new RelayCommand(async _ => await CloseDatabase(), o => CanCloseDatabase());
-            AddFileCommand = new RelayCommand(async _ => await AddFile(), _ => CanAddFile());
-            AddCollectionCommand = new RelayCommand(async _ => await AddCollection(), _ => CanAddCollection());
-            RefreshDatabaseCommand = new RelayCommand(_ => RefreshDatabase(), _ => CanRefreshDatabase());
-            RevealInExplorerCommand = new RelayCommand(async _ => await RevealInExplorer(), _ => CanRevealInExplorer());
-            RenameCollectionCommand = new RelayCommand(async _ => await RenameCollection(), _ => CanRenameCollection());
-            DropCollectionCommand = new RelayCommand(async _ => await DropCollection(), _ => CanDropCollection());
-            ExportCollectionCommand = new RelayCommand(async _ => await ExportCollection(), _ => CanExportCollection());
-            EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), _ => CanEditDbProperties());
+            RenameCollectionCommand = new AsyncCommand<CollectionReference>(RenameCollection, CanRenameCollection, this);
+            DropCollectionCommand = new AsyncCommand<CollectionReference>(DropCollection, CanDropCollection, this);
+            ExportCollectionCommand = new AsyncCommand<CollectionReference>(ExportCollection, CanExportCollection, this);
+            
             ImportDataCommand = new RelayCommand(_ => ImportData(), _ => CanImportData());
 
-            Store.Current.Databases.CollectionChanged += (sender, args) =>
-            {
-                Commands.ShowNavigationPanel.MainExecute(true);
-            };
+            OpenRecentItemCommand = new AsyncCommand<RecentFileInfo>(OpenRecentItem);
+
+            NodeDefaulActionCommand = new AsyncCommand<object>(NodeDefaultAction);
+
+            Store.Current.Databases.CollectionChanged += OnDatabasesCollectionChanged;
         }
 
         public IRecentFilesProvider PathDefinitions { get; }
 
-        public ICommand OpenRecentItemCommand { get; }
-
-        public ICommand ItemDoubleClickCommand { get; }
-
         public ICommand CloseDatabaseCommand { get; }
+
+        public ICommand EditDbPropertiesCommand { get; }
+
+        public ICommand SaveDatabaseCopyAsCommand { get; }
 
         public ICommand AddFileCommand { get; }
 
@@ -77,11 +80,11 @@ namespace LiteDbExplorer.Modules.Database
 
         public ICommand ExportCollectionCommand { get; }
 
-        public ICommand EditDbPropertiesCommand { get; }
-
-        public ICommand SaveDatabaseCopyAsCommand { get; }
-
         public ICommand ImportDataCommand { get; }
+
+        public ICommand OpenRecentItemCommand { get; }
+
+        public ICommand NodeDefaulActionCommand { get; }
 
         [UsedImplicitly]
         public ObservableCollection<DatabaseReference> Databases => Store.Current.Databases;
@@ -92,6 +95,22 @@ namespace LiteDbExplorer.Modules.Database
         public DatabaseReference SelectedDatabase { get; private set; }
 
         public CollectionReference SelectedCollection { get; private set; }
+
+        protected override void OnViewLoaded(object view)
+        {
+            _view = view as IDatabasesExplorerView;
+        }
+
+        private void OnDatabasesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            Commands.ShowNavigationPanel.ExecuteOnMain(true);
+
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                var firstItem = e.NewItems.OfType<object>().FirstOrDefault();
+                _view?.FocusItem(firstItem, true);
+            }
+        }
 
         [UsedImplicitly]
         public async Task OpenDatabase()
@@ -108,6 +127,28 @@ namespace LiteDbExplorer.Modules.Database
             }
 
             await _databaseInteractions.OpenDatabase(info.FullPath);
+        }
+
+        [UsedImplicitly]
+        public async Task NewQuery(object item)
+        {
+            switch (item)
+            {
+                case DatabaseReference databaseReference:
+                    await _applicationInteraction.OpenQuery(new RunQueryContext(databaseReference));
+                    break;
+                case CollectionReference collectionReference:
+                    await _applicationInteraction.OpenQuery(new RunQueryContext(collectionReference.Database, QueryReference.Find(collectionReference)));
+                    break;
+            }
+        }
+
+        [UsedImplicitly]
+        public void NewFindQuery(CollectionReference item, int? skip = null, int? limit = null)
+        {
+            var queryReference = QueryReference.Find(item, skip, limit);
+
+            _applicationInteraction.OpenQuery(new RunQueryContext(item.Database, queryReference) { RunOnStart = true });
         }
 
         [UsedImplicitly]
@@ -143,39 +184,40 @@ namespace LiteDbExplorer.Modules.Database
             }
         }
 
-        public async Task NodeDoubleClick(CollectionReference value)
+        public async Task NodeDefaultAction(object value)
         {
-            await _applicationInteraction.ActivateDefaultCollectionView(value);
-        }
-
-        [UsedImplicitly]
-        public async Task NewQuery(object item)
-        {
-            switch (item)
+            switch (value)
             {
-                case DatabaseReference databaseReference:
-                    await _applicationInteraction.OpenQuery(new RunQueryContext(databaseReference));
-                    break;
                 case CollectionReference collectionReference:
-                    await _applicationInteraction.OpenQuery(new RunQueryContext(collectionReference.Database, QueryReference.Find(collectionReference)));
+                    await _applicationInteraction.ActivateDefaultCollectionView(collectionReference);
+                    break;
+                case DatabaseReference databaseReference:
+                    _applicationInteraction.OpenDatabaseProperties(databaseReference);
                     break;
             }
         }
 
         [UsedImplicitly]
-        public void NewFindQuery(CollectionReference item, int? skip = null, int? limit = null)
-        {
-            var queryReference = QueryReference.Find(item, skip, limit);
+        public async Task NodeKeyDownAction(KeyEventArgs keyArgs, object item)
+        {   
+            if (keyArgs.Key == Key.Enter)
+            {
+                keyArgs.Handled = true;
+                await NodeDefaultAction(item);
+            }
+        }
 
-            _applicationInteraction.OpenQuery(new RunQueryContext(item.Database, queryReference) { RunOnStart = true });
+        public void HandleError(Exception ex)
+        {
+            _applicationInteraction.ShowError(ex, "An error occurred while performing the action.");
         }
 
         #region Routed Commands
 
         [UsedImplicitly]
-        public async Task SaveDatabaseCopyAs()
+        public async Task SaveDatabaseCopyAs(DatabaseReference databaseReference)
         {
-            var newDatabasePath = await _databaseInteractions.SaveDatabaseCopyAs(SelectedDatabase);
+            var newDatabasePath = await _databaseInteractions.SaveDatabaseCopyAs(databaseReference);
             if (newDatabasePath.HasValue)
             {
                 NotificationInteraction.Default()
@@ -193,34 +235,51 @@ namespace LiteDbExplorer.Modules.Database
             }
         }
 
-        public bool CanSaveDatabaseCopyAs()
+        public bool CanSaveDatabaseCopyAs(DatabaseReference databaseReference)
         {
-            return SelectedDatabase != null;
+            return databaseReference != null;
         }
 
         [UsedImplicitly]
-        public async Task CloseDatabase()
+        public async Task CloseDatabase(DatabaseReference databaseReference)
         {
-            await _databaseInteractions.CloseDatabase(SelectedDatabase);
-
-            if (SelectedCollection?.Database == SelectedDatabase)
+            if (SelectedCollection?.Database == databaseReference)
             {
                 SelectedCollection = null;
             }
 
-            SelectedDatabase = null;
+            if (SelectedDatabase == databaseReference)
+            {
+                SelectedDatabase = null;
+            }
+
+            await _databaseInteractions.CloseDatabase(databaseReference);
         }
 
         [UsedImplicitly]
-        public bool CanCloseDatabase()
+        public bool CanCloseDatabase(DatabaseReference databaseReference)
         {
-            return SelectedDatabase != null;
+            return databaseReference != null;
         }
 
         [UsedImplicitly]
-        public async Task AddFile()
+        public Task EditDbProperties(DatabaseReference databaseReference)
         {
-            await _databaseInteractions.AddFileToDatabase(SelectedDatabase)
+            _applicationInteraction.OpenDatabaseProperties(databaseReference);
+
+            return Task.CompletedTask;
+        }
+
+        [UsedImplicitly]
+        public bool CanEditDbProperties(DatabaseReference databaseReference)
+        {
+            return databaseReference != null;
+        }
+
+        [UsedImplicitly]
+        public async Task AddFile(DatabaseReference databaseReference)
+        {
+            await _databaseInteractions.AddFileToDatabase(databaseReference)
                 .OnSuccess(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference, reference.Items);
@@ -228,15 +287,15 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public bool CanAddFile()
+        public bool CanAddFile(DatabaseReference databaseReference)
         {
-            return SelectedDatabase != null;
+            return databaseReference != null;
         }
 
         [UsedImplicitly]
-        public async Task AddCollection()
+        public async Task AddCollection(DatabaseReference databaseReference)
         {
-            await _databaseInteractions.AddCollection(SelectedDatabase)
+            await _databaseInteractions.AddCollection(databaseReference)
                 .OnSuccess(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference);
@@ -244,83 +303,78 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public bool CanAddCollection()
+        public bool CanAddCollection(DatabaseReference databaseReference)
         {
-            return SelectedDatabase != null;
+            return databaseReference != null;
         }
 
         [UsedImplicitly]
-        public void RefreshDatabase()
+        public Task RefreshDatabase(DatabaseReference databaseReference)
         {
-            SelectedDatabase?.Refresh();
+            databaseReference?.Refresh();
+
+            return Task.CompletedTask;
         }
 
         [UsedImplicitly]
-        public bool CanRefreshDatabase()
+        public bool CanRefreshDatabase(DatabaseReference databaseReference)
         {
-            return SelectedDatabase != null;
+            return databaseReference != null;
         }
 
         [UsedImplicitly]
-        public async Task RevealInExplorer()
+        public async Task RevealInExplorer(DatabaseReference databaseReference)
         {
-            await _applicationInteraction.RevealInExplorer(SelectedDatabase.Location);
+            if (databaseReference == null)
+            {
+                return;
+            }
+
+            await _applicationInteraction.RevealInExplorer(databaseReference.Location);
         }
 
         [UsedImplicitly]
-        public bool CanRevealInExplorer()
+        public bool CanRevealInExplorer(DatabaseReference databaseReference)
         {
-            return SelectedDatabase != null;
+            return databaseReference != null;
         }
 
         [UsedImplicitly]
-        public async Task RenameCollection()
+        public async Task RenameCollection(CollectionReference collectionReference)
         {
-            await _databaseInteractions.RenameCollection(SelectedCollection);
+            await _databaseInteractions.RenameCollection(collectionReference);
         }
 
         [UsedImplicitly]
-        public bool CanRenameCollection()
+        public bool CanRenameCollection(CollectionReference collectionReference)
         {
-            return SelectedCollection != null && !SelectedCollection.IsFilesOrChunks;
+            return collectionReference != null && !collectionReference.IsFilesOrChunks;
         }
 
         [UsedImplicitly]
-        public async Task DropCollection()
+        public async Task DropCollection(CollectionReference collectionReference)
         {
-            await _databaseInteractions.DropCollection(SelectedCollection);
+            await _databaseInteractions.DropCollection(collectionReference);
 
             SelectedCollection = null;
         }
 
         [UsedImplicitly]
-        public bool CanDropCollection()
+        public bool CanDropCollection(CollectionReference collectionReference)
         {
-            return SelectedCollection != null;
+            return collectionReference != null;
         }
 
         [UsedImplicitly]
-        public async Task ExportCollection()
+        public async Task ExportCollection(CollectionReference collectionReference)
         {
-            await _databaseInteractions.ExportAs(this, SelectedCollection);
+            await _databaseInteractions.ExportAs(this, collectionReference);
         }
 
         [UsedImplicitly]
-        public bool CanExportCollection()
+        public bool CanExportCollection(CollectionReference collectionReference)
         {
-            return SelectedCollection != null;
-        }
-
-        [UsedImplicitly]
-        public void EditDbProperties()
-        {
-            _applicationInteraction.OpenDatabaseProperties(SelectedDatabase);
-        }
-
-        [UsedImplicitly]
-        public bool CanEditDbProperties()
-        {
-            return SelectedDatabase != null;
+            return collectionReference != null;
         }
 
         [UsedImplicitly]
@@ -347,5 +401,6 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         #endregion
+
     }
 }

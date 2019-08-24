@@ -86,6 +86,7 @@
     <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
     <Compile Include="Controls\ViewContentProxy.cs" />
+    <Compile Include="Modules\Database\IDatabasesExplorerView.cs" />
     <Compile Include="Modules\ImportData\DocumentMapperView.xaml.cs">
       <DependentUpon>DocumentMapperView.xaml</DependentUpon>
     </Compile>

@@ -22,7 +22,7 @@ namespace LiteDbExplorer.Modules.DbQuery
 
     [Export(typeof(QueryViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
-    public class QueryViewModel : DocumentConductorOneActive<RunQueryContext>, INavigationTarget<RunQueryContext>, IQueryHistoryHandler
+    public sealed class QueryViewModel : DocumentConductorOneActive<RunQueryContext>, INavigationTarget<RunQueryContext>, IQueryHistoryHandler
     {
         private static int _queryRefCount;
         private readonly IApplicationInteraction _applicationInteraction;
@@ -48,11 +48,11 @@ namespace LiteDbExplorer.Modules.DbQuery
                 }
             };
 
-            RunQueryCommand = new RelayCommand(_=> RunAllRawQuery(), _=> CanRunQuery);
+            RunQueryCommand = new AsyncCommand(RunAllRawQuery, () => CanRunQuery);
 
-            RunSelectedQueryCommand = new RelayCommand(_=> RunSelectedQuery(), _=> CanRunSelectedQuery);
+            RunSelectedQueryCommand = new AsyncCommand(RunSelectedQuery, ()=> CanRunSelectedQuery);
 
-            OpenHelpCommand = new RelayCommand(_=> OpenHelp(), _=> true);
+            OpenHelpCommand = new AsyncCommand(OpenHelp);
 
             QueryHistoryView = IoC.Get<QueryHistoryViewModel>();
 
@@ -137,7 +137,7 @@ namespace LiteDbExplorer.Modules.DbQuery
             if (InitialQueryContext?.RunOnStart == true)
             {
                 await Task.Delay(250);
-                RunAllRawQuery();
+                await RunAllRawQuery();
             }
         }
 
@@ -155,37 +155,37 @@ namespace LiteDbExplorer.Modules.DbQuery
         }
 
         [UsedImplicitly]
-        public void RunAllRawQuery()
+        public async Task RunAllRawQuery()
         {
-            RunQuery(RawQuery);
+            await RunQuery(RawQuery);
         }
 
         [UsedImplicitly]
-        public void RunSelectedQuery()
+        public async Task RunSelectedQuery()
         {
             if (string.IsNullOrWhiteSpace(RawQuerySelected))
             {
                 return;
             }
 
-            RunQuery(RawQuerySelected);
+            await RunQuery(RawQuerySelected);
         }
 
-        public void OpenHelp()
+        public async Task OpenHelp()
         {
             var documentSet = IoC.Get<IDocumentSet>();
             var context = new GithubWikiMarkdownDocContext("Using Shell - Command reference", "mbdavid", "LiteDB", "Shell");
-            documentSet.OpenDocument<MarkdownDocViewModel, IMarkdownDocContext>(context);
+            await documentSet.OpenDocument<MarkdownDocViewModel, IMarkdownDocContext>(context);
         }
 
-        private void RunQuery(string query)
+        private Task RunQuery(string query)
         {
             ActiveItem = null;
             Items.Clear();
 
             if (string.IsNullOrWhiteSpace(query))
             {
-                return;
+                return Task.CompletedTask;
             }
 
             var rawQueries = RemoveQueryComments(query)
@@ -229,6 +229,8 @@ namespace LiteDbExplorer.Modules.DbQuery
             _queryHistoryProvider.Upsert(queryHistory);
 
             ActiveItem = Items.FirstOrDefault();
+
+            return Task.CompletedTask;
         }
 
         private static string RemoveQueryComments(string sql)

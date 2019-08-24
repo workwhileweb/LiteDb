@@ -90,6 +90,7 @@
     <Compile Include="Extensions\TreeViewExtensions.cs" />
     <Compile Include="Extensions\VisualTreeExtensions.cs" />
     <Compile Include="Framework\AppWindowManager.cs" />
+    <Compile Include="Framework\AsyncCommand.cs" />
     <Compile Include="Framework\Commands\CommandToCommandBindings.cs" />
     <Compile Include="Framework\DataContextProxy.cs" />
     <Compile Include="Framework\ILayoutItem.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Framework\Shell\IStatusBarContent.cs" />
     <Compile Include="Framework\Shell\StatusBarContentLocation.cs" />
     <Compile Include="Framework\Shell\ToolPanel.cs" />
+    <Compile Include="Framework\TaskUtilities.cs" />
     <Compile Include="Framework\Win32\NativeMethods.cs" />
     <Compile Include="Framework\WindowBase.cs" />
     <Compile Include="Framework\Windows\BaseDialogWindow.xaml.cs">

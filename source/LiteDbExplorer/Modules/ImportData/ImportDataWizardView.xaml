@@ -9,8 +9,12 @@
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
+             xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -27,9 +31,10 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <materialDesign:PackIcon Kind="FileImport" Margin="20,0" Height="52" Width="52" 
+                <materialDesign:PackIcon Kind="DatabaseImport" 
+                                         Margin="20,0,15,0" Height="48" Width="48" 
                                          HorizontalAlignment="Center" 
-                                         VerticalAlignment="Center" Opacity="0.67"/>
+                                         VerticalAlignment="Center" />
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <TextBlock Text="{Binding DisplayName}"
                                Style="{StaticResource MaterialDesignTitleTextBlock}"/>
@@ -61,5 +66,13 @@
             </DockPanel>
         </Border>
 
+        <materialDesign:Card Grid.Row="0" Grid.RowSpan="3"
+                             UniformCornerRadius="14" Padding="4" HorizontalAlignment="Center" Margin="90"
+                             Visibility="{Binding Path=IsBusy, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ProgressBar
+                Style="{StaticResource MaterialDesignCircularProgressBar}"
+                Value="50"
+                IsIndeterminate="True" />
+        </materialDesign:Card>
     </Grid>
 </UserControl>

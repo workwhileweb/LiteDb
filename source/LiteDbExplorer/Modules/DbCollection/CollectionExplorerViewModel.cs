@@ -24,7 +24,7 @@ namespace LiteDbExplorer.Modules.DbCollection
     [Export(typeof(CollectionExplorerViewModel))]
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class CollectionExplorerViewModel : DocumentConductor<CollectionReferencePayload, IDocumentPreview>,
-        INavigationTarget<CollectionReferencePayload>
+        INavigationTarget<CollectionReferencePayload>, IErrorHandler
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IApplicationInteraction _applicationInteraction;
@@ -53,12 +53,13 @@ namespace LiteDbExplorer.Modules.DbCollection
 
             ItemDoubleClickCommand = new RelayCommand<DocumentReference>(async doc => await OnItemDoubleClick(doc));
 
-            AddDocumentCommand = new RelayCommand(async _ => await AddDocument(), o => CanAddDocument());
-            EditDocumentCommand = new RelayCommand(async _ => await EditDocument(), o => CanEditDocument());
-            RemoveDocumentCommand = new RelayCommand(async _ => await RemoveDocument(), o => CanRemoveDocument());
-            ExportDocumentCommand = new RelayCommand(async _ => await ExportDocument(), o => CanExportDocument());
-            CopyDocumentCommand = new RelayCommand(async _ => await CopyDocument(), o => CanCopyDocument());
-            PasteDocumentCommand = new RelayCommand(async _ => await PasteDocument(), o => CanPasteDocument());
+            AddDocumentCommand = new AsyncCommand(AddDocument, CanAddDocument, this);
+            EditDocumentCommand = new AsyncCommand<DocumentReference>(EditDocument, CanEditDocument, this);
+            RemoveDocumentCommand = new AsyncCommand(RemoveDocument, CanRemoveDocument, this);
+            ExportDocumentCommand = new AsyncCommand(ExportDocument, CanExportDocument, this);
+            CopyDocumentCommand = new AsyncCommand(CopyDocument, CanCopyDocument, this);
+            PasteDocumentCommand = new AsyncCommand(PasteDocument, CanPasteDocument, this);
+
             RefreshCollectionCommand = new RelayCommand(_ => RefreshCollection(), o => CanRefreshCollection());
             EditDbPropertiesCommand = new RelayCommand(_ => EditDbProperties(), o => CanEditDbProperties());
             FindCommand = new RelayCommand(_ => OpenFind(), o => CanOpenFind());
@@ -234,6 +235,11 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
 
+        public void HandleError(Exception ex)
+        {
+            _applicationInteraction.ShowError(ex, "An error occurred while performing the action.");
+        }
+
         protected override void OnViewLoaded(object view)
         {
             _view = view as ICollectionReferenceListView;
@@ -366,15 +372,15 @@ namespace LiteDbExplorer.Modules.DbCollection
         }
 
         [UsedImplicitly]
-        public async Task EditDocument()
+        public async Task EditDocument(DocumentReference documentReference)
         {
-            await _databaseInteractions.OpenEditDocument(SelectedDocument);
+            await _databaseInteractions.OpenEditDocument(documentReference);
         }
 
         [UsedImplicitly]
-        public bool CanEditDocument()
+        public bool CanEditDocument(DocumentReference documentReference)
         {
-            return SelectedDocument != null;
+            return documentReference != null;
         }
 
         [UsedImplicitly]

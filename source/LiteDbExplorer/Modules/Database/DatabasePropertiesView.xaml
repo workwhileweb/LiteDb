@@ -73,9 +73,10 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <materialDesign:PackIcon Kind="SettingsBox" Margin="20,0" Height="52" Width="52"
+                <materialDesign:PackIcon Kind="SettingsBox" Margin="20,0,15,0" 
+                                         Height="48" Width="48"
                                          HorizontalAlignment="Center"
-                                         VerticalAlignment="Center" Opacity="0.67" />
+                                         VerticalAlignment="Center" />
                 <TextBlock Grid.Column="1" Text="Database Properties"
                            Style="{StaticResource MaterialDesignTitleTextBlock}"
                            VerticalAlignment="Center" />

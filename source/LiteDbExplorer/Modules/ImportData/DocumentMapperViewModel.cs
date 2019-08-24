@@ -7,7 +7,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Caliburn.Micro;
-using Humanizer;
 using JetBrains.Annotations;
 using LiteDB;
 using LiteDbExplorer.Core;
@@ -27,7 +26,7 @@ namespace LiteDbExplorer.Modules.ImportData
         {
             DisplayName = "Import fields";
 
-            BsonTypes = Enum.GetValues(typeof(BsonType))
+            ValidBsonTypes = Enum.GetValues(typeof(BsonType))
                 .Cast<BsonType>()
                 .Except(new[] {BsonType.MinValue, BsonType.MaxValue, BsonType.Document, BsonType.Array});
 
@@ -36,7 +35,7 @@ namespace LiteDbExplorer.Modules.ImportData
             TargetFields = new BindableCollection<string>();
         }
 
-        public IEnumerable<BsonType> BsonTypes { get; private set; }
+        public IEnumerable<BsonType> ValidBsonTypes { get; private set; }
 
         public IObservableCollection<string> SourceFields { get; private set; }
 
@@ -78,7 +77,7 @@ namespace LiteDbExplorer.Modules.ImportData
                     .SelectMany(p => p.LiteDocument.RawValue)
                     .GroupBy(p => p.Key)
                     .Select(p => new {p.First().Key, Value = p.First().Value.Type})
-                    .Where(p => BsonTypes.Contains(p.Value))
+                    // .Where(p => ValidBsonTypes.Contains(p.Value))
                     .ToDictionary(p => p.Key, p => p.Value);
 
                 _targetFields = _targetFieldsWithTypes.Select(p => p.Key).ToHashSet();
@@ -93,12 +92,12 @@ namespace LiteDbExplorer.Modules.ImportData
             SourceFields.AddRange(_sourceFields);
             foreach (var sourceField in _sourceFields.Select(p => p.RemoveSpaces().WithoutDiacritics()))
             {
-                if (_targetFields.Any(p => p.TrimStart('_').Equals(sourceField, StringComparison.OrdinalIgnoreCase)))
+                if (_targetFields.Any(p => p.TrimStart('_').Equals(sourceField.TrimStart('_'), StringComparison.OrdinalIgnoreCase)))
                 {
                     continue;
                 }
 
-                _targetFields.Add(sourceField); //.Pascalize()
+                _targetFields.Add(sourceField);
             }
 
             TargetFields.Clear();
@@ -124,26 +123,28 @@ namespace LiteDbExplorer.Modules.ImportData
             foreach (var targetField in TargetFields)
             {
                 var documentMap = mappingSet.FirstOrDefault(
-                    p => p.SourceKey != null && p.SourceKey.Equals(targetField.TrimStart('_'), StringComparison.OrdinalIgnoreCase)
+                    p => p.SourceKey != null && p.SourceKey.TrimStart('_').Equals(targetField.TrimStart('_'), StringComparison.OrdinalIgnoreCase)
                 );
 
                 BsonType? fieldType = null;
                 if (_targetFieldsWithTypes.TryGetValue(targetField, out var bsonType))
                 {
-                    fieldType = bsonType;
+                    fieldType = ValidBsonTypes.Contains(bsonType) ? bsonType : BsonType.Null;
                 }
 
                 if (documentMap != null)
                 {
                     documentMap.TargetKey = targetField;
                     documentMap.FieldType = fieldType;
+                    documentMap.TargetExists = fieldType.HasValue;
                 }
                 else
                 {
                     documentMap = new DocumentToDocumentMap
                     {
                         TargetKey = targetField,
-                        FieldType = fieldType
+                        FieldType = fieldType,
+                        TargetExists = fieldType.HasValue
                     };
                     mappingSet.Add(documentMap);
                 }
@@ -194,14 +195,26 @@ namespace LiteDbExplorer.Modules.ImportData
 
         private void OnDocumentMapItemPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (!(sender is DocumentToDocumentMap documentMap))
+            {
+                return;
+            }
+
             if (e.PropertyName.Equals(nameof(DocumentToDocumentMap.TargetKey)))
             {
-                if (sender is DocumentToDocumentMap documentMap && 
-                    _targetFieldsWithTypes.TryGetValue(documentMap.TargetKey, out var bsonType))
+                if (!string.IsNullOrEmpty(documentMap.TargetKey) && _targetFieldsWithTypes.TryGetValue(documentMap.TargetKey, out var bsonType))
                 {
-                    documentMap.FieldType = bsonType;
+                    documentMap.FieldType = ValidBsonTypes.Contains(bsonType) ? bsonType : BsonType.Null;
+                    documentMap.TargetExists = true;
+                }
+                else
+                {
+                    documentMap.FieldType = null;
+                    documentMap.TargetExists = false;
                 }
             }
+
+            documentMap.Active = documentMap.HasRequiredValues;
         }
     }
 
@@ -235,9 +248,13 @@ namespace LiteDbExplorer.Modules.ImportData
 
         public BsonType? FieldType { get; set; }
 
+        public bool TargetExists { get; set; }
+
         public bool SourceIsReadonly { get; set; }
 
         public bool SourceIsEditable => !SourceIsReadonly;
+
+        public bool HasRequiredValues => !string.IsNullOrEmpty(SourceKey) && !string.IsNullOrEmpty(TargetKey) && FieldType.HasValue;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
