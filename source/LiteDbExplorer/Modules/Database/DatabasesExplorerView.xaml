@@ -221,7 +221,7 @@
                                         </MenuItem>
                                         <Separator />
                                         <MenuItem Command="liteDbExplorer:Commands.AddCollection" 
-                                                  CommandParameter="{Binding}">
+                                                  CommandParameter="{Binding Database}">
                                             <MenuItem.Icon>
                                                 <materialDesign:PackIcon Kind="TablePlus" />
                                             </MenuItem.Icon>

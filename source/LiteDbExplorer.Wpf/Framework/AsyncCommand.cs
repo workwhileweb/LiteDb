@@ -128,12 +128,23 @@ namespace LiteDbExplorer.Framework
         #region Explicit implementations
         bool ICommand.CanExecute(object parameter)
         {
-            return CanExecute((T)parameter);
+            if (parameter is T param)
+            {
+                return CanExecute(param);
+            }
+
+            return CanExecute(default);
         }
 
         void ICommand.Execute(object parameter)
         {
-            ExecuteAsync((T)parameter).FireAndForgetSafeAsync(_errorHandler);
+            if (parameter is T param)
+            {
+                ExecuteAsync(param).FireAndForgetSafeAsync(_errorHandler);
+                return;
+            }
+
+            ExecuteAsync(default).FireAndForgetSafeAsync(_errorHandler);
         }
         #endregion
     }
