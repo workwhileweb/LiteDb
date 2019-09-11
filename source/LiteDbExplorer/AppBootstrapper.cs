@@ -97,17 +97,6 @@ namespace LiteDbExplorer
             var pipeServiceBootstrapper = _container.GetExportedValueOrDefault<PipeServiceBootstrapper>();
             
             pipeServiceBootstrapper?.Init();
-
-#if (!DEBUG)
-
-            Task.Factory.StartNew(async () =>
-            {
-                await Task.Delay(2000);
-                await AppUpdateManager.Current.CheckForUpdates(false);
-
-            }).ConfigureAwait(false);
-#endif
-
         }
 
         protected override IEnumerable<Assembly> SelectAssemblies()

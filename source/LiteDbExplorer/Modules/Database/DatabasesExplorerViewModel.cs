@@ -280,7 +280,7 @@ namespace LiteDbExplorer.Modules.Database
         public async Task AddFile(DatabaseReference databaseReference)
         {
             await _databaseInteractions.AddFileToDatabase(databaseReference)
-                .OnSuccess(async reference =>
+                .Tap(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference, reference.Items);
                 });
@@ -296,7 +296,7 @@ namespace LiteDbExplorer.Modules.Database
         public async Task AddCollection(DatabaseReference databaseReference)
         {
             await _databaseInteractions.AddCollection(databaseReference)
-                .OnSuccess(async reference =>
+                .Tap(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference);
                 });

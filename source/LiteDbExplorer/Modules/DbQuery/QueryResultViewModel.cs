@@ -1,7 +1,11 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.ComponentModel.Composition;
+using System.Diagnostics;
+using System.Reactive.Disposables;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using Humanizer;
+using Humanizer.Localisation;
 using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 
@@ -12,11 +16,26 @@ namespace LiteDbExplorer.Modules.DbQuery
     public class QueryResultViewModel : Screen
     {
         private readonly IDatabaseInteractions _databaseInteractions;
+        private Stopwatch _stopwatch;
 
         [ImportingConstructor]
         public QueryResultViewModel(IDatabaseInteractions databaseInteractions)
         {
             _databaseInteractions = databaseInteractions;
+
+
+            _stopwatch = new Stopwatch();
+        }
+
+        public IDisposable StartQuery()
+        {
+            _stopwatch = Stopwatch.StartNew();
+            return Disposable.Create(() =>
+            {
+                _stopwatch.Stop();
+                ElapsedTime = _stopwatch.Elapsed;
+                _stopwatch = null;
+            });
         }
 
         public void SetResult(string displayName, string rawQuery, QueryResult queryResult)
@@ -30,8 +49,13 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         public string RawQuery { get; set; } = string.Empty;
 
+        public TimeSpan? ElapsedTime { get; private set; }
+
         [UsedImplicitly]
         public string ResultSetCountInfo => !QueryResult.HasValue ? "No records" : "record".ToQuantity(QueryResult.Count);
+
+        [UsedImplicitly]
+        public string ElapsedTimeInfo => ElapsedTime.HasValue ? $"Query time: {ElapsedTime.Value.Humanize(3, null, TimeUnit.Minute)}" : string.Empty;
 
         [UsedImplicitly]
         public int ContentMaxLength { get; private set; } = 10000;

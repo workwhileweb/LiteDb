@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -110,6 +111,11 @@ namespace LiteDbExplorer.Modules.Main
             }
 
             CommandManager.InvalidateRequerySuggested();
+
+#if (!DEBUG)
+            await Task.Delay(TimeSpan.FromSeconds(5))
+                .ContinueWith(task => AppUpdateManager.Current.CheckForUpdates(false), TaskScheduler.Current);
+#endif
         }
 
         private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)

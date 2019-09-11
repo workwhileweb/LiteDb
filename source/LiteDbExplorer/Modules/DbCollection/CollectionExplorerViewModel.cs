@@ -357,7 +357,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         public async Task AddDocument()
         {
             await _databaseInteractions.CreateItem(CollectionReference)
-                .OnSuccess(async reference =>
+                .Tap(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference,
                         reference.Items);
@@ -426,7 +426,7 @@ namespace LiteDbExplorer.Modules.DbCollection
 
             await _databaseInteractions
                 .ImportDataFromText(CollectionReference, textData)
-                .OnSuccess(update => _eventAggregator.PublishOnUIThread(update));
+                .Tap(update => _eventAggregator.PublishOnUIThread(update));
         }
 
         [UsedImplicitly]

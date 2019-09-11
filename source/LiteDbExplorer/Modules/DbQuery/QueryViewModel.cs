@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
@@ -8,6 +9,7 @@ using System.Windows.Input;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
+using LiteDB;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Help;
@@ -197,11 +199,16 @@ namespace LiteDbExplorer.Modules.DbQuery
             foreach (var rawQuery in rawQueries)
             {
                 resultCount++;
+                
                 try
                 {
-                    var results = CurrentDatabase.LiteDatabase.Engine.Run(rawQuery);
-
                     var resultViewModel = IoC.Get<QueryResultViewModel>();
+                    
+                    IList<BsonValue> results;
+                    using (resultViewModel.StartQuery())
+                    {
+                        results = CurrentDatabase.LiteDatabase.Engine.Run(rawQuery);
+                    }
                     
                     resultViewModel.SetResult(
                         $"Result {resultCount}", 
