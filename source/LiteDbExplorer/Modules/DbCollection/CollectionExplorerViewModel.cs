@@ -356,13 +356,18 @@ namespace LiteDbExplorer.Modules.DbCollection
         [UsedImplicitly]
         public async Task AddDocument()
         {
-            await _databaseInteractions.CreateItem(CollectionReference)
-                .Tap(async reference =>
+            var result = await _databaseInteractions.CreateItem(this, CollectionReference);
+            await result.Tap(async reference =>
+            {
+                await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference,
+                    reference.Items);
+                _eventAggregator.PublishOnUIThread(reference);
+
+                if (reference.PostAction is "edit" && reference.DocumentReference != null)
                 {
-                    await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference,
-                        reference.Items);
-                    _eventAggregator.PublishOnUIThread(reference);
-                });
+                    await EditDocument(reference.DocumentReference);
+                }
+            });
         }
 
         [UsedImplicitly]
@@ -375,6 +380,8 @@ namespace LiteDbExplorer.Modules.DbCollection
         public async Task EditDocument(DocumentReference documentReference)
         {
             await _databaseInteractions.OpenEditDocument(documentReference);
+
+            _view.FocusListView();
         }
 
         [UsedImplicitly]

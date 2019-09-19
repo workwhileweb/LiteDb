@@ -295,7 +295,7 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public async Task AddCollection(DatabaseReference databaseReference)
         {
-            await _databaseInteractions.AddCollection(databaseReference)
+            await _databaseInteractions.AddCollection(this, databaseReference)
                 .Tap(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference);

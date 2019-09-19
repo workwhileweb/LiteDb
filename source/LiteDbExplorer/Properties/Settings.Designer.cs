@@ -186,5 +186,17 @@ namespace LiteDbExplorer.Properties {
                 this["ShowNavigationPanelOnOpen"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool DocumentEditor_AllowEditId {
+            get {
+                return ((bool)(this["DocumentEditor_AllowEditId"]));
+            }
+            set {
+                this["DocumentEditor_AllowEditId"] = value;
+            }
+        }
     }
 }

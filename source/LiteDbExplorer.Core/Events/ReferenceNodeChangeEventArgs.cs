@@ -27,6 +27,8 @@ namespace LiteDbExplorer.Core
 
         public virtual IReadOnlyCollection<T> Items { get; }
 
+        public string PostAction { get; set; }
+
         public virtual bool ContainsReference(T item)
         {
             return Items != null && Items.Any(p => p.InstanceId.Equals(item.InstanceId));

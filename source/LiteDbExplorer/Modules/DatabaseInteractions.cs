@@ -32,10 +32,10 @@ namespace LiteDbExplorer.Modules
         Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database);
         Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database);
         Task<Result<CollectionDocumentChangeEventArgs>> ImportDataFromText(CollectionReference collection, string textData);
-        Task<Result<CollectionDocumentChangeEventArgs>> CreateItem(CollectionReference collection);
+        Task<Result<CollectionDocumentChangeEventArgs>> CreateItem(IScreen context, CollectionReference collection);
         Task<Result> CopyDocuments(IEnumerable<DocumentReference> documents);
         Task<Maybe<DocumentReference>> OpenEditDocument(DocumentReference document);
-        Task<Result<CollectionReference>> AddCollection(DatabaseReference database);
+        Task<Result<CollectionReference>> AddCollection(IScreen context, DatabaseReference database);
         Task<Result> RenameCollection(CollectionReference collection);
         Task<Result<CollectionReference>> DropCollection(CollectionReference collection);
         Task<Result> RemoveDocuments(IEnumerable<DocumentReference> documents);
@@ -286,14 +286,21 @@ namespace LiteDbExplorer.Modules
             return Task.FromResult(Result.Ok());
         }
 
-        public async Task<Result<CollectionReference>> AddCollection(DatabaseReference database)
+        public async Task<Result<CollectionReference>> AddCollection(IScreen context, DatabaseReference database)
         {
+            var exportOptions = new AddCollectionOptions(database);
+            var optionsResult = await ShowHostDialog(context).For(exportOptions);
+            if (optionsResult.Action is "cancel")
+            {
+                return Result.Fail<CollectionReference>(Fails.Canceled);
+            }
+
             try
             {
-                var maybeName = await _applicationInteraction.ShowInputDialog("New collection name:", "Enter new collection name");
-                if (maybeName.HasValue)
+                var collectionName = optionsResult.Model.NewCollectionName;
+                if (!string.IsNullOrEmpty(collectionName))
                 {
-                    var collectionReference = database.AddCollection(maybeName.Value);
+                    var collectionReference = database.AddCollection(collectionName);
                     return Result.Ok(collectionReference);
                 }
 
@@ -386,13 +393,7 @@ namespace LiteDbExplorer.Modules
             }
 
             var exportOptions = new CollectionExportOptions(collectionReference.IsFilesOrChunks, selectedDocuments?.Count);
-
-            var dialogHostIdentifier = AppConstants.DialogHosts.Shell;
-            if (context is Wpf.Framework.Shell.IDocument document)
-            {
-                dialogHostIdentifier = document.DialogHostIdentifier;
-            }
-            var result = await Show.Dialog(dialogHostIdentifier).For(exportOptions);
+            var result = await ShowHostDialog(context).For(exportOptions);
             if (result.Action is "cancel")
             {
                 return null;
@@ -456,13 +457,7 @@ namespace LiteDbExplorer.Modules
             }
 
             var exportOptions = new CollectionExportOptions(false, null);
-
-            var dialogHostIdentifier = AppConstants.DialogHosts.Shell;
-            if (context is Wpf.Framework.Shell.IDocument document)
-            {
-                dialogHostIdentifier = document.DialogHostIdentifier;
-            }
-            var result = await Show.Dialog(dialogHostIdentifier).For(exportOptions);
+            var result = await ShowHostDialog(context).For(exportOptions);
             if (result.Action is "cancel")
             {
                 return null;
@@ -869,23 +864,53 @@ namespace LiteDbExplorer.Modules
             }
         }
         
-        public Task<Result<CollectionDocumentChangeEventArgs>> CreateItem(CollectionReference collection)
+        public async Task<Result<CollectionDocumentChangeEventArgs>> CreateItem(IScreen context, CollectionReference collection)
         {
             if (collection is FileCollectionReference)
             {
-                return AddFileToDatabase(collection.Database);
+                return await AddFileToDatabase(collection.Database);
             }
 
+            var addDocumentOptions = new AddDocumentOptions(collection);
+
+            var optionsResult = await ShowHostDialog(context).For(addDocumentOptions);
+
+            if (optionsResult.Action is AddDocumentOptions.ACTION_CANCEL)
+            {
+                return Result.Fail<CollectionDocumentChangeEventArgs>(Fails.Canceled);
+            }
+
+            var newId = optionsResult.Model.NewId;
             var newDoc = new BsonDocument
             {
-                ["_id"] = ObjectId.NewObjectId()
+                ["_id"] = newId
             };
 
             var documentReference = collection.AddItem(newDoc);
             
-            var documentsCreated = new CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction.Add, documentReference, collection);
+            var documentsCreated = new CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction.Add, documentReference, collection)
+            {
+                PostAction = (optionsResult.Model.EditAfterCreate || optionsResult.Action is AddDocumentOptions.ACTION_OK_AND_EDIT) ? "edit" : null
+            };
 
-            return Task.FromResult(Result.Ok(documentsCreated));
+            return Result.Ok(documentsCreated);
+        }
+
+        private IModelHost ShowHostDialog(IScreen context)
+        {
+            var dialogHostIdentifier = GetDialogHostIdentifier(context);
+            return Show.Dialog(dialogHostIdentifier);
+        }
+
+        private string GetDialogHostIdentifier(IScreen context)
+        {
+            var dialogHostIdentifier = AppConstants.DialogHosts.Shell;
+            if (context is Wpf.Framework.Shell.IDocument document)
+            {
+                dialogHostIdentifier = document.DialogHostIdentifier;
+            }
+
+            return dialogHostIdentifier;
         }
     }
 }
