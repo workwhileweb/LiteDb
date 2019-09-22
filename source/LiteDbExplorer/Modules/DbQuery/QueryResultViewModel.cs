@@ -22,19 +22,15 @@ namespace LiteDbExplorer.Modules.DbQuery
         public QueryResultViewModel(IDatabaseInteractions databaseInteractions)
         {
             _databaseInteractions = databaseInteractions;
-
-
-            _stopwatch = new Stopwatch();
         }
 
-        public IDisposable StartQuery()
+        public IDisposable StartTime()
         {
             _stopwatch = Stopwatch.StartNew();
             return Disposable.Create(() =>
             {
-                _stopwatch.Stop();
+                _stopwatch?.Stop();
                 ElapsedTime = _stopwatch.Elapsed;
-                _stopwatch = null;
             });
         }
 

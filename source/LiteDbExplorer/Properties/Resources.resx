@@ -126,6 +126,9 @@
   <data name="SettingsPageGeneral" xml:space="preserve">
     <value>_General</value>
   </data>
+  <data name="SettingsPageIntegration" xml:space="preserve">
+    <value>_Integration</value>
+  </data>
   <data name="SettingsPageUpdate" xml:space="preserve">
     <value>_Update</value>
   </data>

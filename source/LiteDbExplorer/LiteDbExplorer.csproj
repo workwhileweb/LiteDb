@@ -269,6 +269,10 @@
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\StartPage\StartPageViewModel.cs" />
+    <Compile Include="Modules\WinInterop\FileAssociationSettingsView.xaml.cs">
+      <DependentUpon>FileAssociationSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\WinInterop\FileAssociationSettingsViewModel.cs" />
     <Compile Include="Presentation\Behaviors\BsonValueForeground.cs" />
     <Compile Include="Presentation\Behaviors\TabablzControlAssist.cs" />
     <Compile Include="Presentation\Converters\DateTimeHumanizeConverter.cs" />
@@ -412,6 +416,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Modules\StartPage\StartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\WinInterop\FileAssociationSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

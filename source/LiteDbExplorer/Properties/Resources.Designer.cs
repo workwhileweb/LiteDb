@@ -88,6 +88,15 @@ namespace LiteDbExplorer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Integration.
+        /// </summary>
+        public static string SettingsPageIntegration {
+            get {
+                return ResourceManager.GetString("SettingsPageIntegration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Update.
         /// </summary>
         public static string SettingsPageUpdate {

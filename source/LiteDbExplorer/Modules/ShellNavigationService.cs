@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Windows.Threading;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using LiteDbExplorer.Framework;

@@ -19,6 +19,7 @@ using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf;
+using LiteDbExplorer.Wpf.Framework.FileAssociation;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using LiteDbExplorer.Wpf.Modules.Settings;
 
@@ -42,7 +43,7 @@ namespace LiteDbExplorer
                     .Select(x => new AssemblyCatalog(x)).OfType<ComposablePartCatalog>()
             );
 
-            aggregateCatalog.Catalogs.Add(LiteDbExplorerWpfCatalog.AssemblyCatalog);
+            // aggregateCatalog.Catalogs.Add(LiteDbExplorerWpfCatalog.AssemblyCatalog);
 
             _container = new CompositionContainer(aggregateCatalog);
 
@@ -57,6 +58,7 @@ namespace LiteDbExplorer
             batch.AddExportedValue<IRecentFilesProvider>(new Paths());
             batch.AddExportedValue<IQueryHistoryProvider>(new QueryHistoryProvider());
             batch.AddExportedValue(NotificationInteraction.Manager);
+            
             batch.AddExportedValue(_container);
 
             _container.Compose(batch);

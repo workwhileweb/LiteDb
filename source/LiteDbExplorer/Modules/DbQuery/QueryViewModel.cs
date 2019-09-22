@@ -205,11 +205,10 @@ namespace LiteDbExplorer.Modules.DbQuery
                     var resultViewModel = IoC.Get<QueryResultViewModel>();
                     
                     IList<BsonValue> results;
-                    using (resultViewModel.StartQuery())
+                    using (resultViewModel.StartTime())
                     {
                         results = CurrentDatabase.LiteDatabase.Engine.Run(rawQuery);
                     }
-                    
                     resultViewModel.SetResult(
                         $"Result {resultCount}", 
                         rawQuery,
