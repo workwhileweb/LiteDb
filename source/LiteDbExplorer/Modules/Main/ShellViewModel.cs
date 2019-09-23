@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Caliburn.Micro;
@@ -41,7 +40,7 @@ namespace LiteDbExplorer.Modules.Main
 
             ToolPanelsContent = IoC.Get<IToolPanelSet>();
 
-            MainContent.ActiveDocumentChanged += MainContentOnActiveDocumentChanged;
+            MainContent.DocumentDeactivated += MainContentOnDocumentDeactivated;
 
             Properties.Settings.Default.PropertyChanged += OnSettingsPropertyChanged;
         }
@@ -134,10 +133,20 @@ namespace LiteDbExplorer.Modules.Main
             }
         }
 
-        private async void MainContentOnActiveDocumentChanged(object sender, EventArgs e)
+        private async void MainContentOnDocumentDeactivated(object sender, DocumentDeactivateEventArgs e)
         {
+            if (!e.Close)
+            {
+                return;
+            }
+
             if (!MainContent.Documents.Any() && Properties.Settings.Default.ShowStartOnCloseAll)
             {
+                if (e.Item is IStartupDocument)
+                {
+                    return;
+                }
+
                 await MainContent.OpenDocument<IStartupDocument>();
             }
         }

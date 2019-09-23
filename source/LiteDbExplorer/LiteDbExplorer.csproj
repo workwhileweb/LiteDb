@@ -81,6 +81,9 @@
     <Compile Include="Application\DataProtectionProvider.cs" />
     <Compile Include="Application\IRecentFilesProvider.cs" />
     <Compile Include="Application\RecentFileInfo.cs" />
+    <Compile Include="Controls\AppHeader.xaml.cs">
+      <DependentUpon>AppHeader.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Controls\AppPackIcon.cs" />
     <Compile Include="Controls\AutoUpdateTextBlock.cs" />
     <Compile Include="Controls\HighlightTextBlock.cs" />
@@ -295,6 +298,10 @@
     <Compile Include="Presentation\Windows\InputBoxWindow.xaml.cs">
       <DependentUpon>InputBoxWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\AppHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ArrayEntryControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

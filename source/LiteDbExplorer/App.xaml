@@ -16,24 +16,26 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary>
-                    <app:AppBootstrapper x:Key="bootstrapper"/>    
+                    <app:AppBootstrapper x:Key="bootstrapper" />
                 </ResourceDictionary>
 
-                <ResourceDictionary Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/Styles.xaml"/>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Extended.Wpf.Toolkit;component/Themes/ToolkitControls.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/Styles.xaml" />
+                <ResourceDictionary
+                    Source="pack://application:,,,/MaterialDesignThemes.Extended.Wpf.Toolkit;component/Themes/ToolkitControls.xaml" />
 
                 <!-- Local Styles -->
-                <ResourceDictionary Source="Themes/MaterialDesignTheme.Dragablz.xaml"/>
+                <ResourceDictionary Source="Themes/MaterialDesignTheme.Dragablz.xaml" />
                 <ResourceDictionary Source="Themes/Controls.Wpf.Notifications.xaml" />
                 <!--<ResourceDictionary Source="/Enterwell.Clients.Wpf.Notifications;component/Themes/Generic.xaml" />-->
                 <ResourceDictionary Source="pack://application:,,,/Forge.Forms;component/Themes/Material.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/MaterialDesignTheme.TreeViewFullRow.xaml"/>
+                <ResourceDictionary
+                    Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/MaterialDesignTheme.TreeViewFullRow.xaml" />
 
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 
-            <Style TargetType="{x:Type ScrollBar}" 
+            <Style TargetType="{x:Type ScrollBar}"
                    BasedOn="{StaticResource MaterialDesignScrollBarMinimal}">
                 <Setter Property="materialDesign:ScrollBarAssist.ThumbCornerRadius" Value="0" />
                 <Setter Property="materialDesign:ScrollBarAssist.ButtonsVisibility" Value="Collapsed" />
@@ -42,19 +44,19 @@
             </Style>
 
             <Style x:Key="{x:Type GridSplitter}" TargetType="GridSplitter">
-                <Setter Property="Background" Value="{DynamicResource ShellBackground}"/>
+                <Setter Property="Background" Value="{DynamicResource ShellBackground}" />
             </Style>
 
             <Style TargetType="avalonedit:TextEditor">
-                <Setter Property="Background" Value="{DynamicResource TextEditorBackground}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignPaper}"/>
+                <Setter Property="Background" Value="{DynamicResource TextEditorBackground}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignPaper}" />
             </Style>
 
             <Style TargetType="localControls:ExtendedTextEditor">
-                <Setter Property="Background" Value="{DynamicResource TextEditorBackground}"/>
-                <Setter Property="BorderThickness" Value="1"/>
-                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignPaper}"/>
+                <Setter Property="Background" Value="{DynamicResource TextEditorBackground}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignPaper}" />
             </Style>
 
             <Style TargetType="forge:DialogWindow"
@@ -68,8 +70,8 @@
 
             <DataTemplate DataType="{x:Type localControls:ViewContentProxy}">
                 <Grid>
-                    <ContentControl Content="{Binding Content}" 
-                                    Margin="{Binding Margin}"/>
+                    <ContentControl Content="{Binding Content}"
+                                    Margin="{Binding Margin}" />
                 </Grid>
             </DataTemplate>
 
@@ -89,17 +91,61 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type localControls:AppPackIcon}">
-                            <Border Background="{TemplateBinding Background}" 
+                            <Border Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}">
                                 <Viewbox FlowDirection="{TemplateBinding FlowDirection}">
                                     <Canvas Width="24" Height="24">
-                                        <Path Data="{Binding Data, RelativeSource={RelativeSource TemplatedParent}}"                                   
+                                        <Path Data="{Binding Data, RelativeSource={RelativeSource TemplatedParent}}"
                                               Fill="{TemplateBinding Foreground}" />
                                     </Canvas>
                                 </Viewbox>
                             </Border>
                         </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <DrawingImage x:Key="AppIconImage">
+                <DrawingImage.Drawing>
+                    <DrawingGroup ClipGeometry="M0,0 V230 H230 V0 H0 Z">
+                        <DrawingGroup Opacity="1">
+                            <DrawingGroup Opacity="1">
+                                <GeometryDrawing Brush="#FF424242"
+                                                 Geometry="F1 M230,230z M0,0z M155.325,49.97C171.931,50.802 188.012,53.869 203.058,61.275 206.807,63.121 210.304,65.387 213.369,68.237 217.699,72.263 220.042,77.028 220.018,83.206 219.879,119.507 219.799,155.809 220.065,192.109 220.125,200.306 216.953,206.168 210.64,210.78 200.453,218.223 188.745,221.954 176.552,224.164 148.945,229.167 121.563,228.687 94.673,219.828 87.355,217.417 80.467,214.093 74.606,208.971 69.869,204.831 67.368,199.824 67.424,193.244 67.671,164.111 67.635,134.976 67.7,105.841 70.167,102.941 72.635,100.041 74.988,97.276 92.568,106.988 109.242,106.89 126.038,98.851 126.558,100.022 127.638,99.873 128.602,99.884 136.422,99.977 144.253,100.346 152.06,100.058 168.319,99.458 184.18,96.811 198.784,89.097 202.255,87.264 205.882,85.393 207.208,81.352 206.548,78.629 204.613,77.252 202.73,75.916 197.516,72.216 191.637,69.911 185.598,67.959 175.399,64.663 164.826,63.457 154.24,62.322 155.314,58.268 155.241,54.112 155.325,49.97z M178.241,187.713C165.184,187.713 152.774,187.713 140.029,187.713 144.184,167.626 148.247,147.981 152.347,128.157 147.429,128.157 142.861,128.157 138.085,128.157 133.201,151.743 128.365,175.101 123.443,198.867 132.399,198.867 140.873,198.867 149.346,198.867 157.964,198.867 166.582,198.867 175.404,198.867 176.346,195.168 177.196,191.824 178.241,187.713z" />
+                                <GeometryDrawing Brush="#FF587EE5"
+                                                 Geometry="F1 M230,230z M0,0z M155.325,49.97C155.241,54.112 155.314,58.268 154.242,62.323 151.809,71.388 148.084,79.745 141.703,86.842 137.199,91.851 131.242,94.829 126.039,98.85 109.243,106.889 92.57,106.987 74.989,97.275 72.636,100.04 70.168,102.939 67.701,105.84 65.77,106.3 64.735,107.923 63.459,109.193 52.373,120.238 41.32,131.318 30.247,142.375 28.972,143.648 27.629,144.852 26.585,145.835 20.908,140.056 15.48,134.53 9.93300000000001,128.882 25.665,113.214 41.997,96.948 58.275,80.736 56.803,77.037 55.625,74.318 54.627,71.535 44.469,43.184 60.893,11.92 89.896,4.355 119.214,-3.292 148.6,15.505 153.867,45.318 154.156,46.957 154.228,48.609 155.325,49.97z M63.188,52.92C63.193,75.027 80.406,92.603 102.102,92.654 124.334,92.706 142.26,74.857 142.177,52.75 142.094,30.656 124.633,13.566 102.181,13.602 79.905,13.638 63.183,30.499 63.188,52.92z" />
+                                <GeometryDrawing Brush="#FFFDFEFE"
+                                                 Geometry="F1 M230,230z M0,0z M126.039,98.851C131.242,94.829 137.199,91.852 141.703,86.843 148.084,79.746 151.809,71.389 154.242,62.324 164.828,63.459 175.401,64.664 185.6,67.96 191.638,69.912 197.518,72.216 202.732,75.917 204.615,77.253 206.55,78.63 207.21,81.353 205.883,85.395 202.256,87.265 198.786,89.098 184.183,96.811 168.321,99.459 152.062,100.059 144.255,100.347 136.424,99.977 128.604,99.885 127.639,99.873 126.559,100.022 126.039,98.851z" />
+                                <GeometryDrawing Brush="#FFFDFEFE"
+                                                 Geometry="F1 M230,230z M0,0z M178.241,187.713C177.196,191.824 176.346,195.168 175.405,198.867 166.583,198.867 157.965,198.867 149.347,198.867 140.873,198.867 132.4,198.867 123.444,198.867 128.365,175.101 133.202,151.743 138.086,128.157 142.862,128.157 147.43,128.157 152.348,128.157 148.248,147.981 144.184,167.626 140.03,187.713 152.774,187.713 165.184,187.713 178.241,187.713z" />
+                                <GeometryDrawing Brush="#FFFDFEFE"
+                                                 Geometry="F1 M230,230z M0,0z M63.188,52.92C63.183,30.499 79.904,13.638 102.181,13.602 124.633,13.566 142.094,30.656 142.177,52.75 142.26,74.857 124.334,92.706 102.102,92.654 80.407,92.603 63.194,75.027 63.188,52.92z" />
+                            </DrawingGroup>
+                        </DrawingGroup>
+                    </DrawingGroup>
+                </DrawingImage.Drawing>
+            </DrawingImage>
+
+            <Style x:Key="ShellBackgroundImageStyle" TargetType="Image">
+                <Setter Property="Stretch" Value="Uniform"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Source">
+                    <Setter.Value>
+                        <DrawingImage>
+                            <DrawingImage.Drawing>
+                                <DrawingGroup ClipGeometry="M0,0 V230 H230 V0 H0 Z">
+                                    <DrawingGroup Opacity="1">
+                                        <DrawingGroup Opacity="1">
+                                            <GeometryDrawing Brush="{DynamicResource ShellBrandBackground}"
+                                                             Geometry="F1 M230,230z M0,0z M155.325,49.97C171.931,50.802 188.012,53.869 203.058,61.275 206.807,63.121 210.304,65.387 213.369,68.237 217.699,72.263 220.042,77.028 220.018,83.206 219.879,119.507 219.799,155.809 220.065,192.109 220.125,200.306 216.953,206.168 210.64,210.78 200.453,218.223 188.745,221.954 176.552,224.164 148.945,229.167 121.563,228.687 94.673,219.828 87.355,217.417 80.467,214.093 74.606,208.971 69.869,204.831 67.368,199.824 67.424,193.244 67.671,164.111 67.635,134.976 67.7,105.841 70.167,102.941 72.635,100.041 74.988,97.276 92.568,106.988 109.242,106.89 126.038,98.851 126.558,100.022 127.638,99.873 128.602,99.884 136.422,99.977 144.253,100.346 152.06,100.058 168.319,99.458 184.18,96.811 198.784,89.097 202.255,87.264 205.882,85.393 207.208,81.352 206.548,78.629 204.613,77.252 202.73,75.916 197.516,72.216 191.637,69.911 185.598,67.959 175.399,64.663 164.826,63.457 154.24,62.322 155.314,58.268 155.241,54.112 155.325,49.97z M178.241,187.713C165.184,187.713 152.774,187.713 140.029,187.713 144.184,167.626 148.247,147.981 152.347,128.157 147.429,128.157 142.861,128.157 138.085,128.157 133.201,151.743 128.365,175.101 123.443,198.867 132.399,198.867 140.873,198.867 149.346,198.867 157.964,198.867 166.582,198.867 175.404,198.867 176.346,195.168 177.196,191.824 178.241,187.713z" />
+                                            <GeometryDrawing Brush="{DynamicResource ShellBrandBackground}"
+                                                             Geometry="F1 M230,230z M0,0z M155.325,49.97C155.241,54.112 155.314,58.268 154.242,62.323 151.809,71.388 148.084,79.745 141.703,86.842 137.199,91.851 131.242,94.829 126.039,98.85 109.243,106.889 92.57,106.987 74.989,97.275 72.636,100.04 70.168,102.939 67.701,105.84 65.77,106.3 64.735,107.923 63.459,109.193 52.373,120.238 41.32,131.318 30.247,142.375 28.972,143.648 27.629,144.852 26.585,145.835 20.908,140.056 15.48,134.53 9.93300000000001,128.882 25.665,113.214 41.997,96.948 58.275,80.736 56.803,77.037 55.625,74.318 54.627,71.535 44.469,43.184 60.893,11.92 89.896,4.355 119.214,-3.292 148.6,15.505 153.867,45.318 154.156,46.957 154.228,48.609 155.325,49.97z M63.188,52.92C63.193,75.027 80.406,92.603 102.102,92.654 124.334,92.706 142.26,74.857 142.177,52.75 142.094,30.656 124.633,13.566 102.181,13.602 79.905,13.638 63.183,30.499 63.188,52.92z" />
+                                        </DrawingGroup>
+                                    </DrawingGroup>
+                                </DrawingGroup>
+                            </DrawingImage.Drawing>
+                        </DrawingImage>
                     </Setter.Value>
                 </Setter>
             </Style>

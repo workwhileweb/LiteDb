@@ -9,6 +9,7 @@
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
+             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              mc:Ignorable="d"
              d:DesignHeight="650" d:DesignWidth="800"
              Background="{DynamicResource TabActiveBackground}"
@@ -41,19 +42,7 @@
             <ColumnDefinition Width="Auto" MinWidth="50" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="1"
-                    Orientation="Horizontal" Margin="8,50,0,25">
-            <Image Source="/Images/icon.png" Height="42" Stretch="Uniform"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="4,0,4,0" />
-            <TextBlock FontWeight="Light" FontSize="34"
-                       Text="LiteDB Explorer" Margin="0,8,8,0" />
-            <Border Margin="8,7" Padding="8,3" CornerRadius="3" VerticalAlignment="Bottom"
-                    Background="{DynamicResource AccentColorBrush}">
-                <TextBlock FontWeight="Normal" 
-                           Text="Preview" Foreground="White" 
-                           Style="{StaticResource MaterialDesignCaptionTextBlock}"/>
-            </Border>
-        </StackPanel>
+        <controls:AppHeader Grid.Row="0" Grid.Column="1" Margin="2,50,0,25"/>
 
         <Grid Grid.Row="1" Grid.Column="1">
 

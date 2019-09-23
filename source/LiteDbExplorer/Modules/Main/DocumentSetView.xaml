@@ -10,12 +10,14 @@
     xmlns:behaviors="clr-namespace:LiteDbExplorer.Presentation.Behaviors"
     xmlns:appBehaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
     xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
+    xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
     x:Class="LiteDbExplorer.Modules.Main.DocumentSetView"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800"
     appBehaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:RoutedCommandToInputGestureTextConverter x:Key="RoutedCommandToInputGestureTextConverter"/>
 
         <DataTemplate x:Key="TabHeaderDataTemplate">
             <Grid Margin="8,0">
@@ -71,10 +73,11 @@
                                        Style="{StaticResource MaterialDesignSubheadingTextBlock}"
                                        VerticalAlignment="Center"
                                        FontSize="14" />
-                            <TextBlock Visibility="{Binding GroupDisplayNameIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
-                                       Text="{Binding GroupDisplayName}"
-                                       Style="{StaticResource MaterialDesignSubheadingTextBlock}"
-                                       FontSize="14" Opacity="0.8"/>
+                            <TextBlock
+                                Visibility="{Binding GroupDisplayNameIsVisible, Converter={StaticResource BooleanToVisibilityConverter}}"
+                                Text="{Binding GroupDisplayName}"
+                                Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                FontSize="14" Opacity="0.8" />
                         </StackPanel>
                     </ToolTip>
                 </Setter.Value>
@@ -95,7 +98,7 @@
             <Setter Property="ContentTemplate">
                 <Setter.Value>
                     <DataTemplate>
-                        <materialDesign:DialogHost Identifier="{Binding DialogHostIdentifier}" 
+                        <materialDesign:DialogHost Identifier="{Binding DialogHostIdentifier}"
                                                    Style="{StaticResource MaterialDesignEmbeddedDialogHost}"
                                                    DialogTheme="Inherit">
                             <ContentControl cal:View.Model="{Binding}" />
@@ -103,14 +106,45 @@
                     </DataTemplate>
                 </Setter.Value>
             </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsEmpty" Value="True">
+                    <Setter Property="Background" Value="Transparent" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
-    <DockPanel>
+    <Grid>
+        <Grid Background="{DynamicResource ShellEmptyBackground}"
+                Visibility="{Binding Path=IsEmpty, ElementName=TabablzControl, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="1*" MinHeight="260"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            
+            <Image VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                   Height="250" Margin="-60,0,0,0"
+                   Style="{StaticResource ShellBackgroundImageStyle}"/>
+
+            <StackPanel Grid.Row="1" Margin="15,40,15,15" Opacity="0.5">
+                <StackPanel.Resources>
+                    <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubheadingTextBlock}">
+                        <Setter Property="VerticalAlignment" Value="Center"/>
+                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                        <Setter Property="Margin" Value="0,10"/>
+                    </Style>
+                </StackPanel.Resources>
+                <TextBlock Text="{Binding Path=., Source={x:Static ApplicationCommands.New}, Converter={StaticResource RoutedCommandToInputGestureTextConverter}}"/>
+                <TextBlock Text="{Binding Path=., Source={x:Static ApplicationCommands.Open}, Converter={StaticResource RoutedCommandToInputGestureTextConverter}}"/>
+                <TextBlock Text="{Binding Path=., Source={x:Static liteDbExplorer:Commands.ShowNavigationPanel}, Converter={StaticResource RoutedCommandToInputGestureTextConverter}}"/>
+                <TextBlock Text="Drop files here to open"/>
+            </StackPanel>
+        </Grid>
+
         <dragablz:TabablzControl x:Name="TabablzControl"
                                  Padding="0" Margin="0"
                                  Style="{StaticResource DocSetTabablzControlStyle}"
                                  ItemsSource="{Binding Items, Mode=OneWay}"
                                  SelectedItem="{Binding ActiveLayoutItem}"
-                                 behaviors:TabablzControlAssist.CloseItemCommand="{Binding CloseDocumentCommand}"/>
-    </DockPanel>
+                                 behaviors:TabablzControlAssist.CloseItemCommand="{Binding CloseDocumentCommand}" />
+    </Grid>
 </UserControl>

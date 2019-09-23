@@ -19,7 +19,6 @@ using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf;
-using LiteDbExplorer.Wpf.Framework.FileAssociation;
 using LiteDbExplorer.Wpf.Framework.Shell;
 using LiteDbExplorer.Wpf.Modules.Settings;
 
@@ -117,6 +116,7 @@ namespace LiteDbExplorer
                 .ForEach(binding =>
                 {
                     CommandManager.RegisterClassCommandBinding(typeof(Window), binding);
+                    CommandManager.InvalidateRequerySuggested();
                 });
         }
 

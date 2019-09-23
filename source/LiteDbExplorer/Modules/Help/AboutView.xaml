@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LiteDbExplorer.Modules.Help"
              xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="765" d:DesignWidth="570">
     <UserControl.Resources>
@@ -24,19 +25,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <StackPanel Grid.Row="0" 
-                    Orientation="Horizontal" Margin="0,0,0,15">
-            <Image Source="/Images/icon.png" Height="42" Stretch="Uniform"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="4,0,4,0" />
-            <TextBlock FontWeight="Light" FontSize="34"
-                       Text="LiteDB Explorer" Margin="0,8,8,0" />
-            <Border Margin="8,7" Padding="8,3" CornerRadius="3" VerticalAlignment="Bottom"
-                    Background="{DynamicResource AccentColorBrush}">
-                <TextBlock FontWeight="Normal" 
-                           Text="Preview" Foreground="White" 
-                           Style="{StaticResource MaterialDesignCaptionTextBlock}"/>
-            </Border>
-        </StackPanel>
+        <controls:AppHeader Grid.Row="0" Margin="0,0,0,15"/>
 
         <StackPanel Grid.Row="1" Margin="4,8">
             <StackPanel.Resources>
@@ -48,9 +37,10 @@
             <TextBlock>
                 <Run Text="Version: " FontWeight="Bold"/>
                 <Run Text="{Binding CurrentVersion, Mode=OneWay}"/>
+                <Run Text=" " />
+                <Run Text="{Binding VersionUpdateMessage, Mode=OneWay}" Foreground="#7F7F7F"/>
             </TextBlock>
-            <TextBlock Text="{Binding VersionUpdateMessage, Mode=OneWay}" Opacity="0.7"/>
-
+            
             <TextBlock>
                 <Run Text="Location: " FontWeight="Bold"/>
                 <Run Text="{Binding DirectoryLocation, Mode=OneWay}"/>

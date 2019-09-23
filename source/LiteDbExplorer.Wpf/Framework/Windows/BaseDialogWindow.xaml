@@ -11,7 +11,8 @@
         UseLayoutRounding="True">
     <mah:MetroWindow.IconTemplate>
         <DataTemplate>
-            <Image Source="/Images/icon.png" Height="21" Stretch="Uniform"
+            <Image Source="{StaticResource AppIconImage}" 
+                   Height="21" Stretch="Uniform"
                    RenderOptions.BitmapScalingMode="HighQuality" />
         </DataTemplate>
     </mah:MetroWindow.IconTemplate>

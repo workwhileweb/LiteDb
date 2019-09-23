@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     
     <SolidColorBrush x:Key="ShellBackground" Color="#252526" />
+    <SolidColorBrush x:Key="ShellEmptyBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="ShellBrandBackground" Color="#151515" />
     <SolidColorBrush x:Key="NavBackground" Color="#252526"/>
     <SolidColorBrush x:Key="SectionBackground" Color="#383838"/>
 

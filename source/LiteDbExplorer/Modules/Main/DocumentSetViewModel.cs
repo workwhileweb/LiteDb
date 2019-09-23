@@ -188,9 +188,10 @@ namespace LiteDbExplorer.Modules.Main
             base.DeactivateItem(item, close);
 
             InvalidateDisplayGroup();
-            
-            RaiseActiveDocumentChanged();
 
+            OnDocumentDeactivated(item, close);
+
+            RaiseActiveDocumentChanged();
         }
         
         protected override void OnActivationProcessed(IDocument item, bool success)
@@ -249,7 +250,16 @@ namespace LiteDbExplorer.Modules.Main
             handler?.Invoke(this, EventArgs.Empty);
         }
 
+        protected virtual void OnDocumentDeactivated(IDocument item, bool deactivate)
+        {
+            DocumentDeactivated?.Invoke(this, new DocumentDeactivateEventArgs(item, deactivate));
+        }
+
         public event EventHandler ActiveDocumentChanging;
         public event EventHandler ActiveDocumentChanged;
+        public event EventHandler<DocumentDeactivateEventArgs> DocumentDeactivated;
     }
+
+    
+
 }
