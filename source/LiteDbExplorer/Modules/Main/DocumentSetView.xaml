@@ -11,14 +11,19 @@
     xmlns:appBehaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
     xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
     xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
+    xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:coreWpf="clr-namespace:LiteDbExplorer.Wpf.Framework.Shell;assembly=LiteDbExplorer.Wpf"
+    xmlns:framework="clr-namespace:LiteDbExplorer.Framework;assembly=LiteDbExplorer.Wpf"
+    xmlns:main="clr-namespace:LiteDbExplorer.Modules.Main"
     x:Class="LiteDbExplorer.Modules.Main.DocumentSetView"
     mc:Ignorable="d"
     d:DesignHeight="450" d:DesignWidth="800"
     appBehaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">
     <UserControl.Resources>
+        <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}" />
         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:RoutedCommandToInputGestureTextConverter x:Key="RoutedCommandToInputGestureTextConverter"/>
-
+        
         <DataTemplate x:Key="TabHeaderDataTemplate">
             <Grid Margin="8,0">
                 <Grid.Resources>
@@ -63,6 +68,7 @@
         <Style x:Key="DocSetTabItemStyle"
                TargetType="{x:Type dragablz:DragablzItem}"
                BasedOn="{StaticResource MaterialDesignDragableTabItemStyle}">
+            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
             <Setter Property="themes:MaterialDesignAssist.IndicatorBrush"
                     Value="{Binding Path=GroupDisplayBackground, FallbackValue={StaticResource MaterialDesignToolBarBackground}}" />
             <Setter Property="ToolTip">
@@ -92,7 +98,6 @@
             <Setter Property="BorderThickness" Value="0" />
             <Setter Property="ShowDefaultCloseButton" Value="True" />
             <Setter Property="ShowDefaultAddButton" Value="False" />
-            <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
             <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}" />
             <Setter Property="BorderBrush" Value="Transparent" />
             <Setter Property="ContentTemplate">
@@ -104,6 +109,90 @@
                             <ContentControl cal:View.Model="{Binding}" />
                         </materialDesign:DialogHost>
                     </DataTemplate>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="HeaderSuffixContent">
+                <Setter.Value>
+                    <Grid>
+                        <StackPanel Margin="8,2,0,2" HorizontalAlignment="Right">
+                            <Button
+                                Style="{StaticResource MaterialDesignToolForegroundButton}"
+                                Width="40"
+                                Height="40"
+                                Padding="2,0"
+                                Opacity="1"
+                                materialDesign:RippleAssist.IsCentered="True"
+                                ToolTip="More Actions...">
+                                <materialDesign:PackIcon Kind="EllipsisHorizontal" />
+                                <i:Interaction.Behaviors>
+                                    <appBehaviors:ButtonClickOpenMenuBehavior PlacementMode="Left"/>
+                                </i:Interaction.Behaviors>
+                                <Button.ContextMenu>
+                                    <ContextMenu MinWidth="250" HorizontalContentAlignment="Stretch">
+                                        <ContextMenu.Resources>
+                                            <CollectionViewSource Source="{Binding Path=Items}" x:Key="DocumentsMenuItems"/>
+                                            <Style TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
+                                                <Setter Property="UsesItemContainerTemplate" Value="True"/>
+                                                <Setter Property="ItemContainerTemplateSelector">
+                                                    <Setter.Value>
+                                                        <main:DocumentMenuItemContainerTemplateSelector>
+                                                            <main:DocumentMenuItemContainerTemplateSelector.DocumentsMenuHeaderTemplate>
+                                                                <DataTemplate>
+                                                                    <MenuItem cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}"
+                                                                              cal:Message.Attach="OpenDocument($dataContext)"
+                                                                              HorizontalContentAlignment="Stretch">
+                                                                        <MenuItem.Header>
+                                                                            <StackPanel Orientation="Horizontal" MinWidth="200">
+                                                                                <TextBlock Text="{Binding DisplayName}"
+                                                                                           MaxWidth="200"
+                                                                                           TextTrimming="CharacterEllipsis"
+                                                                                           VerticalAlignment="Center"/>
+                                                                                <TextBlock Margin="8,0,0,0" Opacity="0.7"
+                                                                                           MaxWidth="200"
+                                                                                           Text="{Binding GroupDisplayName}"
+                                                                                           Style="{StaticResource MaterialDesignSubheadingTextBlock}"
+                                                                                           Foreground="{Binding GroupDisplayBackground}"
+                                                                                           TextTrimming="CharacterEllipsis"
+                                                                                           VerticalAlignment="Center"
+                                                                                           FontSize="14"/>
+                                                                            </StackPanel>
+                                                                        </MenuItem.Header>
+                                                                        <MenuItem.Icon>
+                                                                            <StackPanel Orientation="Horizontal">
+                                                                                <Border Margin="-14,0,6,0" Background="{DynamicResource MaterialDesignBody}" 
+                                                                                        VerticalAlignment="Stretch" Width="5" Height="5" CornerRadius="5"
+                                                                                        Visibility="{Binding IsSelected, Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                                                                                <ContentControl Content="{Binding IconContent}"
+                                                                                                VerticalContentAlignment="Center"
+                                                                                                HorizontalContentAlignment="Center"
+                                                                                                MaxHeight="40" MaxWidth="40"
+                                                                                                Margin="0" />
+                                                                            </StackPanel>
+                                                                        </MenuItem.Icon>
+                                                                    </MenuItem>
+                                                                </DataTemplate>
+                                                            </main:DocumentMenuItemContainerTemplateSelector.DocumentsMenuHeaderTemplate>
+                                                        </main:DocumentMenuItemContainerTemplateSelector>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </ContextMenu.Resources>
+                                        <ContextMenu.ItemsSource>
+                                            <CompositeCollection>
+                                                <CollectionContainer Collection="{Binding Source={StaticResource DocumentsMenuItems}}" />
+                                                <Separator />
+                                                <MenuItem Header="Close All" cal:Message.Attach="CloseAllDocuments()">
+                                                    <MenuItem.Icon>
+                                                        <materialDesign:PackIcon Kind="CloseBoxMultipleOutline" />
+                                                    </MenuItem.Icon>
+                                                </MenuItem>
+                                            </CompositeCollection>
+                                        </ContextMenu.ItemsSource>
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
                 </Setter.Value>
             </Setter>
             <Style.Triggers>

@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
 using Caliburn.Micro;
+using JetBrains.Annotations;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Presentation;
@@ -41,7 +42,7 @@ namespace LiteDbExplorer.Modules.Main
         public Guid Id { get; } = Guid.NewGuid();
 
         public string ContentId => Id.ToString();
-
+        
         public ICommand CloseDocumentCommand { get; }
         
         public IObservableCollection<IDocument> Documents => Items;
@@ -139,6 +140,32 @@ namespace LiteDbExplorer.Modules.Main
         public void CloseDocument(IDocument document)
         {
             DeactivateItem(document, true);
+        }
+
+        [UsedImplicitly]
+        public void CloseAllDocuments()
+        {
+            if (Items == null)
+            {
+                return;
+            }
+
+            foreach (var document in Items.ToList())
+            {
+                CloseDocument(document);
+            }
+        }
+
+        [UsedImplicitly]
+        public bool CanCloseAllDocuments => Items != null && Items.Any();
+
+        [UsedImplicitly]
+        public bool IsEmpty => Items == null || !Items.Any();
+
+        [UsedImplicitly]
+        public async Task OpenStartupDocument()
+        {
+            await OpenDocument<IStartupDocument>();
         }
 
         public override void ActivateItem(IDocument item)

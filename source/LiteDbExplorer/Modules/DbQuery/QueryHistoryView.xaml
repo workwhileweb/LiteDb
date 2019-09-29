@@ -75,11 +75,6 @@
                                            Style="{StaticResource MaterialDesignCaptionTextBlock}" />
                             </StackPanel>
 
-
-                            <!--<controls:PathTrimmingTextBlock Grid.Row="1" Grid.Column="0" 
-                                       Margin="20,2,0,0" Opacity="0.67" FontSize="10"
-                                       Path="{Binding DatabaseLocation}" 
-                                       TextBlockStyle="{StaticResource MaterialDesignCaptionTextBlock}"/>-->
                             <TextBlock Grid.Row="1" Grid.Column="0" 
                                        Margin="20,2,0,0" Opacity="0.67" FontSize="10"
                                        Text="{Binding Name}" 
