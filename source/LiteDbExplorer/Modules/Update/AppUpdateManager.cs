@@ -15,7 +15,9 @@ using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework;
 using Onova;
 using Onova.Services;
+using Serilog;
 using Action = System.Action;
+using Log = OfficeOpenXml.FormulaParsing.Excel.Functions.Math.Log;
 
 namespace LiteDbExplorer.Modules
 {
@@ -29,6 +31,8 @@ namespace LiteDbExplorer.Modules
             new Lazy<AppUpdateManager>(() => new AppUpdateManager());
 
         public static AppUpdateManager Current => _instance.Value;
+
+        private static readonly ILogger Logger = Serilog.Log.ForContext<AppUpdateManager>();
 
         public AppUpdateManager()
         {
@@ -79,6 +83,8 @@ namespace LiteDbExplorer.Modules
         
         public async Task CheckForUpdates(bool userInitiated)
         {
+            Logger.Information("Start check for updates.");
+
             if (!userInitiated && !Properties.Settings.Default.UpdateManager_CheckUpdateOnStartup)
             {
                 return;
@@ -109,6 +115,8 @@ namespace LiteDbExplorer.Modules
 
                 Properties.Settings.Default.Save();
 
+                Logger.Information("Check for updates: {canUpdate}, {lastVersion}.", result.CanUpdate, result.LastVersion);
+
                 if (result.CanUpdate)
                 {
                     HasUpdate = true;
@@ -128,7 +136,7 @@ namespace LiteDbExplorer.Modules
             }
             catch (Exception exception)
             {
-                Console.WriteLine(exception);
+                Logger.Error(exception, "Error on check for updates.");
                 if (userInitiated)
                 {
                     NotificationInteraction.Alert("Unable to check for updates.", UINotificationType.Error);
@@ -226,7 +234,7 @@ namespace LiteDbExplorer.Modules
 
         private void ShowUpdateNotification()
         {
-            Dispatcher.BeginInvoke((Action) (() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 if (_downloadNotification != null)
                 {
@@ -248,7 +256,7 @@ namespace LiteDbExplorer.Modules
                     .Dismiss().WithButton("Later", button => { })
                     .Queue();
                 
-            }), DispatcherPriority.Normal);
+            }, DispatcherPriority.Normal);
 
         }
 
@@ -256,7 +264,7 @@ namespace LiteDbExplorer.Modules
 
         private void ShowDownloadNotification()
         {
-            Dispatcher.BeginInvoke((Action) (() =>
+            Application.Current.Dispatcher.Invoke(() =>
             {
                 if (_updateNotificationMessage != null)
                 {
@@ -283,7 +291,7 @@ namespace LiteDbExplorer.Modules
                     .WithOverlay(progressBar)
                     .Queue();
 
-            }), DispatcherPriority.Normal);
+            }, DispatcherPriority.Normal);
         }
         
         public event PropertyChangedEventHandler PropertyChanged;

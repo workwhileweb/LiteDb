@@ -1,10 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Composition;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
-using Caliburn.Micro;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Services;
+using LiteDbExplorer.Modules.Main;
 using Serilog;
 
 namespace LiteDbExplorer.Modules
@@ -34,14 +35,14 @@ namespace LiteDbExplorer.Modules
                 }
             });
 
-            Add(ApplicationCommands.Open, async (sender, args) =>
-            {
-                await _databaseInteractions.OpenDatabase();
-            });
-
             Add(ApplicationCommands.New, async (sender, args) =>
             {
                 await _databaseInteractions.CreateAndOpenDatabase();
+            });
+
+            Add(ApplicationCommands.Open, async (sender, args) =>
+            {
+                await _databaseInteractions.OpenDatabase();
             });
 
             Add(Commands.FileDropped, async (sender, args) =>
@@ -62,6 +63,35 @@ namespace LiteDbExplorer.Modules
                 {
                     _applicationInteraction.ShowError("Failed to open database: " + exc.Message, "Database Error");
                 }
+            });
+
+            Add(Commands.Import, (sender, args) =>
+            {
+                _applicationInteraction.ShowImportWizard();
+            }, (sender, args) =>
+            {
+                var hasDatabaseOpen = Store.Current.Databases.Any();
+                args.CanExecute = hasDatabaseOpen;
+            });
+
+            Add(Commands.ShowNavigationPanel, (sender, args) =>
+            {
+                var isVisible = !ShellLayoutController.Current.LeftContentIsVisible;
+                if (args.Parameter is bool isVisibleParam)
+                {
+                    isVisible = isVisibleParam;
+                }
+                ShellLayoutController.Current.LeftContentIsVisible = isVisible;
+            });
+
+            Add(Commands.ShowToolsPanel, (sender, args) =>
+            {
+                var isVisible = !ShellLayoutController.Current.ToolsPanelIsVisible;
+                if (args.Parameter is bool isVisibleParam)
+                {
+                    isVisible = isVisibleParam;
+                }
+                ShellLayoutController.Current.ToolsPanelIsVisible = isVisible;
             });
         }
 

@@ -38,7 +38,9 @@ namespace LiteDbExplorer.Modules.StartPage
         
         public override string DisplayName => "Start";
 
-        public override object IconContent => IconProvider.GetImageIcon("/Images/icon.png", new ImageIconOptions{Height = 16});
+        public override string InstanceId => "StartPage";
+
+        public override object IconContent => IconProvider.GetResourceDrawingImageIcon("AppIconImage", new ImageIconOptions{Height = 16});
 
         public IRecentFilesProvider PathDefinitions { get; }
         

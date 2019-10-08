@@ -27,6 +27,16 @@
                 <Setter Property="Background" Value="White"/>
             </Style>
 
+            <Style TargetType="{x:Type TextBoxBase}" BasedOn="{StaticResource {x:Type TextBoxBase}}">
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="Background" Value="White"/>
+            </Style>
+
+            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                <Setter Property="Foreground" Value="Black"/>
+                <Setter Property="Background" Value="White"/>
+            </Style>
+
             <Style x:Key="PagesTreeViewItemStyle" TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
                 <Setter Property="IsExpanded" Value="True" />
             </Style>

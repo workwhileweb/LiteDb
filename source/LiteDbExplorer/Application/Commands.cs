@@ -48,44 +48,86 @@ namespace LiteDbExplorer
             }
         );
 
+        public static readonly RoutedUICommand Export = new RoutedUICommand
+        (
+            "Export...",
+            nameof(Export),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.E, ModifierKeys.Control)
+            }
+        );
+
+        public static readonly RoutedUICommand Import = new RoutedUICommand
+        (
+            "Import...",
+            nameof(Import),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.I, ModifierKeys.Control)
+            }
+        );
+
         public static readonly RoutedUICommand DropCollection = new RoutedUICommand
         (
             "Drop Collection",
             nameof(DropCollection),
-            typeof(Commands)
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.Delete, ModifierKeys.Shift)
+            }
         );
 
         public static readonly RoutedUICommand AddCollection = new RoutedUICommand
         (
             "Add Collection...",
             nameof(AddCollection),
-            typeof(Commands)
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.Insert, ModifierKeys.Shift)
+            }
         );
 
         public static readonly RoutedUICommand RenameCollection = new RoutedUICommand
         (
             "Rename Collection...",
             nameof(RenameCollection),
-            typeof(Commands)
-        );
-
-        public static readonly RoutedUICommand Export = new RoutedUICommand
-        (
-            "Export as...",
-            nameof(Export),
-            typeof(Commands)
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.R, ModifierKeys.Shift | ModifierKeys.Control)
+            }
         );
 
         public static readonly RoutedUICommand ExportCollection = new RoutedUICommand
         (
-            "Export as...",
+            "Export Collection...",
             nameof(ExportCollection),
-            typeof(Commands)
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.E, ModifierKeys.Shift | ModifierKeys.Control)
+            }
+        );
+
+        public static readonly RoutedUICommand RefreshCollection = new RoutedUICommand
+        (
+            "Refresh Collection",
+            nameof(RefreshCollection),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.F5)
+            }
         );
 
         public static readonly RoutedUICommand EditDbProperties = new RoutedUICommand
         (
-            "Database properties...",
+            "Database Properties...",
             "EditDb",
             typeof(Commands)
         );
@@ -99,21 +141,10 @@ namespace LiteDbExplorer
 
         public static readonly RoutedUICommand SaveCopyAs = new RoutedUICommand
         (
-            "Save copy as...",
+            "Save Copy As...",
             nameof(SaveCopyAs),
             typeof(Commands)
         );
-
-        /*public static readonly RoutedUICommand Find = new RoutedUICommand
-        (
-            "Find...",
-            nameof(Find),
-            typeof(Commands),
-            new InputGestureCollection
-            {
-                new KeyGesture(Key.F, ModifierKeys.Control)
-            }
-        );*/
 
         public static readonly RoutedUICommand FindNext = new RoutedUICommand
         (
@@ -137,17 +168,6 @@ namespace LiteDbExplorer
             }
         );
         
-        public static readonly RoutedUICommand RefreshCollection = new RoutedUICommand
-        (
-            "Refresh Collection",
-            nameof(RefreshCollection),
-            typeof(Commands),
-            new InputGestureCollection
-            {
-                new KeyGesture(Key.F5)
-            }
-        );
-
         public static readonly RoutedUICommand RefreshDatabase = new RoutedUICommand
         (
             "Refresh Database",
@@ -187,6 +207,28 @@ namespace LiteDbExplorer
             new InputGestureCollection
             {
                 new KeyGesture(Key.F5, ModifierKeys.Shift)
+            }
+        );
+
+        public static readonly RoutedUICommand ShowNavigationPanel = new RoutedUICommand
+        (
+            "Show Navigation",
+            nameof(ShowNavigationPanel),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.B, ModifierKeys.Control)
+            }
+        );
+
+        public static readonly RoutedUICommand ShowToolsPanel = new RoutedUICommand
+        (
+            "Show Output",
+            nameof(ShowToolsPanel),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                new KeyGesture(Key.O, ModifierKeys.Control | ModifierKeys.Alt)
             }
         );
     }

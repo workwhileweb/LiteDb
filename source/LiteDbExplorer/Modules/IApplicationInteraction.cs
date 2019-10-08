@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CSharpFunctionalExtensions;
-using LiteDB;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Modules.DbQuery;
+using LiteDbExplorer.Modules.Shared;
 
 namespace LiteDbExplorer.Modules
 {
@@ -31,5 +31,7 @@ namespace LiteDbExplorer.Modules
         Task<Maybe<string>> ShowInputDialog(string message, string caption = "", string predefined = "", Func<string, Result> validationFunc = null);
         Task<bool> OpenFileWithAssociatedApplication(string filePath);
         void ShowAlert(string message, string title = null, UINotificationType type = UINotificationType.None);
+        bool ShowImportWizard(ImportDataOptions options = null);
+        Task<Maybe<PasswordInput>> ShowPasswordInputDialog(string message, string caption = "", string predefined = "", bool rememberMe = false);
     }
 }

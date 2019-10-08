@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace LiteDbExplorer
     /// </summary>
     public partial class App : Application
     {
-        private readonly string _instanceMuxet = "LiteDBExplorerInstaceMutex";
+        private readonly string _instanceMutex = @"LiteDBExplorerInstanceMutex";
         private Mutex _appMutex;
         private bool _errorNotified;
 
@@ -33,6 +34,10 @@ namespace LiteDbExplorer
         {
             Config.ConfigureLogger();
 
+            var appCultureInfo = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.CurrentCulture = appCultureInfo;
+            Thread.CurrentThread.CurrentUICulture = appCultureInfo;
+
             AppDomain.CurrentDomain.UnhandledException += OnCurrentDomainUnhandledException;
             DispatcherUnhandledException += OnDispatcherUnhandledException;
         }
@@ -41,11 +46,11 @@ namespace LiteDbExplorer
         {
             if (e.Args?.Any() == true)
             {
-                Properties["ArbitraryArgName"] = e.Args[0];
+                Properties[@"ArbitraryArgName"] = e.Args[0];
             }
 
             // For now we want to allow multiple instances if app is started without args
-            if (Mutex.TryOpenExisting(_instanceMuxet, out var mutex))
+            if (Mutex.TryOpenExisting(_instanceMutex, out var mutex))
             {
                 var client = new PipeClient(Config.PipeEndpoint);
 
@@ -58,11 +63,11 @@ namespace LiteDbExplorer
             }
             else
             {
-                _appMutex = new Mutex(true, _instanceMuxet);
+                _appMutex = new Mutex(true, _instanceMutex);
                 OriginalInstance = true;
             }
 
-            if (Resources["bootstrapper"] == null)
+            if (Resources[@"bootstrapper"] == null)
             {
                 StartupUri = new System.Uri(@"Windows\MainWindow.xaml", System.UriKind.Relative);
             }
@@ -117,7 +122,7 @@ namespace LiteDbExplorer
                 Title = "Open database",
                 Description = "Open LiteDB v4 database file",
                 ApplicationPath = applicationPath,
-                Arguments = "open"
+                Arguments = @"open"
             };
             jumpList.JumpItems.Add(openDatabaseTask);
 
@@ -126,7 +131,7 @@ namespace LiteDbExplorer
                 Title = "New database",
                 Description = "Create and open new LiteDB v4 database",
                 ApplicationPath = applicationPath,
-                Arguments = "new"
+                Arguments = @"new"
             };
             jumpList.JumpItems.Add(newDatabaseTask);
 

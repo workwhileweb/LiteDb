@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -7,7 +8,7 @@ namespace LiteDbExplorer.Presentation
 {
     public static class IconProvider
     {
-        public static Image GetImageIcon(string urlString, ImageIconOptions options = null)
+        public static Image GetBitmapImageIcon(string urlString, ImageIconOptions options = null)
         {
             if (options == null)
             {
@@ -35,6 +36,33 @@ namespace LiteDbExplorer.Presentation
             return image;
         }
 
+        public static Image GetResourceDrawingImageIcon(string resourceKey, ImageIconOptions options = null)
+        {
+            if (options == null)
+            {
+                options = new ImageIconOptions();
+            }
+
+            var image = new Image
+            {
+                Source = Application.Current.FindResource(resourceKey) as DrawingImage,
+                Stretch = options.Stretch,
+            };
+
+            if (options.Height.HasValue)
+            {
+                image.Height = options.Height.Value;
+            }
+
+            if (options.Width.HasValue)
+            {
+                image.Width = options.Width.Value;
+            }
+
+            RenderOptions.SetBitmapScalingMode(image, options.BitmapScalingMode);
+
+            return image;
+        }
     }
 
     public class ImageIconOptions

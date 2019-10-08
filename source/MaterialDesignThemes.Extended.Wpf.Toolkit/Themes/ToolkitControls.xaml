@@ -1,0 +1,18 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Controls/Button.xaml" />
+        <ResourceDictionary Source="Controls/ButtonChrome.xaml" />
+        <ResourceDictionary Source="Controls/ButtonSpinner.xaml" />
+        <ResourceDictionary Source="Controls/ToolkitTextBox.xaml" />
+        <ResourceDictionary Source="Controls/NumericUpDown.xaml" />
+        <ResourceDictionary Source="Controls/TimePicker.xaml" />
+        <ResourceDictionary Source="Controls/TimeSpanUpDown.xaml" />
+        <ResourceDictionary Source="Controls/DateTimePicker.xaml" />
+        <ResourceDictionary Source="Controls/DropDownButton.xaml" />
+        <ResourceDictionary Source="Controls/SplitButton.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    
+
+</ResourceDictionary>

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace LiteDbExplorer.Core
 {
@@ -30,14 +31,18 @@ namespace LiteDbExplorer.Core
         public CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction action, IReadOnlyCollection<DocumentReference> items, CollectionReference collectionReference) : base(action, items)
         {
             CollectionReference = collectionReference;
+            DocumentReference = collectionReference.Items.LastOrDefault();
         }
 
         public CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction action, DocumentReference item, CollectionReference collectionReference) : base(action, item)
         {
             CollectionReference = collectionReference ?? item?.Collection;
+            DocumentReference = item;
         }
 
         public CollectionReference CollectionReference { get; }
+
+        public DocumentReference DocumentReference { get; }
     }
 
     public class CollectionChangeEventArgs : ReferenceNodeChangeEventArgs<CollectionReference>

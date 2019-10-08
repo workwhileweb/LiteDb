@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
+using LiteDbExplorer.Framework;
 
 namespace LiteDbExplorer.Wpf.Framework
 {
@@ -99,7 +100,8 @@ namespace LiteDbExplorer.Wpf.Framework
                     }
                     else
                     {
-                        method.Invoke(viewModel, new [] { modelParams });   
+                        method.InvokeOnMainThread(viewModel, modelParams);
+                        //method.Invoke(viewModel, new [] { modelParams });
                     }
                 }
             }

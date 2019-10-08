@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
+using Forge.Forms;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework.Windows;
@@ -14,10 +15,13 @@ using LiteDbExplorer.Modules.DbCollection;
 using LiteDbExplorer.Modules.DbDocument;
 using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Help;
+using LiteDbExplorer.Modules.ImportData;
+using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Windows;
 using LiteDbExplorer.Wpf.Framework;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using DialogOptions = LiteDbExplorer.Framework.Windows.DialogOptions;
 
 namespace LiteDbExplorer.Modules
 {
@@ -43,9 +47,34 @@ namespace LiteDbExplorer.Modules
             var dialogOptions = new DialogOptions
             {
                 Width = 480,
+                MinWidth = 480,
+                MinHeight = 740,
+                MaxHeight = SystemParameters.VirtualScreenHeight - 160,
                 SizeToContent = SizeToContent.Height,
-                ResizeMode = ResizeMode.NoResize
-            };
+                ResizeMode = ResizeMode.CanResize,
+                ShowMaxRestoreButton = false
+            }
+            .SizeToFit();
+
+            return _windowManager.ShowDialog(vm, null, dialogOptions.Value) == true;
+        }
+
+        public bool ShowImportWizard(ImportDataOptions options = null)
+        {
+            var vm = IoC.Get<ImportDataWizardViewModel>();
+            vm.Init(options);
+            
+            var dialogOptions = new DialogOptions
+            {
+                Width = 800,
+                MinWidth = 600,
+                Height = 700,
+                MinHeight = 500,
+                SizeToContent = SizeToContent.Manual,
+                ResizeMode = ResizeMode.CanResizeWithGrip
+            }
+            .SizeToFit();
+
             return _windowManager.ShowDialog(vm, null, dialogOptions.Value) == true;
         }
 
@@ -331,16 +360,23 @@ namespace LiteDbExplorer.Modules
         {
             var completionSource = new TaskCompletionSource<Maybe<string>>();
 
-            if (InputBoxWindow.ShowDialog(message, caption, predefined, validationFunc, out var inputText) == true)
-            {
-                completionSource.SetResult(inputText);
-            }
-            else
-            {
-                completionSource.SetResult(Maybe<string>.None);
-            }
+            completionSource.SetResult(
+                InputBoxWindow.ShowDialog(message, caption, predefined, validationFunc, out var inputText) == true
+                    ? inputText
+                    : Maybe<string>.None);
 
             return completionSource.Task;
+        }
+
+        public async Task<Maybe<PasswordInput>> ShowPasswordInputDialog(string message, string caption = "", string predefined = "", bool rememberMe = false)
+        {
+            var passwordInput = new PasswordInput(message, caption, predefined, rememberMe);
+            var result = await Show.Dialog(AppConstants.DialogHosts.Shell).For(passwordInput);
+            if (result.Action is PasswordInput.CANCEL_ACTION)
+            {
+                return Maybe<PasswordInput>.None;
+            }
+            return result.Model;
         }
 
     }

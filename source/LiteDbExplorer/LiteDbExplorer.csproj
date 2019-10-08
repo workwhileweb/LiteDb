@@ -47,6 +47,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.Design" />
@@ -77,9 +78,50 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppConstants.cs" />
+    <Compile Include="Application\DataProtectionProvider.cs" />
     <Compile Include="Application\IRecentFilesProvider.cs" />
     <Compile Include="Application\RecentFileInfo.cs" />
+    <Compile Include="Controls\AppHeader.xaml.cs">
+      <DependentUpon>AppHeader.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\AppPackIcon.cs" />
+    <Compile Include="Controls\AutoUpdateTextBlock.cs" />
+    <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
+    <Compile Include="Controls\ViewContentProxy.cs" />
+    <Compile Include="Modules\Database\IDatabasesExplorerView.cs" />
+    <Compile Include="Modules\DbDocument\DocumentEditorSettingsViewModel.cs" />
+    <Compile Include="Modules\ImportData\DocumentMapperView.xaml.cs">
+      <DependentUpon>DocumentMapperView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ImportData\DocumentMapperViewModel.cs" />
+    <Compile Include="Modules\ImportData\Handlers\CsvDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\Handlers\ExcelDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\Handlers\JsonDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\Handlers\OtherCollectionDataImportTaskHandler.cs" />
+    <Compile Include="Modules\ImportData\ImportDataHandlerSelector.cs" />
+    <Compile Include="Modules\ImportData\ImportDataWizardView.xaml.cs">
+      <DependentUpon>ImportDataWizardView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\ImportData\ImportDataWizardViewModel.cs" />
+    <Compile Include="Modules\DbQuery\IQueryEditorView.cs" />
+    <Compile Include="Modules\DbQuery\IQueryHistoryHandler.cs" />
+    <Compile Include="Modules\DbQuery\QueryHistoryProvider.cs" />
+    <Compile Include="Modules\DbQuery\QueryHistoryView.xaml.cs">
+      <DependentUpon>QueryHistoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\DbQuery\QueryHistoryViewModel.cs" />
+    <Compile Include="Modules\DbQuery\RawQueryHistory.cs" />
+    <Compile Include="Modules\ImportData\Models.cs" />
+    <Compile Include="Modules\ImportData\ViewModels.cs" />
+    <Compile Include="Modules\Main\ShellLayoutController.cs" />
+    <Compile Include="Modules\Shared\AddCollectionOptions.cs" />
+    <Compile Include="Modules\Shared\AddDocumentOptions.cs" />
+    <Compile Include="Modules\Shared\DynamicFormStackView.cs" />
+    <Compile Include="Modules\Shared\DynamicFormView.xaml.cs">
+      <DependentUpon>DynamicFormView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ViewModelContentProxy.cs" />
     <Compile Include="Modules\Shared\CollectionExportOptions.cs" />
     <Compile Include="Modules\DbCollection\CollectionReferencePayload.cs" />
     <Compile Include="Modules\DbDocument\DocumentReferencePayload.cs" />
@@ -93,8 +135,10 @@
     <Compile Include="Modules\Main\ToolPanelSetViewModel.cs" />
     <Compile Include="Modules\Shared\IDocumentExplorer.cs" />
     <Compile Include="Modules\Shared\IDocumentSet.cs" />
+    <Compile Include="Modules\Shared\ImportDataOptions.cs" />
     <Compile Include="Modules\Shared\IOwnerViewLocator.cs" />
     <Compile Include="Modules\Shared\IToolPanelSet.cs" />
+    <Compile Include="Modules\Shared\PasswordInput.cs" />
     <Compile Include="Modules\Shared\PerformanceSettings.cs" />
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Controls\AvalonEditBehaviour.cs" />
@@ -228,8 +272,13 @@
       <DependentUpon>StartPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\StartPage\StartPageViewModel.cs" />
+    <Compile Include="Modules\WinInterop\FileAssociationSettingsView.xaml.cs">
+      <DependentUpon>FileAssociationSettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Modules\WinInterop\FileAssociationSettingsViewModel.cs" />
     <Compile Include="Presentation\Behaviors\BsonValueForeground.cs" />
     <Compile Include="Presentation\Behaviors\TabablzControlAssist.cs" />
+    <Compile Include="Presentation\Converters\DateTimeHumanizeConverter.cs" />
     <Compile Include="Presentation\Converters\GroupDisplayColorToForegloud.cs" />
     <Compile Include="Presentation\GroupDisplayColor.cs" />
     <Compile Include="Presentation\IconProvider.cs" />
@@ -243,12 +292,16 @@
     <Compile Include="Application\PipeServer.cs" />
     <Compile Include="Presentation\ThemeManager.cs" />
     <Compile Include="Application\Settings.cs" />
-    <Compile Include="Windows\DialogWindow.xaml.cs">
+    <Compile Include="Presentation\Windows\DialogWindow.xaml.cs">
       <DependentUpon>DialogWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Windows\InputBoxWindow.xaml.cs">
+    <Compile Include="Presentation\Windows\InputBoxWindow.xaml.cs">
       <DependentUpon>InputBoxWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="Controls\AppHeader.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Controls\ArrayEntryControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -301,6 +354,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Modules\DbQuery\QueryHistoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\DbQuery\QueryResultView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -322,6 +379,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Modules\Help\ReleaseNotesView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\ImportData\DocumentMapperView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\ImportData\ImportDataWizardView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -353,7 +418,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Modules\Shared\DynamicFormView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\StartPage\StartPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Modules\WinInterop\FileAssociationSettingsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -369,43 +442,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Themes\MaterialDesignTheme.ButtonChrome.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.Button.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.ButtonSpinner.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.DateTimePicker.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Themes\MaterialDesignTheme.Dragablz.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.DropDownButton.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.TimePicker.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.TimeSpanUpDown.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.ToolkitTextBox.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\MaterialDesignTheme.NumericUpDown.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -414,11 +451,11 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Presentation\Converters\BsonValueToStringConverter.cs" />
-    <Page Include="Windows\DialogWindow.xaml">
+    <Page Include="Presentation\Windows\DialogWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Windows\InputBoxWindow.xaml">
+    <Page Include="Presentation\Windows\InputBoxWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -476,10 +513,14 @@
       <Project>{e61b6d10-9f85-485d-99fa-7bce12315c57}</Project>
       <Name>LiteDbExplorer.Wpf</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MaterialDesignThemes.Extended.Wpf.Toolkit\MaterialDesignThemes.Extended.Wpf.Toolkit.csproj">
+      <Project>{9713b6d9-59ab-4ac1-8990-c77cf1b84637}</Project>
+      <Name>MaterialDesignThemes.Extended.Wpf.Toolkit</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit">
-      <Version>5.0.4</Version>
+      <Version>6.0.0</Version>
     </PackageReference>
     <PackageReference Include="Caliburn.Micro">
       <Version>3.2.0</Version>
@@ -488,16 +529,19 @@
       <Version>3.0.2.4</Version>
     </PackageReference>
     <PackageReference Include="Costura.Fody">
-      <Version>4.0.0</Version>
+      <Version>4.1.0</Version>
     </PackageReference>
     <PackageReference Include="CSharpFunctionalExtensions">
-      <Version>1.18.2</Version>
+      <Version>2.1.0</Version>
+    </PackageReference>
+    <PackageReference Include="CsvHelper">
+      <Version>12.1.2</Version>
     </PackageReference>
     <PackageReference Include="Dragablz">
       <Version>0.0.3.203</Version>
     </PackageReference>
     <PackageReference Include="DynamicData">
-      <Version>6.10.0.2604</Version>
+      <Version>6.13.9</Version>
     </PackageReference>
     <PackageReference Include="Enterwell.Clients.Wpf.Notifications">
       <Version>1.4.2</Version>
@@ -509,39 +553,39 @@
       <Version>3.5.0</Version>
     </PackageReference>
     <PackageReference Include="Fody">
-      <Version>5.0.6</Version>
+      <Version>6.0.0</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Forge.Forms">
-      <Version>1.1.0</Version>
+      <Version>1.1.1</Version>
     </PackageReference>
     <PackageReference Include="Humanizer.Core">
-      <Version>2.6.2</Version>
+      <Version>2.7.9</Version>
     </PackageReference>
     <PackageReference Include="JetBrains.Annotations">
-      <Version>2019.1.1</Version>
+      <Version>2019.1.3</Version>
     </PackageReference>
     <PackageReference Include="LiteDB">
       <Version>4.1.4</Version>
     </PackageReference>
     <PackageReference Include="Markdig">
-      <Version>0.16.0</Version>
+      <Version>0.17.1</Version>
     </PackageReference>
     <PackageReference Include="Markdig.Wpf">
-      <Version>0.2.8</Version>
+      <Version>0.3.0</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignColors">
-      <Version>1.1.3</Version>
+      <Version>1.2.0</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignExtensions">
-      <Version>2.6.0</Version>
+      <Version>2.7.0</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
-      <Version>2.5.1</Version>
+      <Version>2.6.0</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes.MahApps">
-      <Version>0.0.12</Version>
+      <Version>0.1.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.WindowsAPICodePack.Shell">
       <Version>1.1.0</Version>
@@ -550,16 +594,19 @@
       <Version>12.0.2</Version>
     </PackageReference>
     <PackageReference Include="Octokit">
-      <Version>0.32.0</Version>
+      <Version>0.34.0</Version>
     </PackageReference>
     <PackageReference Include="Onova">
       <Version>2.4.2</Version>
     </PackageReference>
     <PackageReference Include="PropertyChanged.Fody">
-      <Version>3.0.1</Version>
+      <Version>3.1.3</Version>
     </PackageReference>
     <PackageReference Include="PropertyTools.Wpf">
-      <Version>2.0.1</Version>
+      <Version>3.0.0</Version>
+    </PackageReference>
+    <PackageReference Include="ReactiveUI">
+      <Version>10.3.1</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.8.0</Version>
@@ -571,12 +618,16 @@
       <Version>4.0.0</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
-      <Version>4.1.5</Version>
+      <Version>4.1.6</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <SplashScreen Include="Images\splashscreen.png" />
+  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -9,6 +9,15 @@ namespace LiteDbExplorer.Core
 {
     public static class LiteDbReferenceExtensions
     {
+        public static IDictionary<string, BsonType> SelectFirstDistinctKeyTypePair(this IEnumerable<DocumentReference> documents)
+        {
+            return documents
+                .SelectMany(p => p.LiteDocument.RawValue)
+                .GroupBy(p => p.Key)
+                .Select(p => new {p.First().Key, Value = p.First().Value.Type})
+                .ToDictionary(p => p.Key, p => p.Value);
+        }
+
         public static IEnumerable<string> SelectAllDistinctKeys(this IEnumerable<DocumentReference> documents, FieldSortOrder sortOrder = FieldSortOrder.Original)
         {
             if (documents == null)
@@ -148,7 +157,7 @@ namespace LiteDbExplorer.Core
 
                 if (maxLength.HasValue)
                 {
-                    return result.Truncate(maxLength.Value);
+                    return result?.Truncate(maxLength.Value);
                 }
 
                 return result;

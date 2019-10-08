@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using LiteDB;
 using PropertyChanging;
+using static System.Int64;
 
 namespace LiteDbExplorer.Core
 {
@@ -32,11 +33,11 @@ namespace LiteDbExplorer.Core
                 if (_items == null)
                 {
                     _items = new ObservableCollection<DocumentReference>();
+                    // TODO: Lazy load on non UI thread
                     foreach (var item in GetAllItem(LiteCollection))
                     {
                         _items.Add(item);
                     }
-
                     _items.CollectionChanged += OnDocumentsCollectionChanged;
                 }
 
@@ -56,6 +57,14 @@ namespace LiteDbExplorer.Core
                 }
 
                 OnPropertyChanged(nameof(Items));
+            }
+        }
+
+        public IEnumerable<DocumentReference> this[string name]
+        {
+            get
+            {
+                return Items == null ? Enumerable.Empty<DocumentReference>() : Items.Where(p => p.LiteDocument.ContainsKey(name));
             }
         }
 

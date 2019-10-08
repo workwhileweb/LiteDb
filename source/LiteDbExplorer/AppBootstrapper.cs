@@ -15,6 +15,7 @@ using Caliburn.Micro;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Framework.Services;
 using LiteDbExplorer.Modules;
+using LiteDbExplorer.Modules.DbQuery;
 using LiteDbExplorer.Modules.Main;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf;
@@ -41,7 +42,7 @@ namespace LiteDbExplorer
                     .Select(x => new AssemblyCatalog(x)).OfType<ComposablePartCatalog>()
             );
 
-            aggregateCatalog.Catalogs.Add(LiteDbExplorerWpfCatalog.AssemblyCatalog);
+            // aggregateCatalog.Catalogs.Add(LiteDbExplorerWpfCatalog.AssemblyCatalog);
 
             _container = new CompositionContainer(aggregateCatalog);
 
@@ -54,7 +55,9 @@ namespace LiteDbExplorer
             batch.AddExportedValue<IWindowManager>(windowManager);
             batch.AddExportedValue<IEventAggregator>(new EventAggregator());
             batch.AddExportedValue<IRecentFilesProvider>(new Paths());
+            batch.AddExportedValue<IQueryHistoryProvider>(new QueryHistoryProvider());
             batch.AddExportedValue(NotificationInteraction.Manager);
+            
             batch.AddExportedValue(_container);
 
             _container.Compose(batch);
@@ -95,17 +98,6 @@ namespace LiteDbExplorer
             var pipeServiceBootstrapper = _container.GetExportedValueOrDefault<PipeServiceBootstrapper>();
             
             pipeServiceBootstrapper?.Init();
-
-#if (!DEBUG)
-
-            Task.Factory.StartNew(async () =>
-            {
-                await Task.Delay(2000);
-                await AppUpdateManager.Current.CheckForUpdates(false);
-
-            }).ConfigureAwait(false);
-#endif
-
         }
 
         protected override IEnumerable<Assembly> SelectAssemblies()
@@ -124,6 +116,7 @@ namespace LiteDbExplorer
                 .ForEach(binding =>
                 {
                     CommandManager.RegisterClassCommandBinding(typeof(Window), binding);
+                    CommandManager.InvalidateRequerySuggested();
                 });
         }
 
@@ -138,7 +131,7 @@ namespace LiteDbExplorer
                 switch (model)
                 {
                     case IOwnerViewLocator ownerViewLocator:
-                        element = ownerViewLocator.GetView(context);
+                        element = ownerViewLocator.GetOwnView(context);
                         break;
                     case IAutoGenSettingsView _:
                         element = new AutoSettingsView();

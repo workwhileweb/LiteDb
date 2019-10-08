@@ -26,12 +26,15 @@
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesignFont}" />
         <Setter Property="TitleForeground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="WindowTitleBrush" Value="{DynamicResource MaterialDesignPaper}" />
+        <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource NonActiveWindowTitleBrush}" />
         <Setter Property="OverrideDefaultWindowCommandsBrush" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="GlowBrush" Value="Black" />
+        <Setter Property="NonActiveGlowBrush" Value="#9F000000" />
         <Setter Property="TitleCharacterCasing" Value="Normal" />
         <Setter Property="TitleAlignment" Value="Center" />
         <Setter Property="TitlebarHeight" Value="35" />
         <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="WindowTransitionsEnabled" Value="False"/>
         <Setter Property="TextElement.Foreground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TextElement.FontWeight" Value="Regular" />
         <Setter Property="TextElement.FontSize" Value="13" />
@@ -45,6 +48,7 @@
         <Setter Property="FontFamily" Value="{DynamicResource MaterialDesignFont}" />
         <Setter Property="TitleForeground" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="WindowTitleBrush" Value="{DynamicResource MaterialDesignPaper}" />
+        <Setter Property="NonActiveWindowTitleBrush" Value="{DynamicResource NonActiveWindowTitleBrush}" />
         <Setter Property="OverrideDefaultWindowCommandsBrush" Value="{DynamicResource MaterialDesignBody}" />
         <Setter Property="TitleCharacterCasing" Value="Normal" />
         <Setter Property="TitleAlignment" Value="Center" />

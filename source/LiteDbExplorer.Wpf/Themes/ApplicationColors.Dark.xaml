@@ -1,0 +1,19 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    
+    <SolidColorBrush x:Key="ShellBackground" Color="#252526" />
+    <SolidColorBrush x:Key="ShellEmptyBackground" Color="#1E1E1E" />
+    <SolidColorBrush x:Key="ShellBrandBackground" Color="#151515" />
+    <SolidColorBrush x:Key="NavBackground" Color="#252526"/>
+    <SolidColorBrush x:Key="SectionBackground" Color="#383838"/>
+
+
+    <SolidColorBrush x:Key="MaterialDesignToolBarBackground" Color="#383838"/>
+    <SolidColorBrush x:Key="NonActiveWindowTitleBrush" Color="#383838"/>
+
+    <SolidColorBrush x:Key="TabBackground" Color="#2D2D2D"/>
+    <SolidColorBrush x:Key="TabActiveBackground" Color="#1E1E1E"/>
+
+    <SolidColorBrush x:Key="TextEditorBackground" Color="#1E1E1E"/>
+
+</ResourceDictionary>

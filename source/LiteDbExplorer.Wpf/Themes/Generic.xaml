@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:LiteDbExplorer.Controls">
+                    xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
+                    xmlns:controls1="clr-namespace:LiteDbExplorer.Wpf.Controls">
 
     <!-- MahApps Brushes -->
     <SolidColorBrush x:Key="HighlightBrush" Color="{DynamicResource Primary700}" />
@@ -11,6 +12,7 @@
     <SolidColorBrush x:Key="AccentColorBrush4" Color="{DynamicResource Primary200}" />
     <SolidColorBrush x:Key="WindowTitleColorBrush"
                      Color="{Binding Source={StaticResource MaterialDesignPaper}, Path=Color}" />
+
     <SolidColorBrush x:Key="AccentSelectedColorBrush" Color="{DynamicResource Primary500Foreground}" />
     <LinearGradientBrush x:Key="ProgressBrush" EndPoint="0.001,0.5" StartPoint="1.002,0.5">
         <GradientStop Color="{DynamicResource Primary700}" Offset="0" />
@@ -32,5 +34,29 @@
     <Style TargetType="controls:ExceptionViewer">
         <Setter Property="ControlsBorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
     </Style>
+
+    <Style TargetType="{x:Type controls:LocalPackIconBase}">
+        <Setter Property="Height" Value="16" />
+        <Setter Property="Width" Value="16" />
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="IsTabStop" Value="False" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type controls:LocalPackIconBase}">
+                    <Viewbox>
+                        <Canvas Width="24" Height="24">
+                            <Path Data="{Binding Data, RelativeSource={RelativeSource TemplatedParent}}"
+                                  Fill="{TemplateBinding Foreground}" />
+                        </Canvas>
+                    </Viewbox>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <DrawingImage x:Key="AppIconImage">
+        <!-- Override on app.xaml -->
+    </DrawingImage>
 
 </ResourceDictionary>

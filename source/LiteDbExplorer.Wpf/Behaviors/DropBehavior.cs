@@ -21,7 +21,7 @@ namespace LiteDbExplorer.Wpf.Behaviors
                         "PreviewDropCommand",
                         typeof(ICommand),
                         typeof(DropBehavior),
-                        new PropertyMetadata(PreviewDropCommandPropertyChangedCallBack)
+                        new PropertyMetadata(null, PreviewDropCommandPropertyChangedCallBack)
                     );
         #endregion
  
@@ -50,9 +50,9 @@ namespace LiteDbExplorer.Wpf.Behaviors
         /// </summary>
         /// <param name="inUIElement">A UIElement object.</param>
         /// <returns>An object that implements ICommand.</returns>
-        private static ICommand GetPreviewDropCommand(UIElement inUIElement)
+        public static ICommand GetPreviewDropCommand(UIElement inUIElement)
         {
-            return (ICommand)inUIElement.GetValue(PreviewDropCommandProperty);
+            return inUIElement.GetValue(PreviewDropCommandProperty) as ICommand;
         }
         #endregion
  

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using LiteDbExplorer.Framework.Services;
+using System.Windows.Threading;
 using LiteDbExplorer.Presentation;
 
 namespace LiteDbExplorer.Modules.Database
@@ -11,7 +10,7 @@ namespace LiteDbExplorer.Modules.Database
     /// <summary>
     /// Interaction logic for DatabasesNavView.xaml
     /// </summary>
-    public partial class DatabasesExplorerView : UserControl
+    public partial class DatabasesExplorerView : UserControl, IDatabasesExplorerView
     {
         public DatabasesExplorerView()
         {
@@ -34,6 +33,47 @@ namespace LiteDbExplorer.Modules.Database
                     }
                 }
             };
+        }
+
+        public async void FocusItem(object item, bool bringIntoView)
+        {
+            if (Dispatcher == null)
+            {
+                return;
+            }
+
+            await Dispatcher.BeginInvoke(DispatcherPriority.ContextIdle, new Action(() =>
+            {
+                try
+                {
+                    var treeViewItem = TreeDatabase.ItemContainerGenerator.ContainerFromItemRecursive(item);
+                    if (treeViewItem == null)
+                    {
+                        return;
+                    }
+
+                    treeViewItem.IsSelected = true;
+                    treeViewItem.Focus();
+
+                    if (bringIntoView)
+                    {
+                        var firsChildTreeViewItem = treeViewItem.FirstChildrenContainerFromItem();
+                        if (firsChildTreeViewItem != null)
+                        {
+                            treeViewItem.IsExpanded = true;
+                            firsChildTreeViewItem.BringIntoView();
+                        }
+                        else
+                        {
+                            treeViewItem.BringIntoView();
+                        }
+                    }
+                }
+                catch (Exception)
+                {
+                    // Ignore
+                }
+            }));
         }
         
         private void RecentItemMoreBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)

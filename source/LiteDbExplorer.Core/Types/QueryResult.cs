@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -16,62 +15,7 @@ namespace LiteDbExplorer.Core
         {
             InstanceId = Guid.NewGuid().ToString("D");
 
-            Source = bsonValues;
-
-            if (bsonValues == null)
-            {
-                HasValue = false;
-            }
-            else
-            {
-                HasValue = true;
-
-                var items = bsonValues as BsonValue[] ?? bsonValues.ToArray();
-
-                if (bsonValues is BsonArray bsonArray)
-                {
-                    IsArray = true;
-                    AsArray = bsonArray;
-                    Count = bsonArray.Count;
-                }
-                else if (items.Length == 1 && items[0].IsArray)
-                {
-                    IsArray = true;
-                    AsArray = items[0].AsArray;
-                    Count = items[0].AsArray.Count;
-                }
-                else if (items.Length == 1 && items[0].IsDocument)
-                {
-                    var bsonDocument = items[0].AsDocument;
-                    if (bsonDocument.ContainsKey(EXPR_PATH))
-                    {
-                        if (bsonDocument[EXPR_PATH].IsArray)
-                        {
-                            IsArray = true;
-                            AsArray = bsonDocument[EXPR_PATH].AsArray;
-                            Count = bsonDocument[EXPR_PATH].AsArray.Count;
-                        }
-                        else
-                        {
-                            IsDocument = true;
-                            AsDocument = new BsonDocument {{"value", bsonDocument[EXPR_PATH]}};
-                            Count = 1;
-                        }
-                    }
-                    else
-                    {
-                        IsDocument = true;
-                        AsDocument = items[0].AsDocument;
-                        Count = 1;
-                    }
-                }
-                else
-                {
-                    IsArray = true;
-                    AsArray = new BsonArray(items);
-                    Count = items.Length;
-                }
-            }
+            Initialize(bsonValues);
         }
 
         public string InstanceId { get; }
@@ -119,63 +63,66 @@ namespace LiteDbExplorer.Core
                 JsonSerializer.Serialize(AsDocument, writer, pretty, false);
             }
         }
-    }
 
-    public static class QueryResultExtensions
-    {
-        // TODO: Replace DataTable with Lightweight alternative
-        public static DataTable ToDataTable(this IEnumerable<BsonValue> bsonValues)
+        protected void Initialize(IEnumerable<BsonValue> bsonValues)
         {
-            var table = new DataTable();
+            Source = bsonValues;
+
             if (bsonValues == null)
             {
-                return table;
+                HasValue = false;
             }
-
-            foreach (var value in bsonValues)
+            else
             {
-                var row = table.NewRow();
-                var doc = value.IsDocument ?
-                    value.AsDocument :
-                    new BsonDocument { ["[value]"] = value };
+                HasValue = true;
 
-                if (doc.Keys.Count == 0)
+                var items = bsonValues as BsonValue[] ?? bsonValues.ToArray();
+
+                if (bsonValues is BsonArray bsonArray)
                 {
-                    doc["[root]"] = "{}";
+                    IsArray = true;
+                    AsArray = bsonArray;
+                    Count = bsonArray.Count;
                 }
-
-                foreach (var key in doc.Keys)
+                else if (items.Length == 1 && items[0].IsArray)
                 {
-                    var col = table.Columns[key];
-                    if (col == null)
-                    {
-                        table.Columns.Add(key);
-                        var readOnly = key == "_id";
-                        col = table.Columns[key];
-                        col.ColumnName = key;
-                        col.Caption = key;
-                        col.ReadOnly = readOnly;
-                    }
+                    IsArray = true;
+                    AsArray = items[0].AsArray;
+                    Count = items[0].AsArray.Count;
                 }
-
-                foreach (var key in doc.Keys)
+                else if (items.Length == 1 && items[0].IsDocument)
                 {
-                    var bsonValue = doc[key];
-                    if (bsonValue.IsNull || bsonValue.IsArray || bsonValue.IsDocument || bsonValue.IsBinary)
+                    var bsonDocument = items[0].AsDocument;
+                    if (bsonDocument.ContainsKey(EXPR_PATH))
                     {
-                        row[key] = bsonValue.ToDisplayValue();
+                        if (bsonDocument[EXPR_PATH].IsArray)
+                        {
+                            IsArray = true;
+                            AsArray = bsonDocument[EXPR_PATH].AsArray;
+                            Count = bsonDocument[EXPR_PATH].AsArray.Count;
+                        }
+                        else
+                        {
+                            IsDocument = true;
+                            AsDocument = new BsonDocument {{@"value", bsonDocument[EXPR_PATH]}};
+                            Count = 1;
+                        }
                     }
                     else
                     {
-                        row[key] = bsonValue.RawValue;                        
+                        IsDocument = true;
+                        AsDocument = items[0].AsDocument;
+                        Count = 1;
                     }
                 }
-
-                table.Rows.Add(row);
+                else
+                {
+                    IsArray = true;
+                    AsArray = new BsonArray(items);
+                    Count = items.Length;
+                }
             }
-
-            return table;
         }
-    }
 
+    }
 }

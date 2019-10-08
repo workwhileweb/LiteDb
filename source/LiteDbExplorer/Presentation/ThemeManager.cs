@@ -18,7 +18,9 @@ namespace LiteDbExplorer.Presentation
 
         public static void SetColorTheme(ColorTheme colorTheme)
         {
+#pragma warning disable CS0612 // Type or member is obsolete
             new LocalPaletteHelper().SetLightDark(colorTheme == ColorTheme.Dark);
+#pragma warning restore CS0612 // Type or member is obsolete
 
             OnThemeChange();
         }

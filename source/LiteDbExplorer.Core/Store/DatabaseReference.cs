@@ -9,6 +9,13 @@ using Serilog;
 
 namespace LiteDbExplorer.Core
 {
+    public enum ConnectionMode
+    {
+        Exclusive,
+        ReadOnly,
+        Shared
+    }
+
     public sealed class DatabaseReference : ReferenceNode<DatabaseReference>
     {
         private readonly bool _enableLog;
@@ -25,9 +32,19 @@ namespace LiteDbExplorer.Core
             Location = path;
             Name = Path.GetFileName(path);
 
-            LiteDatabase = string.IsNullOrEmpty(password)
-                ? new LiteDatabase(path, log: GetLogger())
-                : new LiteDatabase($"Filename={path};Password={password}", log: GetLogger());
+            var connectionMap = new Dictionary<string, string>
+            {
+                { "Filename", path },
+                { "Password", password },
+                { "Mode", $"{LiteDB.FileMode.Exclusive}" }
+            };
+
+            var connectionString = connectionMap
+                .Where(pair => !string.IsNullOrEmpty(pair.Value))
+                .Select(pair => $"{pair.Key}={pair.Value}")
+                .Aggregate((p, n) => $"{p};{n}");
+
+            LiteDatabase = new LiteDatabase(connectionString, log: GetLogger());
 
             UpdateCollections();
 
@@ -45,7 +62,7 @@ namespace LiteDbExplorer.Core
         public ObservableCollection<CollectionReference> Collections
         {
             get => _collections;
-            set
+            private set
             {
                 OnPropertyChanging();
                 if (_collections != null)
@@ -149,6 +166,7 @@ namespace LiteDbExplorer.Core
 
         private void UpdateCollections()
         {
+            // TODO: Bind database tree and lazy load CollectionReference
             CollectionsLookup = new ObservableCollection<CollectionReferenceLookup>(
                 LiteDatabase.GetCollectionNames()
                     .Where(name => name != @"_chunks")

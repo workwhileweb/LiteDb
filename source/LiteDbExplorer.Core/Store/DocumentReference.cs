@@ -3,13 +3,6 @@ using LiteDB;
 
 namespace LiteDbExplorer.Core
 {
-    public enum DocumentTypeFilter
-    {
-        All = -1,
-        BsonDocument = 0,
-        File = 1
-    }
-
     public sealed class DocumentReference : ReferenceNode<DocumentReference>, IJsonSerializerProvider
     {
         public DocumentReference()
@@ -25,6 +18,12 @@ namespace LiteDbExplorer.Core
         public BsonDocument LiteDocument { get; set; }
 
         public CollectionReference Collection { get; set; }
+
+        public BsonValue this[string name]
+        {
+            get => LiteDocument[name];
+            set => LiteDocument[name] = value;
+        }
 
         public bool ContainsReference(CollectionReference collectionReference)
         {

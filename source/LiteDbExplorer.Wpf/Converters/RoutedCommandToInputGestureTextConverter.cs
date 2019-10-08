@@ -59,6 +59,8 @@ namespace LiteDbExplorer.Wpf.Converters
                 }
             }
 
+            keyGestureText = keyGestureText?.Replace("+", " + ");
+
             return (text, keyGestureText);
         }
     }

@@ -18,17 +18,29 @@
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
     <commands:CommandToCommand.Bindings>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Add" TargetCommand="{Binding AddDocumentCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Edit" TargetCommand="{Binding EditDocumentCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Remove" TargetCommand="{Binding RemoveDocumentCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Export" TargetCommand="{Binding ExportDocumentCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="Copy" TargetCommand="{Binding CopyDocumentCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="Paste" TargetCommand="{Binding PasteDocumentCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshCollection" TargetCommand="{Binding RefreshCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" TargetCommand="{Binding EditDbPropertiesCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="Find" TargetCommand="{Binding FindCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindNext" TargetCommand="{Binding FindNextCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindPrevious" TargetCommand="{Binding FindPreviousCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Add" 
+                                          TargetCommand="{Binding AddDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Edit" 
+                                          TargetCommand="{Binding EditDocumentCommand}"
+                                          CommandParameter="{Binding SelectedDocument}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Remove" 
+                                          TargetCommand="{Binding RemoveDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Export" 
+                                          TargetCommand="{Binding ExportDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Copy" 
+                                          TargetCommand="{Binding CopyDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Paste" 
+                                          TargetCommand="{Binding PasteDocumentCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshCollection" 
+                                          TargetCommand="{Binding RefreshCollectionCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" 
+                                          TargetCommand="{Binding EditDbPropertiesCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Find" 
+                                          TargetCommand="{Binding FindCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindNext" 
+                                          TargetCommand="{Binding FindNextCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindPrevious" 
+                                          TargetCommand="{Binding FindPreviousCommand}"/>
     </commands:CommandToCommand.Bindings>
     <Grid>
         <controls1:SplitContainer x:Name="splitContainer" 

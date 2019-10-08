@@ -17,4 +17,10 @@ namespace LiteDbExplorer.Wpf.Modules.Settings
         void ApplyChanges();
         void DiscardChanges();
     }
+
+    public interface ILazyInitialize
+    {
+        void Init();
+        bool IsInitialized { get; set; }
+    }
 }

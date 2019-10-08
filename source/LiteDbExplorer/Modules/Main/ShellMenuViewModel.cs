@@ -51,7 +51,6 @@ namespace LiteDbExplorer.Modules.Main
         [UsedImplicitly]
         public void OpenIssuePage()
         {
-            // Process.Start(Config.IssuesUrl);
             _applicationInteraction.ShowIssueHelper();
         }
 
@@ -83,12 +82,6 @@ namespace LiteDbExplorer.Modules.Main
         public void ShowReleaseNotes()
         {
             _applicationInteraction.ShowReleaseNotes();
-        }
-
-        [UsedImplicitly]
-        public void OpenOutput()
-        {
-            _eventAggregator.BeginPublishOnUIThread(new ToolSetPanelActionRequest(ToolSetPanelAction.Open));
         }
 
         [UsedImplicitly]

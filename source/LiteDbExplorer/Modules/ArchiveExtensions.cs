@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using JetBrains.Annotations;
+using Newtonsoft.Json;
 
 namespace LiteDbExplorer.Modules
 {
@@ -81,6 +82,83 @@ namespace LiteDbExplorer.Modules
             result += $".{extension.TrimStart('.')}";
 
             return result;
+        }
+
+        public static DriveType GetDriveType(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return DriveType.Unknown;
+            }
+
+            var dir = Path.GetDirectoryName(path);
+            if (!string.IsNullOrEmpty(dir))
+            {
+                // var di = new DirectoryInfo(dir);
+                var isWinDrive = Regex.IsMatch(dir, @"[a-z]:\\");
+                if (Path.IsPathRooted(dir) && isWinDrive)
+                {
+                    try
+                    {
+                        var rootPath = Path.GetPathRoot(dir);
+                        var drive = new DriveInfo(rootPath);
+                        return drive.DriveType;
+                    }
+                    catch (Exception)
+                    {
+                        // Ignore
+                    }
+                }
+
+                if (new Uri(path).IsUnc)
+                {
+                    return DriveType.Network;
+                }
+            }
+
+            return DriveType.Unknown;
+        }
+
+        public static T SafeDeserializeJsonFile<T>(string path,
+            Action<(string recoveryPath, Exception exception)> errorCallback = null,
+            JsonSerializerSettings serializerSettings = null)
+        {
+            if (serializerSettings == null)
+            {
+                serializerSettings = new JsonSerializerSettings
+                {
+                    ContractResolver = new IgnoreParentPropertiesResolver(true),
+                    Formatting = Formatting.Indented
+                };
+            }
+
+            try
+            {
+                if (File.Exists(path))
+                {
+                    var value = File.ReadAllText(path);
+                    var rawQueryHistories = JsonConvert.DeserializeObject<T>(value, serializerSettings);
+                    return rawQueryHistories;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                string recoveryPath = null;
+                if (File.Exists(path))
+                {
+                    recoveryPath = Path.Combine(
+                        Path.GetDirectoryName(path), 
+                        $"{Path.GetFileNameWithoutExtension(path)}_{DateTime.UtcNow.Ticks}_fail.{Path.GetExtension(path).TrimStart('.')}"
+                    );
+                    File.Copy(path, recoveryPath);
+                    File.WriteAllText(path, JsonConvert.SerializeObject(default(T)));
+                }
+
+                errorCallback?.Invoke((recoveryPath, e));
+            }
+
+            return default(T);
         }
     }
 }

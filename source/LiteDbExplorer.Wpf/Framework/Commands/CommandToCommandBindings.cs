@@ -100,6 +100,13 @@ namespace LiteDbExplorer.Framework.Commands
                     new FrameworkPropertyMetadata(null));
 
         /// <summary>
+        /// Identifies the <see cref="CommandParameter"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty CommandParameterProperty =
+            DependencyProperty.Register(nameof(CommandParameter), typeof(object), typeof(CommandToCommandBinding), 
+                new FrameworkPropertyMetadata(null));
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CommandToCommandBinding"/> class.
         /// </summary>
         public CommandToCommandBinding()
@@ -132,6 +139,15 @@ namespace LiteDbExplorer.Framework.Commands
             set => SetValue(TargetCommandProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the target command for the binding.
+        /// </summary>
+        public object CommandParameter
+        {
+            get => GetValue(CommandParameterProperty);
+            set => SetValue(CommandParameterProperty, value);
+        }
+
         private static void SourceCommandChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
         {
             var c2cBinding = (CommandToCommandBinding)obj;
@@ -145,7 +161,7 @@ namespace LiteDbExplorer.Framework.Commands
             var targetCommand = TargetCommand;
             if (targetCommand != null)
             {
-                e.CanExecute = targetCommand.CanExecute(e.Parameter);
+                e.CanExecute = targetCommand.CanExecute(e.Parameter ?? CommandParameter);
                 e.Handled = true;
             }
         }
@@ -155,7 +171,7 @@ namespace LiteDbExplorer.Framework.Commands
             var targetCommand = TargetCommand;
             if (targetCommand != null)
             {
-                targetCommand.Execute(e.Parameter);
+                targetCommand.Execute(e.Parameter ?? CommandParameter);
                 e.Handled = true;
             }
         }

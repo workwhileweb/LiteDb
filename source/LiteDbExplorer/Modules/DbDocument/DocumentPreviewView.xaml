@@ -50,7 +50,8 @@
                     </controls:ToolDockPanel>
                     
                     <TabControl DockPanel.Dock="Top"
-                                SelectedIndex="{Binding SelectedIndex, ElementName=detailViewSelector}">
+                                SelectedIndex="{Binding SelectedIndex, ElementName=detailViewSelector}"
+                                Style="{StaticResource TabControlWithoutHeader}">
                         <TabControl.ItemContainerStyle>
                             <Style TargetType="{x:Type TabItem}">
                                 <Setter Property="Visibility" Value="Collapsed" />

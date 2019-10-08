@@ -10,151 +10,188 @@
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:commands="clr-namespace:LiteDbExplorer.Framework.Commands;assembly=LiteDbExplorer.Wpf"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
+             xmlns:cal="http://www.caliburnproject.org"
+             xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
+             xmlns:dbQuery="clr-namespace:LiteDbExplorer.Modules.DbQuery"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
+        <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
+        <converters:BooleanToIntegerConverter x:Key="ShowHistoryColumnSpanConverter" TrueValue="1" FalseValue="3" />
+        <!--<Style TargetType="dbQuery:QueryView">
+            <Setter Property="RightContentIsVisible" Value="{Binding ShowHistory}"/>
+        </Style>-->
     </UserControl.Resources>
+
     <commands:CommandToCommand.Bindings>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Run" 
-                                          TargetCommand="{Binding RunQueryCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RunSelected" 
-                                          TargetCommand="{Binding RunSelectedQueryCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="Help" 
-                                          TargetCommand="{Binding OpenHelpCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Run"
+                                          TargetCommand="{Binding RunQueryCommand}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RunSelected"
+                                          TargetCommand="{Binding RunSelectedQueryCommand}" />
+        <commands:CommandToCommandBinding SourceCommand="Help"
+                                          TargetCommand="{Binding OpenHelpCommand}" />
     </commands:CommandToCommand.Bindings>
+    
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="106" MinHeight="55" />
-            <RowDefinition Height="5" />
-            <RowDefinition Height="*" MinHeight="50" />
-        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="0.38*" MinWidth="280"/>
+        </Grid.ColumnDefinitions>
 
-        <ToolBarTray Grid.Row="0">
-            <ToolBar
-                Style="{DynamicResource AppMaterialDesignToolBar}"
-                ClipToBounds="False">
-                <Label
-                    Content="Database:" FontSize="14"
-                    VerticalAlignment="Center" Margin="7,0,0,0"/>
-                <ComboBox Width="200"
-                          ItemsSource="{Binding Databases}"
-                          SelectedItem="{Binding CurrentDatabase, Mode=TwoWay}"
-                          DisplayMemberPath="Name" />
-                <Separator />
-                <Button
-                    x:Name="RunQuery"
-                    Command="liteDbExplorer:Commands.Run"
-                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="Play" />
-                        <TextBlock Text="Run" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-                <Button
-                    x:Name="RunSelectedQuery"
-                    Command="liteDbExplorer:Commands.RunSelected"
-                    behaviors:RoutedCommandToolTip.ShowToolTip="True">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="PlayBoxOutline" />
-                        <TextBlock Text="Run selected" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-                <Button x:Name="NewQuery" ToolTip="New Query">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="OpenInNew" />
-                        <TextBlock Text="New" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
-                <Separator />
-                <Button x:Name="OpenHelp" 
-                        Command="Help"
+        <Grid x:Name="MainContentContainer" 
+              Grid.Column="0"
+              Grid.ColumnSpan="{Binding ShowHistory, Converter={StaticResource ShowHistoryColumnSpanConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="106" MinHeight="55" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" MinHeight="50" />
+            </Grid.RowDefinitions>
+
+            <ToolBarTray Grid.Row="0">
+                <ToolBar
+                    Style="{DynamicResource AppMaterialDesignToolBar}"
+                    ClipToBounds="False">
+                    <Label
+                        Content="Database:" FontSize="14"
+                        VerticalAlignment="Center" Margin="7,0,0,0" />
+                    <ComboBox Width="200"
+                              ItemsSource="{Binding Databases}"
+                              SelectedItem="{Binding CurrentDatabase, Mode=TwoWay}"
+                              DisplayMemberPath="Name" />
+                    <Separator />
+                    <Button
+                        x:Name="RunQuery"
+                        Command="liteDbExplorer:Commands.Run"
                         behaviors:RoutedCommandToolTip.ShowToolTip="True">
-                    <materialDesign:PackIcon Kind="Help" />
-                </Button>
-            </ToolBar>
-        </ToolBarTray>
-
-        <controls:ExtendedTextEditor
-            x:Name="queryEditor"
-            Grid.Row="1"
-            FontFamily="Consolas"
-            FontSize="11pt"
-            IsReadOnly="False"
-            SnapsToDevicePixels="True"
-            UseLayoutRounding="True"
-            ShowLineNumbers="True"
-            SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.LiteDbCmd.xshd"
-            Padding="0,18,0,0">
-            <i:Interaction.Behaviors>
-                <controls:AvalonEditBehaviour
-                    BindingText="{Binding RawQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                    BindingSelectedText="{Binding RawQuerySelected, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" 
-                    />
-            </i:Interaction.Behaviors>
-            <controls:ExtendedTextEditor.ContextMenu>
-                <ContextMenu>
-                    <MenuItem Command="liteDbExplorer:Commands.Run">
-                        <MenuItem.Icon>
+                        <StackPanel Orientation="Horizontal">
                             <materialDesign:PackIcon Kind="Play" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="liteDbExplorer:Commands.RunSelected">
-                        <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="PlaylistPlay" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <Separator/>
-                    <MenuItem Command="Cut">
-                        <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="ContentCut" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="Copy">
-                        <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="ContentCopy" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <MenuItem Command="Paste">
-                        <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="ContentPaste" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                </ContextMenu>
-            </controls:ExtendedTextEditor.ContextMenu>
-        </controls:ExtendedTextEditor>
+                            <TextBlock Text="Run" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button
+                        x:Name="RunSelectedQuery"
+                        Command="liteDbExplorer:Commands.RunSelected"
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="PlayBoxOutline" />
+                            <TextBlock Text="Run selected" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="NewQuery" ToolTip="New Query">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="OpenInNew" />
+                            <TextBlock Text="New" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                    <ToggleButton IsChecked="{Binding ShowHistory}"
+                                  Style="{StaticResource MaterialDesignToolToggleButton}"
+                                  ToolTip="View query history">
+                        <materialDesign:PackIcon Kind="History" />
+                    </ToggleButton>
+                    <Separator />
+                    <Button x:Name="OpenHelp"
+                            Command="Help"
+                            behaviors:RoutedCommandToolTip.ShowToolTip="True">
+                        <materialDesign:PackIcon Kind="Help" />
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
 
-        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" />
+            <controls:ExtendedTextEditor
+                x:Name="queryEditor"
+                Grid.Row="1" Grid.Column="0"
+                FontFamily="Consolas"
+                FontSize="11pt"
+                IsReadOnly="False"
+                SnapsToDevicePixels="True"
+                UseLayoutRounding="True"
+                ShowLineNumbers="True"
+                SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.LiteDbCmd.xshd"
+                Padding="0,18,0,0">
+                <i:Interaction.Behaviors>
+                    <controls:AvalonEditBehaviour
+                        BindingText="{Binding RawQuery, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        BindingSelectedText="{Binding RawQuerySelected, Mode=OneWayToSource, UpdateSourceTrigger=PropertyChanged}" />
+                </i:Interaction.Behaviors>
+                <controls:ExtendedTextEditor.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Command="liteDbExplorer:Commands.Run">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="Play" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="liteDbExplorer:Commands.RunSelected">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="PlaylistPlay" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <Separator />
+                        <MenuItem Command="Cut">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="ContentCut" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="Copy">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="ContentCopy" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                        <MenuItem Command="Paste">
+                            <MenuItem.Icon>
+                                <materialDesign:PackIcon Kind="ContentPaste" />
+                            </MenuItem.Icon>
+                        </MenuItem>
+                    </ContextMenu>
+                </controls:ExtendedTextEditor.ContextMenu>
+            </controls:ExtendedTextEditor>
 
-        <TabControl Grid.Row="3" x:Name="Items" Padding="0" Margin="0"
-                    mah:TabControlHelper.Underlined="TabPanel"
-                    mah:TabControlHelper.UnderlineBrush="{DynamicResource MaterialDesignDivider}"
-                    mah:TabControlHelper.UnderlineSelectedBrush="{DynamicResource MaterialDesignBody}"
-                    mah:TabControlHelper.UnderlineMouseOverSelectedBrush="{DynamicResource MaterialDesignBody}"
-                    mah:TabControlHelper.UnderlineMouseOverBrush="{DynamicResource MaterialDesignBody}">
-            <TabControl.Resources>
-                <Style TargetType="{x:Type TabPanel}">
-                    <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}"/>
-                </Style>
-                <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource MahTabItem}">
-                    <Setter Property="mah:ControlsHelper.HeaderFontSize" Value="14" />
-                    <Setter Property="Padding" Value="0,10,0,6"/>
-                    <Setter Property="MinWidth" Value="30"/>
-                    <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}"/>
-                    <Setter Property="BorderBrush" Value="Transparent"/>
-                    <Setter Property="BorderThickness" Value="16,0,4,0"/>
-                </Style>
-            </TabControl.Resources>
-            <TabControl.ItemTemplate>
-                <DataTemplate>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="{Binding DisplayName}" 
-                                   Foreground="{DynamicResource MaterialDesignBody}"
-                                   Typography.Capitals="AllSmallCaps"/>
-                    </StackPanel>
-                </DataTemplate>
-            </TabControl.ItemTemplate>
-        </TabControl>
+            <GridSplitter Grid.Row="2" Height="4" Grid.Column="0" HorizontalAlignment="Stretch" />
+
+            <TabControl Grid.Row="3" Grid.Column="0" x:Name="Items" 
+                        Padding="0" Margin="0" Background="Transparent" BorderThickness="0,1,0,0"
+                        mah:TabControlHelper.Underlined="TabPanel"
+                        mah:TabControlHelper.UnderlineBrush="{DynamicResource MaterialDesignDivider}"
+                        mah:TabControlHelper.UnderlineSelectedBrush="{DynamicResource MaterialDesignBody}"
+                        mah:TabControlHelper.UnderlineMouseOverSelectedBrush="{DynamicResource MaterialDesignBody}"
+                        mah:TabControlHelper.UnderlineMouseOverBrush="{DynamicResource MaterialDesignBody}">
+                <TabControl.Resources>
+                    <Style TargetType="{x:Type TabPanel}">
+                        <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}" />
+                    </Style>
+                    <Style TargetType="{x:Type TabItem}" BasedOn="{StaticResource MahTabItem}">
+                        <Setter Property="mah:ControlsHelper.HeaderFontSize" Value="14" />
+                        <Setter Property="Padding" Value="0,10,0,6" />
+                        <Setter Property="MinWidth" Value="30" />
+                        <Setter Property="Background" Value="{DynamicResource MaterialDesignToolBarBackground}" />
+                        <Setter Property="BorderBrush" Value="Transparent" />
+                        <Setter Property="BorderThickness" Value="16,0,4,0" />
+                    </Style>
+                </TabControl.Resources>
+                <TabControl.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding DisplayName}"
+                                       Foreground="{DynamicResource MaterialDesignBody}"
+                                       Typography.Capitals="AllSmallCaps" />
+                        </StackPanel>
+                    </DataTemplate>
+                </TabControl.ItemTemplate>
+            </TabControl>
+        </Grid>
+
+        <GridSplitter x:Name="RightContentGridSplitter" 
+                      Grid.Column="1" Width="4" HorizontalAlignment="Stretch"
+                      Visibility="{Binding Path=ShowHistory, Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+        <Border x:Name="RightContentContainer" Grid.Column="2"
+                BorderBrush="{DynamicResource MaterialDesignDivider}"
+                Visibility="{Binding Path=ShowHistory, Converter={StaticResource BooleanToVisibilityConverter}}">
+            <ContentControl x:Name="QueryHistoryView"
+                            HorizontalContentAlignment="Stretch"
+                            cal:View.Model="{Binding QueryHistoryView}" />
+        </Border>
 
     </Grid>
 </UserControl>

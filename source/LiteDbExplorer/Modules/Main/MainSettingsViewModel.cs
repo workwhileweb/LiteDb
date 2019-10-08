@@ -20,15 +20,18 @@ namespace LiteDbExplorer.Modules.Main
         public MainSettingsViewModel()
         {
             ColorTheme = Settings.Current.ColorTheme;
+            ShowNavigationPanelOnOpen = Properties.Settings.Default.ShowNavigationPanelOnOpen;
         }
 
         [SelectorStyle(SelectorStyle.ComboBox), Width(120)]
         public ColorTheme ColorTheme { get; set; }
 
+        public bool ShowNavigationPanelOnOpen { get; set; }
+
         public void ApplyChanges()
         {
             Settings.Current.ColorTheme = ColorTheme;
-            
+            Properties.Settings.Default.ShowNavigationPanelOnOpen = ShowNavigationPanelOnOpen;
             Settings.Current.SaveSettings();
         }
 

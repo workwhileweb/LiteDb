@@ -9,9 +9,10 @@
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
+             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              mc:Ignorable="d"
              d:DesignHeight="650" d:DesignWidth="800"
-             Background="{DynamicResource MaterialDesignToolBarBackground}"
+             Background="{DynamicResource TabActiveBackground}"
              behaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">
     <UserControl.Resources>
         <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}" />
@@ -41,19 +42,7 @@
             <ColumnDefinition Width="Auto" MinWidth="50" />
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Row="0" Grid.Column="1"
-                    Orientation="Horizontal" Margin="8,50,0,25">
-            <Image Source="/Images/icon.png" Height="42" Stretch="Uniform"
-                   RenderOptions.BitmapScalingMode="HighQuality" Margin="4,0,4,0" />
-            <TextBlock FontWeight="Light" FontSize="34"
-                       Text="LiteDB Explorer" Margin="0,8,8,0" />
-            <Border Margin="8,7" Padding="8,3" CornerRadius="3" VerticalAlignment="Bottom"
-                    Background="{DynamicResource AccentColorBrush}">
-                <TextBlock FontWeight="Normal" 
-                           Text="Preview" Foreground="White" 
-                           Style="{StaticResource MaterialDesignCaptionTextBlock}"/>
-            </Border>
-        </StackPanel>
+        <controls:AppHeader Grid.Row="0" Grid.Column="1" Margin="2,50,0,25"/>
 
         <Grid Grid.Row="1" Grid.Column="1">
 
@@ -256,8 +245,8 @@
             <Grid x:Name="PART_Right" Grid.Column="2" Grid.Row="0" Grid.RowSpan="2" MaxWidth="400">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" MinHeight="240"/>
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <Border BorderThickness="0,0,0,0" Padding="8,16"
@@ -362,10 +351,19 @@
                     </Button>
                 </StackPanel>
 
-                <StackPanel x:Name="PART_Info" Grid.Row="2" Margin="0,25" Opacity="0.8">
-                    <TextBlock TextWrapping="Wrap" Margin="16 8"
-                               Foreground="{DynamicResource MaterialDesignBodyLight}"
-                               VerticalAlignment="Top">
+                <Grid x:Name="PART_Info" Grid.Row="2" 
+                      Margin="0,10,0,25" Opacity="0.8" 
+                      VerticalAlignment="Bottom">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Grid.Row="0" 
+                               TextAlignment="Justify"
+                               TextWrapping="Wrap" 
+                               TextTrimming="CharacterEllipsis" 
+                               Margin="16,8"
+                               Foreground="{DynamicResource MaterialDesignBodyLight}">
                         <TextBlock.Resources>
                             <Style TargetType="Hyperlink">
                                 <Setter Property="Foreground" Value="{DynamicResource AccentColorBrush2}" />
@@ -386,12 +384,16 @@
                         .
                     </TextBlock>
 
-                    <TextBlock Margin="16 8" Foreground="{DynamicResource MaterialDesignBodyLight}" TextWrapping="Wrap">
+                    <TextBlock Grid.Row="1" Margin="16,8" 
+                               TextAlignment="Justify"
+                               TextWrapping="Wrap" 
+                               TextTrimming="CharacterEllipsis" 
+                               Foreground="{DynamicResource MaterialDesignBodyLight}" >
                         <Run FontWeight="SemiBold" Text="This is a pre-release." />
                         <Run FontWeight="Normal"
                              Text="We'll point out that this release is identified as non-production ready." />
                     </TextBlock>
-                </StackPanel>
+                </Grid>
             </Grid>
 
         </Grid>

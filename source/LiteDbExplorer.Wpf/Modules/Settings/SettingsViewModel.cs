@@ -35,6 +35,7 @@ namespace LiteDbExplorer.Wpf.Modules.Settings
                 _selectedPage = value;
                 NotifyOfPropertyChange(() => SelectedPage);
                 NotifyOfPropertyChange(() => SelectedPageEditors);
+                OnSelectedPageChanged();
             }
         }
 
@@ -127,6 +128,18 @@ namespace LiteDbExplorer.Wpf.Modules.Settings
             }
 
             return pages;
+        }
+
+        protected virtual void OnSelectedPageChanged()
+        {
+            foreach (var settingsEditor in SelectedPageEditors)
+            {
+                if (settingsEditor is ILazyInitialize initialize && !initialize.IsInitialized)
+                {
+                    initialize.Init();
+                    initialize.IsInitialized = true;
+                }
+            }
         }
         
         protected override void OnDeactivate(bool close)

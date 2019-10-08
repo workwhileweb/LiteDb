@@ -1,4 +1,6 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -32,6 +34,16 @@ namespace LiteDbExplorer.Presentation
                     return search;
                 }
             }
+            return null;
+        }
+
+        public static TreeViewItem FirstChildrenContainerFromItem(this TreeViewItem parent)
+        {
+            if (parent != null && parent.Items.Count > 0)
+            {
+                return parent.ItemContainerGenerator.ContainerFromItemRecursive(parent.Items[0]);
+            }
+
             return null;
         }
 

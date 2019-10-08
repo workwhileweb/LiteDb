@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Linq;
 using System.Windows;
+using System.Windows.Input;
 using Caliburn.Micro;
 using LiteDbExplorer.Modules.Diagnostics;
 using LiteDbExplorer.Modules.Shared;
@@ -13,7 +14,7 @@ namespace LiteDbExplorer.Modules.Main
 {
     [Export(typeof(IShell))]
     [PartCreationPolicy(CreationPolicy.Shared)]
-    public sealed class ShellViewModel : Screen, IShell, IHandle<ToolSetPanelActionRequest>
+    public sealed class ShellViewModel : Screen, IShell
     {
         private readonly IEventAggregator _eventAggregator;
         private IOwnerViewModelMessageHandler _view;
@@ -37,9 +38,9 @@ namespace LiteDbExplorer.Modules.Main
 
             MainContent = IoC.Get<IDocumentSet>();
 
-            BottomToolPanels = IoC.Get<IToolPanelSet>();
+            ToolPanelsContent = IoC.Get<IToolPanelSet>();
 
-            MainContent.ActiveDocumentChanged += MainContentOnActiveDocumentChanged;
+            MainContent.DocumentDeactivated += MainContentOnDocumentDeactivated;
 
             Properties.Settings.Default.PropertyChanged += OnSettingsPropertyChanged;
         }
@@ -54,23 +55,7 @@ namespace LiteDbExplorer.Modules.Main
 
         public IDocumentSet MainContent { get; }
 
-        public IToolPanelSet BottomToolPanels { get; }
-
-        public void Handle(ToolSetPanelActionRequest message)
-        {
-            switch (message.Action)
-            {
-                case ToolSetPanelAction.Open:
-                    _view?.Handle("OpenToolSetPanel");
-                    break;
-                case ToolSetPanelAction.Close:
-                    _view?.Handle("CloseToolSetPanel");
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-
-        }
+        public IToolPanelSet ToolPanelsContent { get; }
 
         protected override void OnViewReady(object view)
         {
@@ -107,6 +92,13 @@ namespace LiteDbExplorer.Modules.Main
 
         protected override async void OnViewLoaded(object view)
         {
+            ToolPanelsContent.ActivateItem(IoC.Get<IOutput>());
+
+            if (Properties.Settings.Default.ShowNavigationPanelOnOpen)
+            {
+                ShellLayoutController.Current.LeftContentIsVisible = true;
+            }
+
             if (Properties.Settings.Default.ShowStartPageOnOpen)
             {
                 await MainContent.OpenDocument<IStartupDocument>();
@@ -117,7 +109,12 @@ namespace LiteDbExplorer.Modules.Main
                 StatusBarContent.ActivateContent(new MemoryUsageStatusButton().Start(), StatusBarContentLocation.Right);
             }
 
-            BottomToolPanels.ActivateItem(IoC.Get<IOutput>());
+            CommandManager.InvalidateRequerySuggested();
+
+#if (!DEBUG)
+            await Task.Delay(TimeSpan.FromSeconds(5))
+                .ContinueWith(task => AppUpdateManager.Current.CheckForUpdates(false), TaskScheduler.Current);
+#endif
         }
 
         private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -136,13 +133,22 @@ namespace LiteDbExplorer.Modules.Main
             }
         }
 
-        private async void MainContentOnActiveDocumentChanged(object sender, EventArgs e)
+        private async void MainContentOnDocumentDeactivated(object sender, DocumentDeactivateEventArgs e)
         {
+            if (!e.Close)
+            {
+                return;
+            }
+
             if (!MainContent.Documents.Any() && Properties.Settings.Default.ShowStartOnCloseAll)
             {
-                await MainContent.OpenDocument<IStartupDocument>();
-            }            
-        }
+                if (e.Item is IStartupDocument)
+                {
+                    return;
+                }
 
+                await MainContent.OpenDocument<IStartupDocument>();
+            }
+        }
     }
 }

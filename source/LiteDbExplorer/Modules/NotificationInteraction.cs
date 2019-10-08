@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
+using System.Windows.Threading;
 using Enterwell.Clients.Wpf.Notifications;
 
 namespace LiteDbExplorer.Modules
@@ -40,35 +41,45 @@ namespace LiteDbExplorer.Modules
 
         public static INotificationMessage Alert(string message, UINotificationType type = UINotificationType.None, Action closeAction = null)
         {
-            return Default()
-                .HasMessage(message)
-                .Dismiss().WithButton("Close", button => { closeAction?.Invoke(); })
-                .WithBadgeType(type)
-                .Queue();
+            return Application.Current.Dispatcher.Invoke(() =>
+            {
+                return Default()
+                    .HasMessage(message)
+                    .Dismiss().WithButton("Close", button => { closeAction?.Invoke(); })
+                    .WithBadgeType(type)
+                    .Queue();
+
+            }, DispatcherPriority.Normal);
         }
 
         public static Task<string> ActionsSheet(string message, IDictionary<string, string> actions)
         {
-            var taskCompletionSource = new TaskCompletionSource<string>();
-            var builder = Default()
-                .HasMessage(message);
-
-            foreach (var action in actions)
+            return Application.Current.Dispatcher.Invoke(() =>
             {
-                if (action.Key.StartsWith(@"-"))
-                {
-                    builder = builder.WithButton(action.Value, button => { taskCompletionSource.TrySetResult(action.Key); });
-                }
-                else
-                {
-                    builder = builder
-                        .Dismiss().WithButton(action.Value, button => { taskCompletionSource.TrySetResult(action.Key); });
-                }
-            }
-            
-            builder.Queue();
+                var taskCompletionSource = new TaskCompletionSource<string>();
+                var builder = Default()
+                    .HasMessage(message);
 
-            return taskCompletionSource.Task;
+                foreach (var action in actions)
+                {
+                    if (action.Key.StartsWith(@"-"))
+                    {
+                        builder = builder.WithButton(action.Value, button => { taskCompletionSource.TrySetResult(action.Key); });
+                    }
+                    else
+                    {
+                        builder = builder
+                            .Dismiss().WithButton(action.Value, button => { taskCompletionSource.TrySetResult(action.Key); });
+                    }
+                }
+            
+                builder.Queue();
+
+                return taskCompletionSource.Task;
+
+            }, DispatcherPriority.Normal);
+
+            
         }
     }
 

@@ -97,4 +97,5 @@ namespace LiteDbExplorer.Framework
 
         #endregion // ICommand Members
     }
+
 }

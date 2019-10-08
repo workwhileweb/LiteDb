@@ -344,7 +344,8 @@ namespace LiteDbExplorer.Controls
                 expandMode = OpenEditorMode.Window;
             }
 
-            var isReadOnly = readOnly || _currentDocument[key].IsObjectId || (IsFileCollection && key.Equals("_id"));
+            var editorAllowEditId = Properties.Settings.Default.DocumentEditor_AllowEditId;
+            var isReadOnly = readOnly || (_currentDocument[key].IsObjectId && !editorAllowEditId) || (IsFileCollection && key.Equals("_id") && !editorAllowEditId);
 
             if (_currentDocument[key].IsNull)
             {
@@ -627,23 +628,6 @@ namespace LiteDbExplorer.Controls
             }
 
             _invalidatingSize = true;
-
-            /*var listView = sender as ListView;
-            var grid = listView.View as GridView;
-
-            var col0MaxSize = (listView.ActualWidth / 2) - SystemParameters.VerticalScrollBarWidth - 10;
-            if (grid.Columns[0].ActualWidth > col0MaxSize)
-            {
-                grid.Columns[0].Width = col0MaxSize;
-            }
-
-            var newWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 10 -
-                           grid.Columns[0].ActualWidth - grid.Columns[2].ActualWidth;
-
-            if (newWidth > 0)
-            {
-                grid.Columns[1].Width = Math.Max(140, newWidth);
-            }*/
 
             var listView = sender as ListView;
             var grid = listView.View as GridView;

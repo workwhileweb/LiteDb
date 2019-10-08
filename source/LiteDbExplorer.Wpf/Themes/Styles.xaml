@@ -20,6 +20,9 @@
             Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Fonts.xaml" />
         <ResourceDictionary
             Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Flyout.xaml" />
+
+        <ResourceDictionary
+            Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/ApplicationColors.Light.xaml" />
         
         <!-- Material Design Extensions -->
         <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml" />-->
@@ -30,8 +33,6 @@
         <ResourceDictionary Source="MaterialDesignTheme.ListView.xaml" />
         <ResourceDictionary Source="MaterialDesignTheme.Tabs.xaml" />
         <ResourceDictionary Source="MaterialDesignTheme.AppToolBar.xaml" />
-        <ResourceDictionary Source="MaterialDesignTheme.ScrollBar.xaml" />
-        <ResourceDictionary Source="MaterialDesignTheme.ScrollViewer.xaml" />
 
         <!-- Local Controls -->
         <ResourceDictionary Source="Controls.ContextMenu.xaml" />

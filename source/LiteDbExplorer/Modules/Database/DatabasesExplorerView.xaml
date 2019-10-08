@@ -5,15 +5,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
-             xmlns:liteDbExplorerCore="clr-namespace:LiteDbExplorer;assembly=LiteDbExplorer.Core"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              xmlns:cal="http://www.caliburnproject.org"
              xmlns:framework="clr-namespace:LiteDbExplorer.Framework;assembly=LiteDbExplorer.Wpf"
              xmlns:commands="clr-namespace:LiteDbExplorer.Framework.Commands;assembly=LiteDbExplorer.Wpf"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:converters="clr-namespace:LiteDbExplorer.Presentation.Converters"
              xmlns:core="clr-namespace:LiteDbExplorer.Core;assembly=LiteDbExplorer.Core"
+             xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              Focusable="True">
@@ -22,58 +21,79 @@
         <converters:GroupDisplayColorToForegroundConverter x:Key="GroupDisplayColorToForegroundConverter"/>
     </UserControl.Resources>
     <commands:CommandToCommand.Bindings>
-        <commands:CommandToCommandBinding SourceCommand="Close" TargetCommand="{Binding CloseDatabaseCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddFile" TargetCommand="{Binding AddFileCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddCollection" TargetCommand="{Binding AddCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshDatabase" TargetCommand="{Binding RefreshDatabaseCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RevealInExplorer" TargetCommand="{Binding RevealInExplorerCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RenameCollection" TargetCommand="{Binding RenameCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.DropCollection" TargetCommand="{Binding DropCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection" TargetCommand="{Binding ExportCollectionCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" TargetCommand="{Binding EditDbPropertiesCommand}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" TargetCommand="{Binding SaveDatabaseCopyAsCommand}"/>
+        <commands:CommandToCommandBinding SourceCommand="Close" 
+                                          TargetCommand="{Binding CloseDatabaseCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" 
+                                          TargetCommand="{Binding EditDbPropertiesCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" 
+                                          TargetCommand="{Binding SaveDatabaseCopyAsCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddFile" 
+                                          TargetCommand="{Binding AddFileCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddCollection" 
+                                          TargetCommand="{Binding AddCollectionCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshDatabase" 
+                                          TargetCommand="{Binding RefreshDatabaseCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RevealInExplorer" 
+                                          TargetCommand="{Binding RevealInExplorerCommand}"
+                                          CommandParameter="{Binding SelectedDatabase}"/>
+
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RenameCollection" 
+                                          TargetCommand="{Binding RenameCollectionCommand}"
+                                          CommandParameter="{Binding SelectedCollection}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.DropCollection" 
+                                          TargetCommand="{Binding DropCollectionCommand}"
+                                          CommandParameter="{Binding SelectedCollection}"/>
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection" 
+                                          TargetCommand="{Binding ExportCollectionCommand}"
+                                          CommandParameter="{Binding SelectedCollection}"/>
+        
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Import" 
+                                          TargetCommand="{Binding ImportDataCommand}"/>
     </commands:CommandToCommand.Bindings>
-    <UserControl.Style>
-        <Style TargetType="UserControl">
-            <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Background" Value="{DynamicResource MaterialDesignPaper}"/>
-            <Style.Triggers>
-                <Trigger Property="behaviors:FocusGroupState.IsFocusActive" Value="True">
-                    <Setter Property="BorderBrush" Value="#2CFFFFFF"/>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </UserControl.Style>
     <DockPanel AllowDrop="True"
-               Background="Transparent" 
                behaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">
+
+        <Border DockPanel.Dock="Top" Height="45" Padding="10,0">
+            <TextBlock VerticalAlignment="Center" FontSize="14" Opacity="0.7"
+                Style="{StaticResource MaterialDesignSubheadingTextBlock}">
+                Databases
+            </TextBlock>
+        </Border>
+
         <ToolBarTray DockPanel.Dock="Top">
-            <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}">
-                <Button x:Name="OpenDatabase" ContextMenuService.IsEnabled="False" Padding="0">
+            <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}" Height="43">
+                <Button x:Name="OpenDatabase" ToolTip="Open..."
+                        ContextMenuService.IsEnabled="False" 
+                        Padding="0" VerticalContentAlignment="Stretch">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
-                            <materialDesign:PackIcon Kind="FolderOpen" Margin="10" Height="18"/>
-                            <Border Background="{DynamicResource MaterialDesignToolBarBackground}" Width="1" />
-                            <Border x:Name="SplitBorder" Background="Transparent" Padding="3,0" Margin="0,-2" BorderThickness="1" CornerRadius="2"
-                                    PreviewMouseLeftButtonDown="RecentItemMoreBorder_MouseLeftButtonDown">
+                            <controls:AppPackIcon Kind="FolderOutline" Margin="10,0" Height="18" VerticalAlignment="Center"/>
+                            <!--<materialDesign:PackIcon Kind="FolderOpen" Margin="10" Height="18"/>-->
+                            <Border Background="{DynamicResource MaterialDesignToolBarBackground}" Width="1" VerticalAlignment="Stretch"/>
+                            <Border x:Name="SplitBorder" Background="Transparent" Padding="3,0" Margin="0" BorderThickness="1" CornerRadius="0"
+                                    PreviewMouseLeftButtonDown="RecentItemMoreBorder_MouseLeftButtonDown" ClipToBounds="True">
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="BorderBrush"
-                                                        Value="{DynamicResource MaterialDesignDivider}" />
-                                                <Setter Property="Background" Value="{DynamicResource MaterialDesignDivider}"/>
+                                                <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentBaseColorBrush}"/>
+                                                <Setter Property="Opacity" Value="1"/>
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="False">
-                                                <Setter Property="BorderBrush" Value="Transparent" />
-                                                <Setter Property="Background" Value="Transparent" />
+                                                <Setter Property="Opacity" Value="0.67"/>
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
                                 <Path Margin="4" VerticalAlignment="Center" Width="6"
-                                      Fill="{DynamicResource MaterialDesignBody}" Stretch="Uniform"
-                                      HorizontalAlignment="Right"
+                                      Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" 
+                                      Stretch="Uniform" HorizontalAlignment="Right"
                                       Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " />
                             </Border>
                         </StackPanel>
@@ -95,18 +115,25 @@
             </ToolBar>
         </ToolBarTray>
 
-        <TreeView Name="TreeDatabase" DockPanel.Dock="Top"
+        <TreeView Name="TreeDatabase"
                   ItemsSource="{Binding Databases}"
-                  Focusable="True"
+                  Focusable="True" Padding="0"
                   HorizontalContentAlignment="Stretch"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                   mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="False"
                   cal:Message.Attach="[Event SelectedItemChanged] = [OnSelectedItemChanged($eventArgs)];"
-                  VirtualizingStackPanel.IsVirtualizing="True"
+                  VirtualizingStackPanel.IsVirtualizing="False"
                   VirtualizingStackPanel.VirtualizationMode="Standard">
             <TreeView.Resources>
                 <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
                     <Setter Property="IsExpanded" Value="True" />
+                    <Setter Property="behaviors:MouseDoubleClick.Command"
+                            Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}"/>
+                    <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
+                            Value="{Binding}"/>
+                    <Setter Property="cal:Message.Attach"
+                            Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]"/>
+                    <Setter Property="ToolTip" Value="{Binding Name}" />
                     <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnPreviewMouseRightButtonDown" />
                     <Setter Property="ContextMenu">
                         <Setter.Value>
@@ -172,9 +199,11 @@
                     <HierarchicalDataTemplate.ItemContainerStyle>
                         <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
                             <Setter Property="behaviors:MouseDoubleClick.Command"
-                                    Value="{Binding Path=Data.ItemDoubleClickCommand, Source={StaticResource DataContextProxy}}"/>
+                                    Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}"/>
                             <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
                                     Value="{Binding}"/>
+                            <Setter Property="cal:Message.Attach"
+                                    Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]"/>
                             <Setter Property="ToolTip" Value="{Binding Name}" />
                             <Setter Property="ContextMenu">
                                 <Setter.Value>
@@ -192,7 +221,7 @@
                                         </MenuItem>
                                         <Separator />
                                         <MenuItem Command="liteDbExplorer:Commands.AddCollection" 
-                                                  CommandParameter="{Binding}">
+                                                  CommandParameter="{Binding Database}">
                                             <MenuItem.Icon>
                                                 <materialDesign:PackIcon Kind="TablePlus" />
                                             </MenuItem.Icon>

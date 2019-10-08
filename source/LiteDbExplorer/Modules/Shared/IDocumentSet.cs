@@ -23,5 +23,18 @@ namespace LiteDbExplorer.Modules.Shared
         
         event EventHandler ActiveDocumentChanging;
         event EventHandler ActiveDocumentChanged;
+        event EventHandler<DocumentDeactivateEventArgs> DocumentDeactivated;
+    }
+
+    public class DocumentDeactivateEventArgs : EventArgs
+    {
+        public DocumentDeactivateEventArgs(IDocument item, bool close)
+        {
+            Item = item;
+            Close = close;
+        }
+
+        public IDocument Item { get; }
+        public bool Close { get; }
     }
 }

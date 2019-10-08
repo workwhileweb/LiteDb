@@ -15,11 +15,17 @@
     <DockPanel>
 
         <controls:ToolDockPanel DockPanel.Dock="Bottom" Style="{StaticResource ToolDockPanelCompact}">
-            <StackPanel Orientation="Horizontal" Opacity="0.5" Margin="10,0">
-                <TextBlock Text="{Binding ResultSetCountInfo}" VerticalAlignment="Center" />
-                <Separator Style="{StaticResource ToolDockPanelSeparator}" />
-                <TextBlock Text="{Binding RawQuery}" ToolTip="{Binding RawQuery}" VerticalAlignment="Center" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"/>
-            </StackPanel>
+            <DockPanel Opacity="0.5" Margin="10,0" LastChildFill="True">
+
+                <TextBlock Text="{Binding ElapsedTimeInfo}" VerticalAlignment="Center" DockPanel.Dock="Right"/>
+                <Separator Style="{StaticResource ToolDockPanelSeparator}" DockPanel.Dock="Right"/>
+
+                <TextBlock Text="{Binding ResultSetCountInfo}" VerticalAlignment="Center" DockPanel.Dock="Left"/>
+                <Separator Style="{StaticResource ToolDockPanelSeparator}" DockPanel.Dock="Left"/>
+                <TextBlock Text="{Binding RawQuery}" ToolTip="{Binding RawQuery}" 
+                           VerticalAlignment="Center" TextWrapping="Wrap" 
+                           TextTrimming="CharacterEllipsis" DockPanel.Dock="Left"/>
+            </DockPanel>
         </controls:ToolDockPanel>
 
         <controls:ToolDockPanel DockPanel.Dock="Top">
