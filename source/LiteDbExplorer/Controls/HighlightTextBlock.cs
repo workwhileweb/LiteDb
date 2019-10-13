@@ -9,6 +9,7 @@ using ICSharpCode.AvalonEdit.Document;
 using ICSharpCode.AvalonEdit.Highlighting;
 using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using LiteDbExplorer.Presentation;
+using LiteDbExplorer.Wpf.Modules.AvalonEdit;
 
 namespace LiteDbExplorer.Controls
 {
@@ -42,7 +43,7 @@ namespace LiteDbExplorer.Controls
         public void ApplyHighlighter(string code)
         {
             Inlines.Clear();
-            if (string.IsNullOrEmpty(code))
+            if (string.IsNullOrEmpty(code) || SyntaxHighlighting == null)
             {
                 return;
             }
@@ -104,16 +105,16 @@ namespace LiteDbExplorer.Controls
             }
         }
 
-        public static readonly DependencyProperty SyntaxHighlightingSrcProperty = DependencyProperty.Register(
-            nameof(SyntaxHighlightingSrc), 
+        public static readonly DependencyProperty SyntaxHighlightingNameProperty = DependencyProperty.Register(
+            nameof(SyntaxHighlightingName), 
             typeof(string), 
             typeof(HighlightTextBlock), 
             new PropertyMetadata(default(string), OnSyntaxHighlightingSrcChanged));
 
-        public string SyntaxHighlightingSrc
+        public string SyntaxHighlightingName
         {
-            get => (string) GetValue(SyntaxHighlightingSrcProperty);
-            set => SetValue(SyntaxHighlightingSrcProperty, value);
+            get => (string) GetValue(SyntaxHighlightingNameProperty);
+            set => SetValue(SyntaxHighlightingNameProperty, value);
         }
 
         private static void OnSyntaxHighlightingSrcChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -126,20 +127,19 @@ namespace LiteDbExplorer.Controls
 
         private void SetSyntaxHighlighting()
         {
-            if (string.IsNullOrWhiteSpace(SyntaxHighlightingSrc))
+            if (string.IsNullOrWhiteSpace(SyntaxHighlightingName))
             {
                 SyntaxHighlighting = null;
                 return;
             }
 
-            IHighlightingDefinition highlightingDefinition = null;
+            string theme = null;
             if (App.Settings.ColorTheme == ColorTheme.Dark)
             {
-                var darkResourceName = SyntaxHighlightingSrc.Replace(@".xshd", @".dark.xshd");
-                highlightingDefinition = LoadHighlightingFromAssembly(darkResourceName);
+                theme = "dark";
             }
 
-            SyntaxHighlighting = highlightingDefinition ?? LoadHighlightingFromAssembly(SyntaxHighlightingSrc);
+            SyntaxHighlighting = SyntaxHighlightingServices.Current.LoadDefinition(SyntaxHighlightingName, theme);;
         }
 
         private static IHighlightingDefinition LoadHighlightingFromAssembly(string name)

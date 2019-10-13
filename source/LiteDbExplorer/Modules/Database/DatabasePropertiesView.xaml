@@ -200,7 +200,7 @@
                         SnapsToDevicePixels="True"
                         UseLayoutRounding="True"
                         ShowLineNumbers="False"
-                        SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.Json.xshd">
+                        SyntaxHighlightingName="Json">
                         <i:Interaction.Behaviors>
                             <controls:AvalonEditBehaviour
                                 BindingText="{Binding MetadataJson, Mode=OneWay}" />

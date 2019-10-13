@@ -13,6 +13,8 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         public string GroupKey { get; set; }
 
+        public string QueryHandlerName { get; set; }
+
         public string DatabaseLocation
         {
             get => _databaseLocation;
@@ -78,5 +80,6 @@ namespace LiteDbExplorer.Modules.DbQuery
         }
 
         public static IEqualityComparer<RawQueryHistory> RawSourceComparer { get; } = new RawSourceEqualityComparer();
+
     }
 }

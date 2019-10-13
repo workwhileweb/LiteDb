@@ -249,7 +249,7 @@ namespace LiteDbExplorer.Modules
             var maybeFileName = await _applicationInteraction.ShowOpenFileDialog("Add file to database");
             if (maybeFileName.HasNoValue)
             {
-                return Result.Fail<CollectionDocumentChangeEventArgs>("FILE_OPEN_CANCELED");
+                return Result.Failure<CollectionDocumentChangeEventArgs>("FILE_OPEN_CANCELED");
             }
 
             try
@@ -268,14 +268,14 @@ namespace LiteDbExplorer.Modules
             }
 
 
-            return Result.Fail<CollectionDocumentChangeEventArgs>("FILE_OPEN_FAIL");
+            return Result.Failure<CollectionDocumentChangeEventArgs>("FILE_OPEN_FAIL");
         }
 
         public Task<Result> RemoveDocuments(IEnumerable<DocumentReference> documents)
         {
             if (!_applicationInteraction.ShowConfirm("Are you sure you want to remove items?", "Are you sure?"))
             {
-                return Task.FromResult(Result.Fail(Fails.Canceled));
+                return Task.FromResult(Result.Failure(Fails.Canceled));
             }
 
             foreach (var document in documents.ToList())
@@ -292,7 +292,7 @@ namespace LiteDbExplorer.Modules
             var optionsResult = await ShowHostDialog(context).For(exportOptions);
             if (optionsResult.Action is "cancel")
             {
-                return Result.Fail<CollectionReference>(Fails.Canceled);
+                return Result.Failure<CollectionReference>(Fails.Canceled);
             }
 
             try
@@ -310,7 +310,7 @@ namespace LiteDbExplorer.Modules
             {
                 var message = "Failed to add new collection:" + Environment.NewLine + exc.Message;
                 _applicationInteraction.ShowError(exc, message, "Database error");
-                return Result.Fail<CollectionReference>(message);
+                return Result.Failure<CollectionReference>(message);
             }
         }
 
@@ -324,17 +324,17 @@ namespace LiteDbExplorer.Modules
                 {
                     if (string.IsNullOrEmpty(value))
                     {
-                        return Result.Fail("Name cannot be empty.");
+                        return Result.Failure("Name cannot be empty.");
                     }
 
                     if (value.Any(char.IsWhiteSpace))
                     {
-                        return Result.Fail("Name can not contain white spaces.");
+                        return Result.Failure("Name can not contain white spaces.");
                     }
 
                     if (collection.Database.ContainsCollection(value))
                     {
-                        return Result.Fail($"Collection \"{value}\" already exists!");
+                        return Result.Failure($"Collection \"{value}\" already exists!");
                     }
 
                     return Result.Ok();
@@ -345,7 +345,7 @@ namespace LiteDbExplorer.Modules
 
                 if (maybeName.HasNoValue)
                 {
-                    return Result.Fail(Fails.Canceled);
+                    return Result.Failure(Fails.Canceled);
                 }
 
                 collection.Database.RenameCollection(currentName, maybeName.Value);
@@ -356,7 +356,7 @@ namespace LiteDbExplorer.Modules
             {
                 var message = "Failed to rename collection:" + Environment.NewLine + exc.Message;
                 _applicationInteraction.ShowError(exc, message, "Database error");
-                return Result.Fail(message);
+                return Result.Failure(message);
             }
         }
 
@@ -372,13 +372,13 @@ namespace LiteDbExplorer.Modules
                     return Task.FromResult(Result.Ok(collection));
                 }
 
-                return Task.FromResult(Result.Fail<CollectionReference>(Fails.Canceled));
+                return Task.FromResult(Result.Failure<CollectionReference>(Fails.Canceled));
             }
             catch (Exception exc)
             {
                 var message = "Failed to drop collection:" + Environment.NewLine + exc.Message;
                 _applicationInteraction.ShowError(exc, message, "Database error");
-                return Task.FromResult(Result.Fail<CollectionReference>(message));
+                return Task.FromResult(Result.Failure<CollectionReference>(message));
             }
         }
 
@@ -860,7 +860,7 @@ namespace LiteDbExplorer.Modules
                 Logger.Warning(e, "Cannot process clipboard data.");
                 _applicationInteraction.ShowError(e, message, "Import Error");
 
-                return Task.FromResult(Result.Fail<CollectionDocumentChangeEventArgs>(message));
+                return Task.FromResult(Result.Failure<CollectionDocumentChangeEventArgs>(message));
             }
         }
         
@@ -877,7 +877,7 @@ namespace LiteDbExplorer.Modules
 
             if (optionsResult.Action is AddDocumentOptions.ACTION_CANCEL)
             {
-                return Result.Fail<CollectionDocumentChangeEventArgs>(Fails.Canceled);
+                return Result.Failure<CollectionDocumentChangeEventArgs>(Fails.Canceled);
             }
 
             var newId = optionsResult.Model.NewId;

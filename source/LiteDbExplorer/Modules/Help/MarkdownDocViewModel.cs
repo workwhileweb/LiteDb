@@ -122,7 +122,7 @@ namespace LiteDbExplorer.Modules.Help
             }
             catch (Exception e)
             {
-                return Result.Fail<string>(e.Message);
+                return Result.Failure<string>(e.Message);
             }
         }
 

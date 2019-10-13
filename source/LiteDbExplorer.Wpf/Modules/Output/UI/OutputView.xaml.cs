@@ -18,7 +18,7 @@ namespace LiteDbExplorer.Wpf.Modules.Output.UI
         {
             InitializeComponent();
 
-            outputText.SyntaxHighlighting = HighlightingProvider.LoadDefaultHighlighting("Log.xshd", false);
+            outputText.SyntaxHighlighting = SyntaxHighlightingServices.Current.LoadDefinition(LogHighlightingProvider.Name, null);
 
             ToggleWordWrap();
 
