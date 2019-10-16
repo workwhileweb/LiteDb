@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows;
 using System.Windows.Shell;
 using System.Windows.Threading;
+using HL.Manager;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework.Windows;
 using LiteDbExplorer.Presentation;
@@ -81,7 +82,7 @@ namespace LiteDbExplorer
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            ThemeManager.InitColorTheme(Settings.ColorTheme);
+            SetColorTheme();
 
             CreateJumpList();
 
@@ -94,13 +95,16 @@ namespace LiteDbExplorer
             switch (e.PropertyName)
             {
                 case nameof(Settings.ColorTheme):
+                {
                     SetColorTheme();
                     break;
+                }
             }
         }
 
         private void SetColorTheme()
         {
+            ThemedHighlightingManager.Instance.SetCurrentTheme(Settings.ColorTheme == ColorTheme.Light ? "Light" : "VS2019_Dark");
             ThemeManager.SetColorTheme(Settings.ColorTheme);
         }
 

@@ -30,7 +30,7 @@ namespace LiteDbExplorer.Modules
         Task OpenDatabases(IEnumerable<string> paths);
         Task CloseDatabase(DatabaseReference database);
         Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database);
-        Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database);
+        Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(IScreen context, DatabaseReference database);
         Task<Result<CollectionDocumentChangeEventArgs>> ImportDataFromText(CollectionReference collection, string textData);
         Task<Result<CollectionDocumentChangeEventArgs>> CreateItem(IScreen context, CollectionReference collection);
         Task<Result> CopyDocuments(IEnumerable<DocumentReference> documents);
@@ -244,20 +244,27 @@ namespace LiteDbExplorer.Modules
             return Maybe<string>.From(maybeFileName.Value);
         }
 
-        public async Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(DatabaseReference database)
+        public async Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(IScreen context, DatabaseReference database)
         {
             var maybeFileName = await _applicationInteraction.ShowOpenFileDialog("Add file to database");
             if (maybeFileName.HasNoValue)
             {
-                return Result.Failure<CollectionDocumentChangeEventArgs>("FILE_OPEN_CANCELED");
+                return Result.Failure<CollectionDocumentChangeEventArgs>(Fails.Canceled);
+            }
+
+            var exportOptions = new AddFileOptions(database, Path.GetFileName(maybeFileName.Value));
+            var optionsResult = await ShowHostDialog(context).For(exportOptions);
+            if (optionsResult.Action is "cancel")
+            {
+                return Result.Failure<CollectionDocumentChangeEventArgs>(Fails.Canceled);
             }
 
             try
             {
-                var maybeId = await _applicationInteraction.ShowInputDialog("New file id:", "Enter new file id", Path.GetFileName(maybeFileName.Value));
-                if (maybeId.HasValue)
+                var fileId = optionsResult.Model.NewFileId;
+                if (!string.IsNullOrEmpty(fileId))
                 {
-                    var file = database.AddFile(maybeId.Value, maybeFileName.Value);
+                    var file = database.AddFile(fileId, maybeFileName.Value);
                     var documentsCreated = new CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction.Add, new [] {file}, file.Collection);
                     return Result.Ok(documentsCreated);
                 }
@@ -868,7 +875,7 @@ namespace LiteDbExplorer.Modules
         {
             if (collection is FileCollectionReference)
             {
-                return await AddFileToDatabase(collection.Database);
+                return await AddFileToDatabase(context, collection.Database);
             }
 
             var addDocumentOptions = new AddDocumentOptions(collection);

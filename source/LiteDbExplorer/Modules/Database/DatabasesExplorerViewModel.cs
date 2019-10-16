@@ -279,7 +279,7 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public async Task AddFile(DatabaseReference databaseReference)
         {
-            await _databaseInteractions.AddFileToDatabase(databaseReference)
+            await _databaseInteractions.AddFileToDatabase(this, databaseReference)
                 .Tap(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference, reference.Items);

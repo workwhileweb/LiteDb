@@ -4,6 +4,7 @@ namespace LiteDbExplorer.Wpf.Modules.AvalonEdit
 {
     public interface ISyntaxHighlightingServices
     {
-        IHighlightingDefinition LoadDefinition(string name, string theme);
+        IHighlightingDefinition LoadDefinitionFromName(string name, string theme);
+        IHighlightingDefinition LoadDefinitionFromExtension(string fileExtension, string theme);
     }
 }

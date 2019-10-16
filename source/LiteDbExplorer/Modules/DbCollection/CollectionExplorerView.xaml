@@ -97,12 +97,6 @@
 
                     <controls1:ToolDockPanel DockPanel.Dock="Bottom" Style="{StaticResource ToolDockPanelCompact}">
 
-                        <ToggleButton DockPanel.Dock="Right"
-                                      IsChecked="{Binding ShowDocumentPreview}"
-                                      ToolTip="Show Document Preview">
-                            <materialDesign:PackIcon Kind="EyeOutline" />
-                        </ToggleButton>
-
                         <ListBox DockPanel.Dock="Right"
                                  x:Name="splitOrientationSelector"
                                  SelectedIndex="1">
@@ -122,6 +116,24 @@
                                 </materialDesign:PackIcon>
                             </ListBoxItem>
                         </ListBox>
+
+                        <ToggleButton DockPanel.Dock="Right"
+                                      IsChecked="{Binding ShowDocumentPreview}"
+                                      ToolTip="Show Document Preview">
+                            <materialDesign:PackIcon Kind="FileEyeOutline" />
+                        </ToggleButton>
+
+                        <!--<ListBox DockPanel.Dock="Right" SelectedIndex="0">
+                            <i:Interaction.Behaviors>
+                                <behaviors:KeepSelectedItem/>
+                            </i:Interaction.Behaviors>
+                            <ListBoxItem>
+                                <materialDesign:PackIcon Kind="FormatListBulletedSquare" Style="{StaticResource ToolPackIcon}"/>
+                            </ListBoxItem>
+                            <ListBoxItem>
+                                <materialDesign:PackIcon Kind="ViewGrid" Style="{StaticResource ToolPackIcon}"/>
+                            </ListBoxItem>
+                        </ListBox>-->
 
                         <StackPanel Orientation="Horizontal" Opacity="0.5" Margin="10,0">
                             <TextBlock Text="{Binding DocumentsCountInfo}" VerticalAlignment="Center"/>

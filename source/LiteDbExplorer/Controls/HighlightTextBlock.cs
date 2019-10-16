@@ -139,7 +139,7 @@ namespace LiteDbExplorer.Controls
                 theme = "dark";
             }
 
-            SyntaxHighlighting = SyntaxHighlightingServices.Current.LoadDefinition(SyntaxHighlightingName, theme);;
+            SyntaxHighlighting = LocalHighlightingManager.Current.LoadDefinitionFromName(SyntaxHighlightingName, theme);;
         }
 
         private static IHighlightingDefinition LoadHighlightingFromAssembly(string name)

@@ -1,17 +1,38 @@
 ﻿<UserControl x:Class="LiteDbExplorer.Controls.FileView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:LiteDbExplorer.Controls"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
-        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+        <ScrollViewer x:Name="ScrollViewer" 
+                      VerticalScrollBarVisibility="Auto" 
+                      HorizontalScrollBarVisibility="Auto">
             <DockPanel>
-                <Image Name="ImageImage" Visibility="Collapsed" Stretch="None" DockPanel.Dock="Top"/>
-                <TextBox Name="TextText" Visibility="Collapsed" DockPanel.Dock="Top" AcceptsReturn="True" IsReadOnly="True" BorderThickness="0"/>
+                <ContentControl x:Name="ContentControl" 
+                                DockPanel.Dock="Top"
+                                Visibility="Collapsed"/>
             </DockPanel>
         </ScrollViewer>
+        <StackPanel Name="NoFilePreviewPanel">
+            <TextBlock Name="NoFilePreviewText" 
+                       TextAlignment="Center"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Top"
+                       Margin="45" Opacity="0.67"
+                       Text="No preview" 
+                       SnapsToDevicePixels="True"
+                       TextWrapping="Wrap"/>
+
+            <Image Name="NoFilePreviewImage" 
+                   HorizontalAlignment="Center" 
+                   Stretch="None"  
+                   SnapsToDevicePixels="True"
+                   RenderOptions.BitmapScalingMode="NearestNeighbor"
+                   RenderOptions.EdgeMode="Aliased"/>
+        </StackPanel>
+        
     </Grid>
 </UserControl>

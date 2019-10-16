@@ -112,7 +112,7 @@ namespace LiteDbExplorer.Controls
                 jsonEditor.TextArea.Foreground = new SolidColorBrush(Colors.Black);
             }
 
-            jsonEditor.SyntaxHighlighting = SyntaxHighlightingServices.Current.LoadDefinition(JsonHighlightingProvider.Name, theme);
+            jsonEditor.SyntaxHighlighting = LocalHighlightingManager.Current.LoadDefinitionFromName(JsonHighlightingProvider.Name, theme);
         }
 
         private void CanExecuteWithOpenSearchPanel(object sender, CanExecuteRoutedEventArgs e)

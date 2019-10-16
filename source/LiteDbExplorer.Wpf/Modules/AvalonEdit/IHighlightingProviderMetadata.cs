@@ -4,5 +4,6 @@
     {
         string Name { get; }
         int Order { get; }
+        string FileExtension { get; }
     }
 }

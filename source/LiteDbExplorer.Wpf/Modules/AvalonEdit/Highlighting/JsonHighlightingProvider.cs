@@ -4,7 +4,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 
 namespace LiteDbExplorer.Wpf.Modules.AvalonEdit
 {
-    [ExportHighlightingDefinition(Name, 0)]
+    [ExportHighlightingDefinition(Name, 0, ".json")]
     public class JsonHighlightingProvider : IHighlightingProvider
     {
         public const string Name = @"Json";

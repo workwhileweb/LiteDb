@@ -89,6 +89,7 @@
     <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
     <Compile Include="Controls\Highlighting\LiteDbCmdHighlightingProvider.cs" />
+    <Compile Include="Controls\TextBockExtensions.cs" />
     <Compile Include="Controls\ViewContentProxy.cs" />
     <Compile Include="Modules\Database\IDatabasesExplorerView.cs" />
     <Compile Include="Modules\DbDocument\DocumentEditorSettingsViewModel.cs" />
@@ -121,6 +122,7 @@
     <Compile Include="Modules\Main\ShellLayoutController.cs" />
     <Compile Include="Modules\Shared\AddCollectionOptions.cs" />
     <Compile Include="Modules\Shared\AddDocumentOptions.cs" />
+    <Compile Include="Modules\Shared\AddFileOptions.cs" />
     <Compile Include="Modules\Shared\DynamicFormStackView.cs" />
     <Compile Include="Modules\Shared\DynamicFormView.xaml.cs">
       <DependentUpon>DynamicFormView.xaml</DependentUpon>
@@ -515,7 +517,11 @@
       <Project>{e61b6d10-9f85-485d-99fa-7bce12315c57}</Project>
       <Name>LiteDbExplorer.Wpf</Name>
     </ProjectReference>
-    <ProjectReference Include="..\MaterialDesignThemes.Extended.Wpf.Toolkit\MaterialDesignThemes.Extended.Wpf.Toolkit.csproj">
+    <ProjectReference Include="..\Others\HL\HL.csproj">
+      <Project>{8b8fa49b-8c9c-497a-a327-a658f454d9a4}</Project>
+      <Name>HL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Others\MaterialDesignThemes.Extended.Wpf.Toolkit\MaterialDesignThemes.Extended.Wpf.Toolkit.csproj">
       <Project>{9713b6d9-59ab-4ac1-8990-c77cf1b84637}</Project>
       <Name>MaterialDesignThemes.Extended.Wpf.Toolkit</Name>
     </ProjectReference>
@@ -608,10 +614,10 @@
       <Version>3.0.0</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>10.4.1</Version>
+      <Version>10.5.7</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
-      <Version>2.8.0</Version>
+      <Version>2.9.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog.Sinks.Console">
       <Version>3.1.1</Version>

@@ -51,6 +51,8 @@
                 <Setter Property="Background" Value="{DynamicResource TextEditorBackground}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignPaper}" />
+                <Setter Property="avalonedit:TextArea.Foreground" Value="{DynamicResource MaterialDesignBody}"/>
+                <Setter Property="avalonedit:TextView.LinkTextForegroundBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
             </Style>
 
             <Style TargetType="localControls:ExtendedTextEditor">

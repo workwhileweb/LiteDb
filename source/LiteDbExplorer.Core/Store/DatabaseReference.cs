@@ -197,6 +197,11 @@ namespace LiteDbExplorer.Core
             return collection.Items.First(a => a.LiteDocument["_id"] == id);
         }
 
+        public bool FileExists(string id)
+        {
+            return LiteDatabase.FileStorage.Exists(id);
+        }
+
         public CollectionReference AddCollection(string name)
         {
             if (LiteDatabase.GetCollectionNames().Contains(name))

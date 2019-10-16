@@ -39,6 +39,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -124,6 +125,7 @@
     <Compile Include="Framework\Shell\StatusBarContentLocation.cs" />
     <Compile Include="Framework\Shell\ToolPanel.cs" />
     <Compile Include="Framework\TaskUtilities.cs" />
+    <Compile Include="Framework\Win32\IconManager.cs" />
     <Compile Include="Framework\Win32\NativeMethods.cs" />
     <Compile Include="Framework\WindowBase.cs" />
     <Compile Include="Framework\Windows\BaseDialogWindow.xaml.cs">
@@ -143,7 +145,7 @@
     <Compile Include="Modules\AvalonEdit\IHighlightingProviderMetadata.cs" />
     <Compile Include="Modules\AvalonEdit\ISyntaxHighlightingServices.cs" />
     <Compile Include="Modules\AvalonEdit\Highlighting\LogHighlightingProvider.cs" />
-    <Compile Include="Modules\AvalonEdit\SyntaxHighlightingServices.cs" />
+    <Compile Include="Modules\AvalonEdit\LocalHighlightingManager.cs" />
     <Compile Include="Modules\Exception\ExceptionScreenViewModel.cs" />
     <Compile Include="Modules\AvalonEdit\HighlightingHelper.cs" />
     <Compile Include="Modules\Output\IOutput.cs" />
@@ -314,7 +316,7 @@
       <Version>3.0.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
-      <Version>2.8.0</Version>
+      <Version>2.9.0</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
       <Version>4.2.0</Version>

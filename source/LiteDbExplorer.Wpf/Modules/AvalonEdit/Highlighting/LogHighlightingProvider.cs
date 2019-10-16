@@ -3,7 +3,7 @@ using ICSharpCode.AvalonEdit.Highlighting;
 
 namespace LiteDbExplorer.Wpf.Modules.AvalonEdit
 {
-    [ExportHighlightingDefinition(Name, 0)]
+    [ExportHighlightingDefinition(Name, 0, ".log")]
     public class LogHighlightingProvider : IHighlightingProvider
     {
         public const string Name = @"Log";
