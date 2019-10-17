@@ -30,7 +30,7 @@ namespace LiteDbExplorer.Modules
         Task OpenDatabases(IEnumerable<string> paths);
         Task CloseDatabase(DatabaseReference database);
         Task<Maybe<string>> SaveDatabaseCopyAs(DatabaseReference database);
-        Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(IScreen context, DatabaseReference database);
+        Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(IScreen context, DatabaseReference database, string filePath = null);
         Task<Result<CollectionDocumentChangeEventArgs>> ImportDataFromText(CollectionReference collection, string textData);
         Task<Result<CollectionDocumentChangeEventArgs>> CreateItem(IScreen context, CollectionReference collection);
         Task<Result> CopyDocuments(IEnumerable<DocumentReference> documents);
@@ -244,12 +244,16 @@ namespace LiteDbExplorer.Modules
             return Maybe<string>.From(maybeFileName.Value);
         }
 
-        public async Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(IScreen context, DatabaseReference database)
+        public async Task<Result<CollectionDocumentChangeEventArgs>> AddFileToDatabase(IScreen context, DatabaseReference database, string filePath = null)
         {
-            var maybeFileName = await _applicationInteraction.ShowOpenFileDialog("Add file to database");
-            if (maybeFileName.HasNoValue)
+            Maybe<string> maybeFileName = filePath;
+            if (string.IsNullOrEmpty(filePath))
             {
-                return Result.Failure<CollectionDocumentChangeEventArgs>(Fails.Canceled);
+                maybeFileName = await _applicationInteraction.ShowOpenFileDialog("Add file to database");
+                if (maybeFileName.HasNoValue)
+                {
+                    return Result.Failure<CollectionDocumentChangeEventArgs>(Fails.Canceled);
+                }
             }
 
             var exportOptions = new AddFileOptions(database, Path.GetFileName(maybeFileName.Value));

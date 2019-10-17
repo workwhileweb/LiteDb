@@ -65,6 +65,8 @@ namespace LiteDbExplorer.Modules.DbCollection
             FindCommand = new RelayCommand(_ => OpenFind(), o => CanOpenFind());
             FindNextCommand = new RelayCommand(_ => Find(), o => CanFind());
             FindPreviousCommand = new RelayCommand(_ => FindPrevious(), o => CanFind());
+
+            FileDroppedCommand = new AsyncCommand<IDataObject>(OnFileDropped);
         }
 
         public CollectionItemDoubleClickAction DoubleClickAction { get; }
@@ -96,6 +98,8 @@ namespace LiteDbExplorer.Modules.DbCollection
         public ICommand FindNextCommand { get; }
 
         public ICommand FindPreviousCommand { get; }
+
+        public ICommand FileDroppedCommand { get; }
 
         public FindTextModel FindTextModel { get; }
 
@@ -504,6 +508,27 @@ namespace LiteDbExplorer.Modules.DbCollection
         public bool CanFind()
         {
             return CollectionReference != null && IsFindOpen;
+        }
+
+        private async Task OnFileDropped(IDataObject dataObject)
+        {
+            if (dataObject.GetDataPresent(DataFormats.FileDrop) &&
+                dataObject.GetData(DataFormats.FileDrop, false) is string[] paths)
+            {
+                if (CollectionReference.IsFilesOrChunks)
+                {
+                    var result = await _databaseInteractions.AddFileToDatabase(this, CollectionReference.Database, filePath: paths.FirstOrDefault());
+                    if (result.IsSuccess)
+                    {
+                        Init(new CollectionReferencePayload(result.Value.CollectionReference));
+                        _view?.SelectItem(result.Value.DocumentReference);
+                    }
+                    
+                    return;
+                }
+
+                await _databaseInteractions.OpenDatabases(paths);
+            }
         }
 
         #endregion

@@ -31,7 +31,7 @@ namespace LiteDbExplorer.Core
         public CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction action, IReadOnlyCollection<DocumentReference> items, CollectionReference collectionReference) : base(action, items)
         {
             CollectionReference = collectionReference;
-            DocumentReference = collectionReference.Items.LastOrDefault();
+            DocumentReference = items?.LastOrDefault();
         }
 
         public CollectionDocumentChangeEventArgs(ReferenceNodeChangeAction action, DocumentReference item, CollectionReference collectionReference) : base(action, item)

@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace HL.Manager
 {
     using HL.HighlightingTheme;
@@ -115,6 +117,32 @@ namespace HL.Manager
                 }
 
                 return null;
+            }
+        }
+
+        public IEnumerable<string> GetRegisteredExtensions()
+        {
+            lock (lockObj)
+            {
+                if (_ThemedHighlightings.TryGetValue(CurrentTheme.Key, out var theme))
+                {
+                    return theme.GetRegisteredExtensions();
+                }
+
+                return Enumerable.Empty<string>();
+            }
+        }
+
+        public IEnumerable<string> GetRegisteredNames()
+        {
+            lock (lockObj)
+            {
+                if (_ThemedHighlightings.TryGetValue(CurrentTheme.Key, out var theme))
+                {
+                    return theme.GetRegisteredNames();
+                }
+
+                return Enumerable.Empty<string>();
             }
         }
 

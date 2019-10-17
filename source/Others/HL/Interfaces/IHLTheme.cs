@@ -1,4 +1,6 @@
-﻿namespace HL.Manager
+﻿using System.Collections.Generic;
+
+namespace HL.Manager
 {
     using System.Collections.ObjectModel;
     using HL.HighlightingTheme;
@@ -112,5 +114,8 @@
         /// <returns></returns>
         XhstdThemeDefinition ResolveHighLightingTheme(string hLPrefix, string hLThemeName);
         #endregion methods
+
+        IEnumerable<string> GetRegisteredExtensions();
+        IEnumerable<string> GetRegisteredNames();
     }
 }

@@ -17,6 +17,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Others", "Others", "{6F1F52
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HL", "Others\HL\HL.csproj", "{8B8FA49B-8C9C-497A-A327-A658F454D9A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZoomAndPan", "Others\ZoomAndPan\ZoomAndPan.csproj", "{468ADEDE-6F5E-40C0-99C9-C6DAC4FAC934}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,10 @@ Global
 		{8B8FA49B-8C9C-497A-A327-A658F454D9A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B8FA49B-8C9C-497A-A327-A658F454D9A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B8FA49B-8C9C-497A-A327-A658F454D9A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{468ADEDE-6F5E-40C0-99C9-C6DAC4FAC934}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{468ADEDE-6F5E-40C0-99C9-C6DAC4FAC934}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{468ADEDE-6F5E-40C0-99C9-C6DAC4FAC934}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{468ADEDE-6F5E-40C0-99C9-C6DAC4FAC934}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +60,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{9713B6D9-59AB-4AC1-8990-C77CF1B84637} = {6F1F5224-1F50-4ADA-BAAF-83E6B264A7ED}
 		{8B8FA49B-8C9C-497A-A327-A658F454D9A4} = {6F1F5224-1F50-4ADA-BAAF-83E6B264A7ED}
+		{468ADEDE-6F5E-40C0-99C9-C6DAC4FAC934} = {6F1F5224-1F50-4ADA-BAAF-83E6B264A7ED}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {3A1DBB19-D084-4E8C-967D-7EA26CCD4FEC}

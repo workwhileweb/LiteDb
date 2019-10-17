@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace HL.Interfaces
 {
     using HL.Manager;
@@ -61,5 +63,8 @@ namespace HL.Interfaces
         /// <param name="name"></param>
         void SetCurrentTheme(string name);
         #endregion methods
+
+        IEnumerable<string> GetRegisteredExtensions();
+        IEnumerable<string> GetRegisteredNames();
     }
 }

@@ -7,16 +7,21 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         <ScrollViewer x:Name="ScrollViewer" 
+                      CanContentScroll="True"
                       VerticalScrollBarVisibility="Auto" 
                       HorizontalScrollBarVisibility="Auto">
-            <DockPanel>
-                <ContentControl x:Name="ContentControl" 
-                                DockPanel.Dock="Top"
-                                Visibility="Collapsed"/>
-            </DockPanel>
+            <ContentControl x:Name="ContentControl" 
+                            Visibility="Collapsed"
+                            VerticalContentAlignment="Stretch"
+                            HorizontalContentAlignment="Stretch"/>
         </ScrollViewer>
-        <StackPanel Name="NoFilePreviewPanel">
+        <StackPanel Grid.Row="0" 
+                    x:Name="NoFilePreviewPanel">
             <TextBlock Name="NoFilePreviewText" 
                        TextAlignment="Center"
                        HorizontalAlignment="Center"
@@ -25,14 +30,8 @@
                        Text="No preview" 
                        SnapsToDevicePixels="True"
                        TextWrapping="Wrap"/>
-
-            <Image Name="NoFilePreviewImage" 
-                   HorizontalAlignment="Center" 
-                   Stretch="None"  
-                   SnapsToDevicePixels="True"
-                   RenderOptions.BitmapScalingMode="NearestNeighbor"
-                   RenderOptions.EdgeMode="Aliased"/>
         </StackPanel>
-        
+        <ContentControl Grid.Row="1" x:Name="FooterContentControl"
+                        HorizontalContentAlignment="Stretch"/>
     </Grid>
 </UserControl>

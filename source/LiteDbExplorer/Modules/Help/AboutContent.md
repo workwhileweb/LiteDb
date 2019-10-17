@@ -10,9 +10,23 @@ Following codes / libraries make it happen, thanks for their work.
 
 
 ### [JosefNemec/LiteDbExplorer](https://github.com/JosefNemec/LiteDbExplorer)
+[MIT License](http://opensource.org/licenses/MIT).
 
 
 ### [gemini](https://github.com/tgjones/gemini)
+[LICENCE](https://github.com/tgjones/gemini/blob/master/LICENCE.txt)
+
+
+### [SlyZ/CommandToCommandBindings.cs](https://gist.github.com/SlyZ/ca7b03931412115cc5fb1416180ad1b4)
+
+
+### [Dirkster99/AvalonEditHighlightingThemes](https://github.com/Dirkster99/AvalonEditHighlightingThemes)
+[MIT License](http://opensource.org/licenses/MIT).
+
+
+### [An Enhanced WPF Custom Control for Zooming and Panning](https://www.codeproject.com/Articles/1119476/An-Enhanced-WPF-Custom-Control-for-Zooming-and-Pan)
+[CPOL](https://www.codeproject.com/info/cpol10.aspx)
+
 
 
 ### [AvalonEdit](http://avalonedit.net/)

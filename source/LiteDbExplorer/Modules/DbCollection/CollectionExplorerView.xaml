@@ -13,7 +13,8 @@
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:controls1="clr-namespace:LiteDbExplorer.Wpf.Controls;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             behaviors:DropBehavior.PreviewDropCommand="{Binding FileDroppedCommand}">
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </UserControl.Resources>
@@ -41,6 +42,8 @@
                                           TargetCommand="{Binding FindNextCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindPrevious" 
                                           TargetCommand="{Binding FindPreviousCommand}"/>
+        <!--<commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FileDropped" 
+                                          TargetCommand="{Binding FileDroppedCommand}"/>-->
     </commands:CommandToCommand.Bindings>
     <Grid>
         <controls1:SplitContainer x:Name="splitContainer" 

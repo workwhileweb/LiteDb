@@ -91,6 +91,9 @@
     <Compile Include="Controls\Highlighting\LiteDbCmdHighlightingProvider.cs" />
     <Compile Include="Controls\TextBockExtensions.cs" />
     <Compile Include="Controls\ViewContentProxy.cs" />
+    <Compile Include="Controls\ZoomAndPanView.xaml.cs">
+      <DependentUpon>ZoomAndPanView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Modules\Database\IDatabasesExplorerView.cs" />
     <Compile Include="Modules\DbDocument\DocumentEditorSettingsViewModel.cs" />
     <Compile Include="Modules\DbQuery\QueryViewHandler.cs" />
@@ -340,6 +343,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Controls\ZoomAndPanView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Modules\DbCollection\CollectionExplorerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -524,6 +531,10 @@
     <ProjectReference Include="..\Others\MaterialDesignThemes.Extended.Wpf.Toolkit\MaterialDesignThemes.Extended.Wpf.Toolkit.csproj">
       <Project>{9713b6d9-59ab-4ac1-8990-c77cf1b84637}</Project>
       <Name>MaterialDesignThemes.Extended.Wpf.Toolkit</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Others\ZoomAndPan\ZoomAndPan.csproj">
+      <Project>{468adede-6f5e-40c0-99c9-c6dac4fac934}</Project>
+      <Name>ZoomAndPan</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

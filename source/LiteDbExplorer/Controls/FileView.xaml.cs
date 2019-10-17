@@ -14,7 +14,9 @@ using Humanizer;
 using Humanizer.Bytes;
 using LiteDbExplorer.Wpf.Framework.Win32;
 using ICSharpCode.AvalonEdit;
+using LiteDbExplorer.Core;
 using LiteDbExplorer.Presentation;
+using ZoomAndPan;
 
 namespace LiteDbExplorer.Controls
 {
@@ -78,6 +80,16 @@ namespace LiteDbExplorer.Controls
             }
         }
 
+        public object FooterContent
+        {
+            get => FooterContentControl.Content;
+            set
+            {
+                FooterContentControl.Content = value;
+                FooterContentControl.Visibility = FooterContentControl.Content == null ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
         public string FileExtension { get; private set; }
 
         public void LoadFile(LiteFileInfo file)
@@ -138,7 +150,6 @@ namespace LiteDbExplorer.Controls
         protected void ResetNoContentPreview()
         {
             NoFilePreviewPanel.Visibility = Visibility.Collapsed;
-            NoFilePreviewImage.Source = null;
             NoFilePreviewText.Text = string.Empty;
         }
 
@@ -151,7 +162,6 @@ namespace LiteDbExplorer.Controls
             }
 
             NoFilePreviewText.Text = message;
-            TrySetFileIcon(NoFilePreviewImage, file.Filename);
             NoFilePreviewPanel.Visibility = Visibility.Visible;
         }
 
@@ -162,7 +172,7 @@ namespace LiteDbExplorer.Controls
                 disposable.Dispose();
             }
 
-            ToolTip = null;
+            FooterContent = null;
             PreviewContent = null;
             ResetNoContentPreview();
         }
@@ -179,7 +189,7 @@ namespace LiteDbExplorer.Controls
             var textBlock = new TextBlock
             {
                 TextWrapping = TextWrapping.WrapWithOverflow,
-                MaxWidth = 450
+                FontSize = PointsToPixels(8.25)
             }
             .SetDefinitionList(fileInfo);
 
@@ -190,16 +200,26 @@ namespace LiteDbExplorer.Controls
 
             TrySetFileIcon(fileIcon, file.Filename);
 
-            ToolTip = new StackPanel
+            Grid.SetColumn(fileIcon, 0);
+            Grid.SetColumn(textBlock, 1);
+
+            var grid = new Grid
             {
-                Orientation = Orientation.Horizontal,
+                Margin = new Thickness(15,8,15,8),
+                ColumnDefinitions =
+                {
+                    new ColumnDefinition { Width = GridLength.Auto },
+                    new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }
+                },
                 Children =
                 {
                     fileIcon,
                     textBlock
                 }
             };
-            ToolTipService.SetPlacement(this, PlacementMode.Mouse);
+
+            FooterContent = grid;
+            // ToolTipService.SetPlacement(this, PlacementMode.Mouse);
         }
 
         protected static void TrySetFileIcon(Image image, string fileName)
@@ -214,6 +234,11 @@ namespace LiteDbExplorer.Controls
             }
         }
 
+        protected static double PointsToPixels(double points)
+        {
+            return points*(96.0/72.0);
+        }
+
     }
 
 
@@ -226,7 +251,7 @@ namespace LiteDbExplorer.Controls
 
     public class ImageFilePreviewHandler : FilePreviewHandler
     {
-        public override bool CanContentScroll => true;
+        public override bool CanContentScroll => false;
 
         public override bool CanHandle(LiteFileInfo file)
         {
@@ -254,21 +279,39 @@ namespace LiteDbExplorer.Controls
 
         protected FrameworkElement GetImagePreview(ImageSource imageSource)
         {
-            return new Image{ Stretch = Stretch.None, Source = imageSource };
+            var image = new Image{ Stretch = Stretch.None, Source = imageSource };
+
+            var zoomAndPanView = new ZoomAndPanView
+            {
+                Content = image
+            };
+
+            return zoomAndPanView;
         }
     }
 
     public class TextFilePreviewHandler : FilePreviewHandler
     {
         private static readonly Regex TextRegex = new Regex("text|json|script");
-        private static readonly string[] HandledTextExtension = {".log", ".md", ".sql", ".json", ".xml"};
+        private static readonly string[] DefaultTextExtension = {".log", ".md", ".sql", ".json", ".xml"};
+        private readonly HashSet<string> _allHandledTextExtension;
 
         public override bool CanContentScroll => false;
+
+        public TextFilePreviewHandler()
+        {
+            _allHandledTextExtension = new HashSet<string>(DefaultTextExtension);
+            var registeredExtensions = ThemedHighlightingManager.Instance.GetRegisteredExtensions();
+            if (registeredExtensions != null)
+            {
+                _allHandledTextExtension.UnionWith(registeredExtensions);
+            }
+        }
 
         public override bool CanHandle(LiteFileInfo file)
         {
             var fileExtension = Path.GetExtension(file.Filename);
-            return TextRegex.IsMatch(file.MimeType) || HandledTextExtension.Contains(fileExtension, StringComparer.OrdinalIgnoreCase);
+            return TextRegex.IsMatch(file.MimeType) || _allHandledTextExtension.Contains(fileExtension);
         }
 
         public override FrameworkElement GetPreview(LiteFileInfo file)

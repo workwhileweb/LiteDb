@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Core;
 
@@ -47,6 +48,15 @@ namespace LiteDbExplorer.Modules.DbCollection
         public void ScrollIntoItem(object item)
         {
             CollectionListView.ScrollIntoItem(item);
+        }
+
+        public void SelectItem(object item)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                CollectionListView.ScrollIntoItem(item);
+                CollectionListView.ListCollectionData.SelectedItem = item;
+            }, DispatcherPriority.Normal);
         }
 
         public void ScrollIntoSelectedItem()

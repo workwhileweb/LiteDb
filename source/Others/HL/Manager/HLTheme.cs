@@ -222,6 +222,26 @@ namespace HL.Manager
             }
         }
 
+        public IEnumerable<string> GetRegisteredExtensions()
+        {
+            if (highlightingsByExtension == null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            return highlightingsByExtension.Select(p => p.Key).Distinct();
+        }
+
+        public IEnumerable<string> GetRegisteredNames()
+        {
+            if (highlightingsByName == null)
+            {
+                return Enumerable.Empty<string>();
+            }
+
+            return highlightingsByName.Select(p => p.Key).Distinct();
+        }
+
         /// <summary>
         /// Registers a highlighting definition.
         /// </summary>
