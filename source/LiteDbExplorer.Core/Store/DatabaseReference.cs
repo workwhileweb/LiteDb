@@ -4,18 +4,12 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.IO;
 using System.Linq;
+using JetBrains.Annotations;
 using LiteDB;
 using Serilog;
 
 namespace LiteDbExplorer.Core
 {
-    public enum ConnectionMode
-    {
-        Exclusive,
-        ReadOnly,
-        Shared
-    }
-
     public sealed class DatabaseReference : ReferenceNode<DatabaseReference>
     {
         private readonly bool _enableLog;
@@ -23,34 +17,30 @@ namespace LiteDbExplorer.Core
         private bool _isDisposing;
         private bool _beforeDisposeHandled;
 
-        public DatabaseReference(string path, string password, bool enableLog = false)
+        public DatabaseReference([NotNull] DatabaseConnectionOptions options)
         {
-            _enableLog = enableLog;
-            
-            Log.Information("Open database {path}", path);
-
-            Location = path;
-            Name = Path.GetFileName(path);
-
-            var connectionMap = new Dictionary<string, string>
+            if (options == null)
             {
-                { "Filename", path },
-                { "Password", password },
-                { "Mode", $"{LiteDB.FileMode.Exclusive}" }
-            };
+                throw new ArgumentNullException(nameof(options));
+            }
 
-            var connectionString = connectionMap
-                .Where(pair => !string.IsNullOrEmpty(pair.Value))
-                .Select(pair => $"{pair.Key}={pair.Value}")
-                .Aggregate((p, n) => $"{p};{n}");
+            _enableLog = options.EnableLog;
+
+            Log.Information("Open database {path}, mode: {mode}.", options.Path, options.Mode);
+
+            Location = options.Path;
+            Name = Path.GetFileName(options.Path);
+
+            var connectionString = options.GetConnectionString();
 
             LiteDatabase = new LiteDatabase(connectionString, log: GetLogger());
 
             UpdateCollections();
 
             OnReferenceChanged(ReferenceNodeChangeAction.Add, this);
+
         }
-        
+
         public LiteDatabase LiteDatabase { get; }
 
         public string Name { get; set; }

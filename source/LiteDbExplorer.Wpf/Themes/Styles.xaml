@@ -38,7 +38,7 @@
         <ResourceDictionary Source="Controls.ContextMenu.xaml" />
         <ResourceDictionary Source="Controls.SplitContainer.xaml" />
         <ResourceDictionary Source="Controls.SearchableTextControl.xaml" />
-        
+
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSharpFunctionalExtensions" Version="2.1.1" />
-    <PackageReference Include="DynamicData" Version="6.13.18" />
-    <PackageReference Include="Fody" Version="6.0.0">
+    <PackageReference Include="CSharpFunctionalExtensions" Version="2.2.2" />
+    <PackageReference Include="DynamicData" Version="6.13.21" />
+    <PackageReference Include="Fody" Version="6.0.4">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

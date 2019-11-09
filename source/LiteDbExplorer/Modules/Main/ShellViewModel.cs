@@ -113,8 +113,8 @@ namespace LiteDbExplorer.Modules.Main
             CommandManager.InvalidateRequerySuggested();
 
 #if (!DEBUG)
-            await Task.Delay(TimeSpan.FromSeconds(5))
-                .ContinueWith(task => AppUpdateManager.Current.CheckForUpdates(false), TaskScheduler.Current);
+            await Task.Delay(TimeSpan.FromSeconds(40))
+                .ContinueWith(task => { OnUIThread(() => AppUpdateManager.Current.CheckForUpdates(false).ConfigureAwait(false)); });
 #endif
         }
 

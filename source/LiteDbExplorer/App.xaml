@@ -10,6 +10,7 @@
              xmlns:avalonedit="http://icsharpcode.net/sharpdevelop/avalonedit"
              xmlns:modules="clr-namespace:LiteDbExplorer.Modules"
              xmlns:cal="http://www.caliburnproject.org"
+             xmlns:system="clr-namespace:System;assembly=mscorlib"
              ShutdownMode="OnExplicitShutdown"
              Startup="Application_Startup" Exit="Application_Exit">
     <Application.Resources>
@@ -35,6 +36,9 @@
 
             </ResourceDictionary.MergedDictionaries>
 
+            <system:Double x:Key="{x:Static SystemParameters.VerticalScrollBarWidthKey}">6</system:Double>
+            <system:Double x:Key="{x:Static SystemParameters.HorizontalScrollBarHeightKey}">6</system:Double>
+
             <Style TargetType="{x:Type ScrollBar}"
                    BasedOn="{StaticResource MaterialDesignScrollBarMinimal}">
                 <Setter Property="materialDesign:ScrollBarAssist.ThumbCornerRadius" Value="0" />
@@ -51,8 +55,9 @@
                 <Setter Property="Background" Value="{DynamicResource TextEditorBackground}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignPaper}" />
-                <Setter Property="avalonedit:TextArea.Foreground" Value="{DynamicResource MaterialDesignBody}"/>
-                <Setter Property="avalonedit:TextView.LinkTextForegroundBrush" Value="{DynamicResource PrimaryHueMidBrush}"/>
+                <Setter Property="avalonedit:TextArea.Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                <Setter Property="avalonedit:TextView.LinkTextForegroundBrush"
+                        Value="{DynamicResource PrimaryHueMidBrush}" />
             </Style>
 
             <Style TargetType="localControls:ExtendedTextEditor">
@@ -130,8 +135,8 @@
             </DrawingImage>
 
             <Style x:Key="ShellBackgroundImageStyle" TargetType="Image">
-                <Setter Property="Stretch" Value="Uniform"/>
-                <Setter Property="SnapsToDevicePixels" Value="True"/>
+                <Setter Property="Stretch" Value="Uniform" />
+                <Setter Property="SnapsToDevicePixels" Value="True" />
                 <Setter Property="Source">
                     <Setter.Value>
                         <DrawingImage>
@@ -150,6 +155,43 @@
                         </DrawingImage>
                     </Setter.Value>
                 </Setter>
+            </Style>
+
+            <ControlTemplate x:Key="MaterialDesignScrollViewerTemplate" TargetType="{x:Type ScrollViewer}">
+                <Grid x:Name="Grid" Background="{TemplateBinding Background}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Rectangle x:Name="Corner" Grid.Column="1" Fill="{TemplateBinding Background}" Grid.Row="1" />
+                    <ScrollContentPresenter x:Name="PART_ScrollContentPresenter"
+                                            CanContentScroll="{TemplateBinding CanContentScroll}"
+                                            CanHorizontallyScroll="False"
+                                            CanVerticallyScroll="False"
+                                            ContentTemplate="{TemplateBinding ContentTemplate}"
+                                            Content="{TemplateBinding Content}" Grid.Column="0"
+                                            Margin="{TemplateBinding Padding}" Grid.Row="0" />
+                    <ScrollBar x:Name="PART_VerticalScrollBar" AutomationProperties.AutomationId="VerticalScrollBar"
+                               Cursor="Arrow" Grid.Column="1" Maximum="{TemplateBinding ScrollableHeight}" Minimum="0"
+                               Grid.Row="0" Visibility="{TemplateBinding ComputedVerticalScrollBarVisibility}"
+                               Value="{Binding VerticalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                               ViewportSize="{TemplateBinding ViewportHeight}" />
+                    <ScrollBar x:Name="PART_HorizontalScrollBar"
+                               AutomationProperties.AutomationId="HorizontalScrollBar"
+                               Cursor="Arrow" Grid.Column="0" Maximum="{TemplateBinding ScrollableWidth}" Minimum="0"
+                               Orientation="Horizontal" Grid.Row="1"
+                               Visibility="{TemplateBinding ComputedHorizontalScrollBarVisibility}"
+                               Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}"
+                               ViewportSize="{TemplateBinding ViewportWidth}" />
+                </Grid>
+            </ControlTemplate>
+
+            <Style TargetType="ScrollViewer">
+                <Setter Property="Template" Value="{StaticResource MaterialDesignScrollViewerTemplate}" />
             </Style>
 
         </ResourceDictionary>

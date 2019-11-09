@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.Composition;
-using System.Windows.Controls;
 using Caliburn.Micro;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Wpf.Controls;

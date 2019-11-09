@@ -155,7 +155,12 @@ namespace LiteDbExplorer.Modules
                     rememberMe = maybePasswordInput.Value.RememberMe;
                 }
 
-                Store.Current.AddDatabase(new DatabaseReference(path, password));
+                var connectionOptions = new DatabaseConnectionOptions(path, password)
+                {
+                    Mode = Properties.Settings.Default.Database_ConnectionFileMode
+                };
+
+                Store.Current.AddDatabase(new DatabaseReference(connectionOptions));
 
                 if (!string.IsNullOrEmpty(password) && rememberMe)
                 {

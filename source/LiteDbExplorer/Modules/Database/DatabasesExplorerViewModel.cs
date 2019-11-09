@@ -103,7 +103,7 @@ namespace LiteDbExplorer.Modules.Database
 
         private void OnDatabasesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Commands.ShowNavigationPanel.ExecuteOnMain(true);
+            Commands.ShowNavigationPanel.ExecuteOnMainWindow(true);
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
