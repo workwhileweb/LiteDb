@@ -18,15 +18,6 @@ Requirements: Windows 7, 8 or 10 and [.Net 4.6.2](https://www.microsoft.com/en-u
 >
 > If you always want to be notified about updates, please **upgrade to version 0.8.4.1** by manually checking on help menu or [download on releases page](<https://github.com/julianpaulozzi/LiteDbExplorer/releases>).
 
-
-## Important Notes
-
-**This is a pre-release.** We'll point out that this release is identified as non-production ready.
-
-The main purpose of keeping this fork is to meet my LiteDB use cases, refresh WPF knowledge, and share some improvements with the community.
-
-I have seen some LiteDB use cases that go far beyond any that would have with this database. If you use LiteDB to store a large volume of data, large texts and many files ... this project currently will not meet your needs and is outside my current contribution scope. Any contribution is welcome, so before opening a issue mainly related to this topic collaborate and submit a pull request or use [other alternatives](https://github.com/mbdavid/LiteDB#3rd-party-tools-for-litedb).
-
 ## Features in current pre-release:
 * Material dark and white theme.
 * Open multiple databases at the same time.
@@ -42,6 +33,28 @@ I have seen some LiteDB use cases that go far beyond any that would have with th
 * Shrink database.
 * Support for query using shell commands (WIP).
 * Portable exe (require .NET 4.6.2).
+
+### Some screenshots
+
+<p>
+<img align="center" src="https://raw.githubusercontent.com/julianpaulozzi/LiteDbExplorer/master/web/list_dark.png" width="880" >
+</p>
+
+<p>
+<img align="center" src="https://raw.githubusercontent.com/julianpaulozzi/LiteDbExplorer/master/web/query_dark.png" width="880" >
+</p>
+
+<p>
+<img align="center" src="https://raw.githubusercontent.com/julianpaulozzi/LiteDbExplorer/master/web/edit_dark.png" width="880" >
+</p>
+
+## Important Notes
+
+**This is a pre-release.** We'll point out that this release is identified as non-production ready.
+
+The main purpose of keeping this fork is to meet my LiteDB use cases, refresh WPF knowledge, and share some improvements with the community.
+
+I have seen some LiteDB use cases that go far beyond any that would have with this database. If you use LiteDB to store a large volume of data, large texts and many files ... this project currently will not meet your needs and is outside my current contribution scope. Any contribution is welcome, so before opening a issue mainly related to this topic collaborate and submit a pull request or use [other alternatives](https://github.com/mbdavid/LiteDB#3rd-party-tools-for-litedb).
 
 # Issue Reporting Guidelines
 
