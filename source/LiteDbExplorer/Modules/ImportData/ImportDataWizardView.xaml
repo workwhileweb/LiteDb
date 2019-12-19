@@ -45,9 +45,12 @@
         </Border>
 
         <Border Grid.Row="1" Background="{DynamicResource MaterialDesignPaper}" MinHeight="400">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <!--<ScrollViewer VerticalScrollBarVisibility="Auto">
                 <ContentControl Margin="20,10" cal:View.Model="{Binding ActiveItem}" />
-            </ScrollViewer>
+            </ScrollViewer>-->
+            <ContentControl Margin="20,10" cal:View.Model="{Binding ActiveItem}" 
+                            VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                            VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch"/>
         </Border>
 
         <Border Grid.Row="2" Height="60"

@@ -169,8 +169,8 @@ SOFTWARE.
 [The project is licensed under the GNU Library General Public License (LGPL).](https://licenses.nuget.org/LGPL-3.0-or-later).
 
 
-### [wpftoolkit](https://github.com/xceedsoftware/wpftoolkit)
-[MS-PL License](https://licenses.nuget.org/MS-PL).
+### [Extended WPF Toolkit](https://github.com/xceedsoftware/wpftoolkit)
+[Xceed Software, Inc. Community License](https://raw.githubusercontent.com/xceedsoftware/wpftoolkit/master/license.md).
 
 
 

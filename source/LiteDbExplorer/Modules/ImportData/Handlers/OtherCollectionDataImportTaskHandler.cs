@@ -37,6 +37,8 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
         [Field]
         public object TargetOptionsContext => _targetOptions;
 
+        public bool CanContentScroll => true;
+
         public bool HasNext => true;
 
         public Task<object> Next()
@@ -78,7 +80,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
         }
 
         [Heading("Target Options")]
-        public class TargetOptions : ImportTargetDefaultOptions
+        public class TargetOptions : ImportTargetSelectorScreen
         {
         }
 

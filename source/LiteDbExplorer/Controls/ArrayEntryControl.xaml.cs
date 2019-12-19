@@ -80,8 +80,6 @@ namespace LiteDbExplorer.Controls
 
         private readonly WindowController _windowController;
 
-        public BsonArray EditedItems;
-
         public ArrayEntryControl(BsonArray array, bool readOnly, WindowController windowController = null)
         {
             _windowController = windowController;
@@ -128,6 +126,8 @@ namespace LiteDbExplorer.Controls
 
 
         public ObservableCollection<ArrayUIItem> Items { get; set; }
+
+        public BsonArray EditedItems { get; set; }
 
         public bool IsReadOnly { get; } = false;
 
@@ -218,7 +218,7 @@ namespace LiteDbExplorer.Controls
                     if (BindingOperations.IsDataBound(control, current.Property))
                     {
                         var binding = control.GetBindingExpression(current.Property);
-                        if (binding.IsDirty)
+                        if (binding?.IsDirty == true)
                         {
                             binding.UpdateSource();
                         }

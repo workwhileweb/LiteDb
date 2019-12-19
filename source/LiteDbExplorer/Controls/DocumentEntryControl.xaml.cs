@@ -20,10 +20,11 @@ namespace LiteDbExplorer.Controls
 {
     public class DocumentFieldData : INotifyPropertyChanged
     {
-        public DocumentFieldData(string name, FrameworkElement editControl, bool isReadonly = false)
+        public DocumentFieldData(string name, FrameworkElement editControl, BsonType bsonType, bool isReadonly = false)
         {
             Name = name;
             EditControl = editControl;
+            BsonType = bsonType;
             IsReadOnly = isReadonly;
         }
 
@@ -32,6 +33,10 @@ namespace LiteDbExplorer.Controls
         public FrameworkElement EditControl { get; set; }
 
         public bool IsReadOnly { get; set; }
+
+        public bool IsEnable => !IsReadOnly;
+
+        public BsonType BsonType { get; set; }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -344,25 +349,27 @@ namespace LiteDbExplorer.Controls
                 expandMode = OpenEditorMode.Window;
             }
 
-            var editorAllowEditId = Properties.Settings.Default.DocumentEditor_AllowEditId;
-            var isReadOnly = readOnly || (_currentDocument[key].IsObjectId && !editorAllowEditId) || (IsFileCollection && key.Equals("_id") && !editorAllowEditId);
+            var bsonValue = _currentDocument[key];
 
-            if (_currentDocument[key].IsNull)
+            var editorAllowEditId = Properties.Settings.Default.DocumentEditor_AllowEditId;
+            var isReadOnly = readOnly || (bsonValue.IsObjectId && !editorAllowEditId) || (IsFileCollection && key.Equals("_id") && !editorAllowEditId);
+
+            if (bsonValue.IsNull)
             {
                 var docTypePicker = GetNullValueEditor(key, isReadOnly, expandMode);
-                return new DocumentFieldData(key, docTypePicker);
+                return new DocumentFieldData(key, docTypePicker, bsonValue.Type);
             }
 
             var valueEdit =
                 BsonValueEditor.GetBsonValueEditor(
                     expandMode,
                     $"[{key}]",
-                    _currentDocument[key],
+                    bsonValue,
                     _currentDocument,
                     isReadOnly,
                     key);
 
-            return new DocumentFieldData(key, valueEdit, isReadOnly);
+            return new DocumentFieldData(key, valueEdit, bsonValue.Type, isReadOnly);
         }
 
         private FrameworkElement GetNullValueEditor(string key, bool readOnly, OpenEditorMode expandMode)
@@ -501,10 +508,13 @@ namespace LiteDbExplorer.Controls
                 }
             }
 
-            if (_documentReference != null)
+            if (_documentReference != null && _currentDocument != null)
             {
+                _currentDocument.CopyTo(_documentReference.LiteDocument);
                 _documentReference.LiteDocument = _currentDocument;
                 _documentReference.Collection.UpdateItem(_documentReference);
+
+                _documentReference.NotifyDocumentChanged();
             }
 
             DialogResult = true;
@@ -622,7 +632,7 @@ namespace LiteDbExplorer.Controls
 
         private async void ItemsField_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            if (_invalidatingSize)
+            /*if (_invalidatingSize)
             {
                 return;
             }
@@ -644,7 +654,7 @@ namespace LiteDbExplorer.Controls
                 await Task.Delay(25);
             }
 
-            _invalidatingSize = false;
+            _invalidatingSize = false;*/
         }
 
         private void InvalidateItemsSize()

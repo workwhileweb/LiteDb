@@ -29,17 +29,15 @@ namespace LiteDbExplorer.Modules.ImportData
         [SelectFrom("{Binding DataImportHandlers}", SelectionType = SelectionType.RadioButtons, DisplayPath = nameof(IDataImportTaskHandler.HandlerDisplayName))]
         public IDataImportTaskHandler ImportFormat { get; set; }
 
+        public bool CanContentScroll { get; set; } = true;
+
         public bool HasNext => ImportFormat != null;
 
         public override string DisplayName
         {
             get
             {
-                if (ImportFormat == null)
-                {
-                    return "Import data from source";
-                }
-                return $"Import data from {ImportFormat.HandlerDisplayName}";
+                return ImportFormat == null ? "Import data from source" : $"Import data from {ImportFormat.HandlerDisplayName}";
             }
         }
 

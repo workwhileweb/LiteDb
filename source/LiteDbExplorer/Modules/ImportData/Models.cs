@@ -7,8 +7,6 @@ namespace LiteDbExplorer.Modules.ImportData
     {
         string HandlerDisplayName { get; }
         int HandlerDisplayOrder { get; }
-        object SourceOptionsContext { get; }
-        object TargetOptionsContext { get; }
     }
 
     public enum RecordIdHandlerPolice

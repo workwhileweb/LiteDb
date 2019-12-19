@@ -18,7 +18,8 @@ namespace LiteDbExplorer.Controls
 
     public class BsonValueEditor
     {
-        // TODO: Infer Null value type to handle
+        private static double DefaultWindowHeight =>
+            Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight);
 
         public static FrameworkElement GetBsonValueEditor(
             OpenEditorMode openMode,
@@ -58,7 +59,7 @@ namespace LiteDbExplorer.Controls
                         var window = new DialogWindow(control, windowController)
                         {
                             Owner = Application.Current.MainWindow,
-                            Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight),
+                            Height = DefaultWindowHeight,
                             MinWidth = 400,
                             MinHeight = 400,
                         };
@@ -115,7 +116,7 @@ namespace LiteDbExplorer.Controls
                         var window = new DialogWindow(control, windowController)
                         {
                             Owner = Application.Current.MainWindow,
-                            Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight),
+                            Height = DefaultWindowHeight,
                             MinWidth = 400,
                             MinHeight = 400,
                         };
@@ -136,7 +137,10 @@ namespace LiteDbExplorer.Controls
 
                 contentView.LoadButton.Click += (s, a) =>
                 {
-                    if (contentView.ContentLoaded) return;
+                    if (contentView.ContentLoaded)
+                    {
+                        return;
+                    }
 
                     var bsonDocument = bindingValue as BsonDocument;
                     var control = new DocumentEntryControl(bsonDocument, readOnly);

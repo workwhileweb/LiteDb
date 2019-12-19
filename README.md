@@ -2,6 +2,9 @@
 # <img src="https://raw.githubusercontent.com/julianpaulozzi/LiteDbExplorer/master/source/LiteDbExplorer/Images/icon.png" height="42">  LiteDB Explorer
 Graphical editor for [LiteDB](https://github.com/mbdavid/LiteDB) databases.
 
+<p>
+<img align="center" src="https://raw.githubusercontent.com/julianpaulozzi/LiteDbExplorer/master/web/start_dark.png" width="880" >
+</p>
 
 # Download
 
@@ -23,10 +26,6 @@ Requirements: Windows 7, 8 or 10 and [.Net 4.6.2](https://www.microsoft.com/en-u
 The main purpose of keeping this fork is to meet my LiteDB use cases, refresh WPF knowledge, and share some improvements with the community.
 
 I have seen some LiteDB use cases that go far beyond any that would have with this database. If you use LiteDB to store a large volume of data, large texts and many files ... this project currently will not meet your needs and is outside my current contribution scope. Any contribution is welcome, so before opening a issue mainly related to this topic collaborate and submit a pull request or use [other alternatives](https://github.com/mbdavid/LiteDB#3rd-party-tools-for-litedb).
-
-<p>
-<img align="center" src="https://raw.githubusercontent.com/julianpaulozzi/LiteDbExplorer/master/web/screen_01.png" width="880" >
-</p>
 
 ## Features in current pre-release:
 * Material dark and white theme.
@@ -70,22 +69,7 @@ Please make sure to read the Issue Reporting Checklist before opening an issue. 
 
 All contributions are welcome!
 
-Regarding code styling, there are only a few major rules:
-* private fields and properties should use _camelCase (with underscore)
-* all methods (private and public) should use PascalCase
-* use spaces instead of tabs with 4 spaces width
-* always encapsulate with brackets:
-```cs
-if (true)
-{
-    DoSomething()
-}
-```
-instead of 
-```cs
-if (true)
-    DoSomething()
-```
+Carefully read the code to check the style and patterns, follow them.
 
 # License
 [MIT License](http://opensource.org/licenses/MIT).

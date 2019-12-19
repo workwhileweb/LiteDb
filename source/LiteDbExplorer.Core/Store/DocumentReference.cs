@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Runtime.CompilerServices;
 using LiteDB;
 
 namespace LiteDbExplorer.Core
@@ -19,6 +20,7 @@ namespace LiteDbExplorer.Core
 
         public CollectionReference Collection { get; set; }
 
+        [IndexerName(@"Item")]
         public BsonValue this[string name]
         {
             get => LiteDocument[name];
@@ -38,6 +40,12 @@ namespace LiteDbExplorer.Core
         public void RemoveSelf()
         {
             Collection?.RemoveItem(this);
+        }
+
+        public void NotifyDocumentChanged()
+        {
+            OnPropertyChanged(nameof(LiteDocument));
+            OnPropertyChanged(@"Item[]");
         }
 
         protected override void Dispose(bool disposing)

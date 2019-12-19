@@ -30,7 +30,7 @@
                 <!--<ResourceDictionary Source="/Enterwell.Clients.Wpf.Notifications;component/Themes/Generic.xaml" />-->
                 <ResourceDictionary Source="pack://application:,,,/Forge.Forms;component/Themes/Material.xaml" />
                 <ResourceDictionary
-                    Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/MaterialDesignTheme.TreeViewFullRow.xaml" />
+                    Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/MaterialDesignTheme.TreeView.xaml" />
 
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
 

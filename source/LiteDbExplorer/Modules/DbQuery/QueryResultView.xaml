@@ -9,7 +9,9 @@
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:controls1="clr-namespace:LiteDbExplorer.Controls"
-             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls" x:Class="LiteDbExplorer.Modules.DbQuery.QueryResultView"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
+             xmlns:behaviors1="clr-namespace:LiteDbExplorer.Presentation.Behaviors"
+             x:Class="LiteDbExplorer.Modules.DbQuery.QueryResultView"
              mc:Ignorable="d"
              d:DesignHeight="250" d:DesignWidth="600">
     <DockPanel>
@@ -68,6 +70,9 @@
                           IsReadOnly="True"
                           SelectionUnit="FullRow"
                           ItemsSource="{Binding QueryResult.DataTable.DefaultView}">
+                    <i:Interaction.Behaviors>
+                        <behaviors1:EscapeAccessKeyColumnHeaderBehavior/>
+                    </i:Interaction.Behaviors>
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="{x:Type DataGridColumnHeader}" BasedOn="{StaticResource MaterialDesignDataGridColumnHeader}">
                             <Setter Property="FontSize" Value="13"/>

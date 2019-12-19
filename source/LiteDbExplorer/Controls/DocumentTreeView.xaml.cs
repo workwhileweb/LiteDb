@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using JetBrains.Annotations;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Presentation.Behaviors;
 using LiteDB;
@@ -135,7 +136,7 @@ namespace LiteDbExplorer.Controls
             }
             else
             {
-                DocumentTree.CollapseAll();    
+                DocumentTree.CollapseAll();
             }
 
             e.Handled = true;
@@ -207,7 +208,7 @@ namespace LiteDbExplorer.Controls
 
             foreach (var bsonValue in values)
             {
-                var fieldNode = CreateFieldNode(index.ToString(), bsonValue);
+                var fieldNode = CreateFieldNode(index.ToString(), bsonValue, false);
 
                 nodes.Add(fieldNode);
                 index++;
@@ -226,7 +227,7 @@ namespace LiteDbExplorer.Controls
                     var key = document.Keys.ElementAt(i);
                     var bsonValue = document[key];
 
-                    var fieldNode = CreateFieldNode(key, bsonValue);
+                    var fieldNode = CreateFieldNode(key, bsonValue, false);
 
                     nodes.Add(fieldNode);
                 }
@@ -235,7 +236,7 @@ namespace LiteDbExplorer.Controls
             return nodes;
         }
 
-        public DocumentFieldNode CreateFieldNode(string key, BsonValue bsonValue)
+        public DocumentFieldNode CreateFieldNode(string key, BsonValue bsonValue, bool isExpanded)
         {
             Func<BsonDocument, ObservableCollection<DocumentFieldNode>> loadAction = null;
 
@@ -246,7 +247,8 @@ namespace LiteDbExplorer.Controls
 
             return new DocumentFieldNode(key, bsonValue, loadAction)
             {
-                ValueMaxLength = ValueMaxLength
+                ValueMaxLength = ValueMaxLength,
+                IsExpanded = isExpanded
             };
         }
 
@@ -289,7 +291,8 @@ namespace LiteDbExplorer.Controls
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [JetBrains.Annotations.NotifyPropertyChangedInvocator]
+        [UsedImplicitly]
+        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -429,7 +432,8 @@ namespace LiteDbExplorer.Controls
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        [JetBrains.Annotations.NotifyPropertyChangedInvocator]
+        [UsedImplicitly]
+        [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

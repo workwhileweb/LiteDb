@@ -19,13 +19,7 @@ namespace LiteDbExplorer.Modules.ImportData
 
         public ImportDataWizardViewModel()
         {
-            DisplayName = "Import Wizard";
-
-            ActivateItem(IoC.Get<ImportDataHandlerSelector>());
-        }
-
-        public void Init(ImportDataOptions modelParams)
-        {
+            DisplayName = "Import Data";
         }
 
         public Stack<IStepsScreen> PreviousItems { get; } = new Stack<IStepsScreen>();
@@ -35,6 +29,19 @@ namespace LiteDbExplorer.Modules.ImportData
         public bool CanPrevious => PreviousItems.Count > 1;
 
         public bool IsBusy { get; private set; }
+
+        public void Init(ImportDataOptions modelParams)
+        {
+        }
+
+        protected override void OnViewReady(object view)
+        {
+            base.OnViewReady(view);
+
+            var importDataHandlerSelector = IoC.Get<ImportDataHandlerSelector>();
+
+            ActivateItem(importDataHandlerSelector);
+        }
 
         public override void ActivateItem(IStepsScreen item)
         {

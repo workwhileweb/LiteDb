@@ -20,7 +20,7 @@
 
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-                <ResourceDictionary Source="../../Themes/MaterialDesignTheme.TreeViewFullRow.xaml" />
+                <ResourceDictionary Source="../../Themes/MaterialDesignTheme.TreeView.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <Style TargetType="Control" BasedOn="{StaticResource {x:Type Control}}">
