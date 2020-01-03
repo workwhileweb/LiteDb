@@ -10,8 +10,13 @@ namespace LiteDbExplorer.Modules.Database
     [PartCreationPolicy(CreationPolicy.NonShared)]
     public class DatabaseSettingsViewModel : PropertyChangedBase, ISettingsEditor, IAutoGenSettingsView
     {
-        public DatabaseSettingsViewModel()
+        private readonly IApplicationInteraction _applicationInteraction;
+        private DatabaseFileMode _databaseConnectionFileMode;
+
+        [ImportingConstructor]
+        public DatabaseSettingsViewModel(IApplicationInteraction applicationInteraction)
         {
+            _applicationInteraction = applicationInteraction;
             DatabaseConnectionFileMode = Properties.Settings.Default.Database_ConnectionFileMode;
         }
 
@@ -28,12 +33,29 @@ namespace LiteDbExplorer.Modules.Database
         [Category("Connection")]
         [DisplayName("File mode")]
         [Description("Exclusive file mode is recommended to avoid issues")]
-        public DatabaseFileMode DatabaseConnectionFileMode { get; set; }
+        public DatabaseFileMode DatabaseConnectionFileMode
+        {
+            get => _databaseConnectionFileMode;
+            set
+            {
+                _databaseConnectionFileMode = value;
+                OnDatabaseFileModeChanged();
+            }
+        }
+
+        private void OnDatabaseFileModeChanged()
+        {
+            if (DatabaseConnectionFileMode == DatabaseFileMode.Shared && 
+                !_applicationInteraction.ShowConfirm("Accessing database file when in use by another process may cause issues!\n\nChange to Shared connection?"))
+            {
+                _databaseConnectionFileMode = DatabaseFileMode.Exclusive;
+                NotifyOfPropertyChange(nameof(DatabaseConnectionFileMode));
+            }
+        }
 
         public void ApplyChanges()
         {
             Properties.Settings.Default.Database_ConnectionFileMode = DatabaseConnectionFileMode;
-
             Properties.Settings.Default.Save();
         }
 

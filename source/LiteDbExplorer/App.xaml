@@ -33,6 +33,7 @@
                     Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/MaterialDesignTheme.TreeView.xaml" />
 
                 <ResourceDictionary Source="Themes/Controls.SearchReplacePanel.xaml" />
+                <ResourceDictionary Source="Themes/Controls.AvalonEdit.xaml" />
 
             </ResourceDictionary.MergedDictionaries>
 

@@ -17,7 +17,6 @@ using Onova;
 using Onova.Services;
 using Serilog;
 using Action = System.Action;
-using Log = OfficeOpenXml.FormulaParsing.Excel.Functions.Math.Log;
 
 namespace LiteDbExplorer.Modules
 {
@@ -32,19 +31,19 @@ namespace LiteDbExplorer.Modules
 
         public static AppUpdateManager Current => _instance.Value;
 
-        private static readonly ILogger Logger = Serilog.Log.ForContext<AppUpdateManager>();
+        private static readonly ILogger Logger = Log.ForContext<AppUpdateManager>();
 
         public AppUpdateManager()
         {
             _updateManager = new UpdateManager(
                 new GithubPackageResolver(AppConstants.Github.RepositoryOwner, AppConstants.Github.RepositoryName, "*.zip"), 
-                new LocalZipPackageExtractor());
+                new LocalZipPackageExtractor{ IgnoreZipRootPath = true });
 
             UpdateActionText = "Update";
 
-            CheckForUpdatesCommand = new RelayCommand(async _ => await CheckForUpdates(true), _ => !IsBusy);
+            CheckForUpdatesCommand = new AsyncCommand(() => CheckForUpdates(true), () => !IsBusy);
 
-            DoUpdateCommand = new RelayCommand(async _ => await DoUpdate(), _ => HasUpdate && !IsBusy);
+            DoUpdateCommand = new AsyncCommand(DoUpdate, () => HasUpdate && !IsBusy);
         }
 
         public bool IsBusy
@@ -77,14 +76,12 @@ namespace LiteDbExplorer.Modules
 
         public double UpdateProgress { get; private set; }
 
-        public ICommand CheckForUpdatesCommand { get; private set; }
+        public AsyncCommand CheckForUpdatesCommand { get; private set; }
 
-        public ICommand DoUpdateCommand { get; private set; }
+        public AsyncCommand DoUpdateCommand { get; private set; }
         
         public async Task CheckForUpdates(bool userInitiated)
         {
-            Logger.Information("Start check for updates.");
-
             if (!userInitiated && !Properties.Settings.Default.UpdateManager_CheckUpdateOnStartup)
             {
                 return;
@@ -96,6 +93,8 @@ namespace LiteDbExplorer.Modules
             {
                 return;
             }
+
+            Logger.Information("Start check for updates. Last check {LastCheck}.", Properties.Settings.Default.UpdateManager_LastCheck);
 
             IsBusy = true;
             HasUpdate = false;

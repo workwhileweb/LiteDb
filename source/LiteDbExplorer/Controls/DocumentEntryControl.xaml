@@ -187,7 +187,11 @@
 
                     <DockPanel x:Name="GroupFile" DockPanel.Dock="Top" 
                                Visibility="Collapsed" Margin="20,0,0,0">
-                        <controls:FileView x:Name="FileView" />
+                        <Border BorderBrush="{StaticResource MaterialDesignDivider}" 
+                                Background="{DynamicResource MaterialDesignToolBarBackground}"
+                                BorderThickness="0,1,0,0" Margin="0,32,00,15">
+                            <controls:FileView x:Name="FileView" />
+                        </Border>
                     </DockPanel>
                 </UniformGrid>
 

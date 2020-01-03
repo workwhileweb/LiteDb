@@ -93,14 +93,14 @@
                                     <Button.ContextMenu>
                                         <ContextMenu
                                             cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
-                                            <MenuItem Header="Remove from list"
+                                            <MenuItem Header="Remove From List"
                                                       cal:Message.Attach="RemoveFromList($dataContext)">
                                                 <MenuItem.Icon>
                                                     <materialDesign:PackIcon Kind="PlaylistRemove" />
                                                 </MenuItem.Icon>
                                             </MenuItem>
 
-                                            <MenuItem Header="Pin this item on list"
+                                            <MenuItem Header="Pin This Item on List"
                                                       cal:Message.Attach="PinItem($dataContext)"
                                                       Visibility="{Binding Path=IsFixed, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                                                 <MenuItem.Icon>
@@ -108,7 +108,7 @@
                                                 </MenuItem.Icon>
                                             </MenuItem>
 
-                                            <MenuItem Header="Unpin this item on list"
+                                            <MenuItem Header="Unpin This Item on List"
                                                       cal:Message.Attach="UnPinItem($dataContext)"
                                                       Visibility="{Binding Path=IsFixed, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                 <MenuItem.Icon>
@@ -116,7 +116,7 @@
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                             <Separator />
-                                            <MenuItem Header="Copy path"
+                                            <MenuItem Header="Copy Path"
                                                       cal:Message.Attach="CopyPath($dataContext)">
                                                 <MenuItem.Icon>
                                                     <materialDesign:PackIcon Kind="ContentCopy" />

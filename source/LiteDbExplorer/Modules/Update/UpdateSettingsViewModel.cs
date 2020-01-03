@@ -20,7 +20,7 @@ namespace LiteDbExplorer.Modules
 
         public int EditorDisplayOrder => 50;
 
-        public string GroupDisplayName => "Auto update";
+        public string GroupDisplayName => "Auto Update";
 
         public object AutoGenContext => this;
 

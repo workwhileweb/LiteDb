@@ -50,5 +50,8 @@
     <Setting Name="Database_ConnectionFileMode" Type="LiteDbExplorer.Core.DatabaseFileMode" Scope="User">
       <Value Profile="(Default)">Exclusive</Value>
     </Setting>
+    <Setting Name="QueryEditor_EnableShellCommandAutocomplete" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

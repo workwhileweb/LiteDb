@@ -131,8 +131,6 @@ namespace LiteDbExplorer.Controls
         private BsonDocument _currentDocument;
         private DocumentReference _documentReference;
         private ObservableCollection<DocumentFieldData> _entryControls;
-        private bool _invalidatingSize;
-
         private bool _loaded = false;
         private Dictionary<string, BsonType> _allFieldsWithTypes;
 
@@ -630,7 +628,7 @@ namespace LiteDbExplorer.Controls
             LoadExistingFieldsPicker();
         }
 
-        private async void ItemsField_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void ItemsField_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             /*if (_invalidatingSize)
             {

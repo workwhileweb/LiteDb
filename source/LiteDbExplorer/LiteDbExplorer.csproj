@@ -87,6 +87,8 @@
     </Compile>
     <Compile Include="Controls\AppPackIcon.cs" />
     <Compile Include="Controls\AutoUpdateTextBlock.cs" />
+    <Compile Include="Controls\Editor\Completion\DefaultCompletionData.cs" />
+    <Compile Include="Controls\Editor\ImageOrIconPresenter.cs" />
     <Compile Include="Controls\HighlightTextBlock.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
     <Compile Include="Controls\Highlighting\LiteDbCmdHighlightingProvider.cs" />
@@ -98,8 +100,11 @@
     <Compile Include="Modules\Database\DatabaseSettingsViewModel.cs" />
     <Compile Include="Modules\Database\IDatabasesExplorerView.cs" />
     <Compile Include="Modules\DbDocument\DocumentEditorSettingsViewModel.cs" />
+    <Compile Include="Modules\DbQuery\IQueryView.cs" />
+    <Compile Include="Modules\DbQuery\QuerySettingsViewModel.cs" />
     <Compile Include="Modules\DbQuery\QueryViewHandler.cs" />
     <Compile Include="Modules\DbQuery\QueryViewsProvider.cs" />
+    <Compile Include="Modules\DbQuery\ShellCommandCompletion.cs" />
     <Compile Include="Modules\DbQuery\ShellCommandQueryViewHandler.cs" />
     <Compile Include="Modules\ImportData\DocumentMapperView.xaml.cs">
       <DependentUpon>DocumentMapperView.xaml</DependentUpon>
@@ -114,7 +119,7 @@
       <DependentUpon>ImportDataWizardView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Modules\ImportData\ImportDataWizardViewModel.cs" />
-    <Compile Include="Modules\DbQuery\IQueryEditorView.cs" />
+    <Compile Include="Controls\Editor\ITextEditorInteraction.cs" />
     <Compile Include="Modules\DbQuery\IQueryHistoryHandler.cs" />
     <Compile Include="Modules\DbQuery\QueryHistoryProvider.cs" />
     <Compile Include="Modules\DbQuery\QueryHistoryView.xaml.cs">
@@ -156,7 +161,7 @@
     <Compile Include="Modules\Shared\PerformanceSettings.cs" />
     <Compile Include="AppBootstrapper.cs" />
     <Compile Include="Controls\AvalonEditBehaviour.cs" />
-    <Compile Include="Controls\ExtendedTextEditor.cs" />
+    <Compile Include="Controls\Editor\ExtendedTextEditor.cs" />
     <Compile Include="Controls\CollectionListView.xaml.cs">
       <DependentUpon>CollectionListView.xaml</DependentUpon>
     </Compile>
@@ -449,6 +454,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\Controls.AvalonEdit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Controls.MarkdownViewer.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -545,7 +554,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit">
-      <Version>6.0.0</Version>
+      <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="Caliburn.Micro">
       <Version>3.2.0</Version>
@@ -560,13 +569,13 @@
       <Version>2.2.2</Version>
     </PackageReference>
     <PackageReference Include="CsvHelper">
-      <Version>12.2.2</Version>
+      <Version>12.2.3</Version>
     </PackageReference>
     <PackageReference Include="Dragablz">
       <Version>0.0.3.203</Version>
     </PackageReference>
     <PackageReference Include="DynamicData">
-      <Version>6.14.1</Version>
+      <Version>6.14.3</Version>
     </PackageReference>
     <PackageReference Include="Enterwell.Clients.Wpf.Notifications">
       <Version>1.4.2</Version>
@@ -578,7 +587,7 @@
       <Version>3.7.0</Version>
     </PackageReference>
     <PackageReference Include="Fody">
-      <Version>6.0.5</Version>
+      <Version>6.0.6</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -622,7 +631,7 @@
       <Version>0.36.0</Version>
     </PackageReference>
     <PackageReference Include="Onova">
-      <Version>2.4.2</Version>
+      <Version>2.5.2</Version>
     </PackageReference>
     <PackageReference Include="PropertyChanged.Fody">
       <Version>3.2.1</Version>
@@ -631,7 +640,7 @@
       <Version>3.0.0</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>11.0.1</Version>
+      <Version>11.1.1</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.9.0</Version>
@@ -643,7 +652,7 @@
       <Version>4.1.0</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
-      <Version>4.3.1</Version>
+      <Version>4.3.2</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>

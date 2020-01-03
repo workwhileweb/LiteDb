@@ -24,7 +24,7 @@ namespace LiteDbExplorer
 
         public object AutoGenContext => this;
 
-        [DisplayName("Use Deferred Scrolling")]
+        [DisplayName("Use deferred scrolling")]
         public bool DeferredScrolling { get; set; }
 
         public void ApplyChanges()

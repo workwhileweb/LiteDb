@@ -27,7 +27,7 @@ namespace LiteDbExplorer.Modules.DbQuery
         private readonly IApplicationInteraction _applicationInteraction;
         private readonly IQueryViewsProvider _queryViewsProvider;
         private readonly IQueryHistoryProvider _queryHistoryProvider;
-        private IQueryEditorView _view;
+        private IQueryView _view;
         private DatabaseReference _currentDatabase;
 
         [ImportingConstructor]
@@ -91,6 +91,7 @@ namespace LiteDbExplorer.Modules.DbQuery
             {
                 _currentDatabase = value;
                 QueryHistoryView?.SetActiveDatabase(CurrentDatabase);
+                _view?.UpdateCodeCompletion(CurrentDatabase);
             }
         }
 
@@ -143,7 +144,7 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         protected override async void OnViewLoaded(object view)
         {
-            _view = view as IQueryEditorView;
+            _view = view as IQueryView;
 
             _view?.SelectEnd();
 
@@ -152,6 +153,8 @@ namespace LiteDbExplorer.Modules.DbQuery
                 await Task.Delay(250);
                 await RunAllRawQuery();
             }
+
+            _view?.UpdateCodeCompletion(CurrentDatabase);
         }
 
         private void SetDisplay(DatabaseReference databaseReference)

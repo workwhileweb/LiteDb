@@ -34,23 +34,23 @@ namespace LiteDbExplorer.Modules.DbCollection
         public object AutoGenContext => this;
 
         [Category("Collection Explorer")]
-        [DisplayName("Field Sort Order")]
+        [DisplayName("Field sort order")]
         public FieldSortOrder CollectionExplorer_FieldSortOrder { get; set; }
         
         [Category("Collection Explorer")]
-        [DisplayName("Double Click Action")]
+        [DisplayName("Double click action")]
         public CollectionItemDoubleClickAction CollectionExplorer_DoubleClickAction { get; set; }
 
         [Category("Collection Explorer")]
-        [DisplayName("Split Orientation")]
+        [DisplayName("Split orientation")]
         public SplitOrientation CollectionExplorer_SplitOrientation { get; set; }
         
         [Category("Collection Explorer")]
-        [DisplayName("Show Preview")]
+        [DisplayName("Show preview")]
         public bool CollectionExplorer_ShowPreview { get; set; }
 
         [Category("Collection Explorer")]
-        [DisplayName("Content Max Length")]
+        [DisplayName("Content maximum length")]
         [Spinnable(1, 1, 64, 1024), Width(80)]
         public int CollectionExplorer_ContentMaxLength { get; set; }
         

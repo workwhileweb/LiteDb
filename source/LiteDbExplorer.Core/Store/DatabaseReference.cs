@@ -70,6 +70,11 @@ namespace LiteDbExplorer.Core
             }
         }
 
+        public CollectionReference this[string name]
+        {
+            get { return Collections.FirstOrDefault(p => p.Name.Equals(name)); }
+        }
+
         private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
