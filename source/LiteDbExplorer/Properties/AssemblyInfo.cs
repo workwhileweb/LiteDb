@@ -53,8 +53,8 @@ using System.Windows.Markup;
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("0.8.5.2")]
-[assembly: AssemblyFileVersion("0.8.5.2")]
+[assembly: AssemblyVersion("0.8.5.3")]
+[assembly: AssemblyFileVersion("0.8.5.3")]
 [assembly: Guid("AB410213-FF0A-400D-AA1E-AA93C25F0AEE")]
 
 [assembly: XmlnsDefinition("http://schemas.litedbexplorer.io/winfx/xaml", "LiteDbExplorer")]

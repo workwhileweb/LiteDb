@@ -2,6 +2,9 @@
 using System.Windows.Controls;
 using Dragablz;
 using LiteDbExplorer.Wpf.Framework.Shell;
+using System.Linq;
+using System.Windows.Input;
+using Caliburn.Micro;
 
 namespace LiteDbExplorer.Modules.Main
 {
@@ -13,6 +16,21 @@ namespace LiteDbExplorer.Modules.Main
         public DocumentSetView()
         {
             InitializeComponent();
+
+
+            if (TabablzControl != null)
+            {
+                TabablzControl.SelectionChanged += (sender, args) =>
+                {
+                    var screen = args.AddedItems.OfType<Screen>().FirstOrDefault();
+                    if (screen?.GetView() is UserControl userControl)
+                    {
+                        FocusManager.SetFocusedElement(userControl, null);
+                        Keyboard.ClearFocus();
+                        // CommandManager.InvalidateRequerySuggested();
+                    }
+                };
+            }
         }
         
         public TabablzControl TabsControl => TabablzControl;

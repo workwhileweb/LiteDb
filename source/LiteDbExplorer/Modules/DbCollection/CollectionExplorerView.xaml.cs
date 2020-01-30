@@ -5,13 +5,14 @@ using System.Windows.Controls;
 using System.Windows.Threading;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Core;
+using LiteDbExplorer.Modules.Shared;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
     /// <summary>
     /// Interaction logic for CollectionExplorerView.xaml
     /// </summary>
-    public partial class CollectionExplorerView : UserControl, ICollectionReferenceListView
+    public partial class CollectionExplorerView : UserControl, ICollectionReferenceListView, IActivateFocus
     {
         public CollectionExplorerView()
         {
@@ -89,5 +90,12 @@ namespace LiteDbExplorer.Modules.DbCollection
             CollectionListView.ListCollectionData.Focus();
         }
 
+        public void RequestFocus()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                CollectionListView.FocusSelectedItem();
+            }, DispatcherPriority.Background);
+        }
     }
 }

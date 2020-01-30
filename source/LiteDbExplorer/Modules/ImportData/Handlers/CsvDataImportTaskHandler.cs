@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -184,7 +185,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
             public static DataTable ToDataTable(string path, SourceOptions options)
             {
-                var configuration = new Configuration
+                var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     Delimiter = options.Delimiter,
                 };

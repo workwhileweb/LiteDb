@@ -193,6 +193,18 @@ namespace LiteDbExplorer.Controls
         {
             ListCollectionData.ScrollIntoView(ListCollectionData.SelectedItem);
         }
+
+        public void FocusSelectedItem()
+        {
+            if (ListCollectionData.SelectedItem != null)
+            {
+                if (ListCollectionData.ItemContainerGenerator.ContainerFromItem(ListCollectionData.SelectedItem) is ListViewItem container)
+                {
+                    container.IsSelected = true;
+                    container.Focus();
+                }
+            }
+        }
         
         public void UpdateGridColumns()
         {

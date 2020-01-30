@@ -154,6 +154,7 @@
     <Compile Include="Modules\Main\ToolPanelSetViewModel.cs" />
     <Compile Include="Modules\Shared\IDocumentExplorer.cs" />
     <Compile Include="Modules\Shared\IDocumentSet.cs" />
+    <Compile Include="Modules\Shared\IActivateFocus.cs" />
     <Compile Include="Modules\Shared\ImportDataOptions.cs" />
     <Compile Include="Modules\Shared\IOwnerViewLocator.cs" />
     <Compile Include="Modules\Shared\IToolPanelSet.cs" />
@@ -566,10 +567,10 @@
       <Version>4.1.0</Version>
     </PackageReference>
     <PackageReference Include="CSharpFunctionalExtensions">
-      <Version>2.2.2</Version>
+      <Version>2.3.0</Version>
     </PackageReference>
     <PackageReference Include="CsvHelper">
-      <Version>12.2.3</Version>
+      <Version>13.0.0</Version>
     </PackageReference>
     <PackageReference Include="Dragablz">
       <Version>0.0.3.203</Version>
@@ -581,13 +582,13 @@
       <Version>1.4.2</Version>
     </PackageReference>
     <PackageReference Include="EPPlus">
-      <Version>4.5.3.2</Version>
+      <Version>4.5.3.3</Version>
     </PackageReference>
     <PackageReference Include="Extended.Wpf.Toolkit">
       <Version>3.7.0</Version>
     </PackageReference>
     <PackageReference Include="Fody">
-      <Version>6.0.6</Version>
+      <Version>6.0.8</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -604,7 +605,7 @@
       <Version>4.1.4</Version>
     </PackageReference>
     <PackageReference Include="Markdig">
-      <Version>0.18.0</Version>
+      <Version>0.18.1</Version>
     </PackageReference>
     <PackageReference Include="Markdig.Wpf">
       <Version>0.3.1</Version>
@@ -634,13 +635,13 @@
       <Version>2.5.2</Version>
     </PackageReference>
     <PackageReference Include="PropertyChanged.Fody">
-      <Version>3.2.1</Version>
+      <Version>3.2.5</Version>
     </PackageReference>
     <PackageReference Include="PropertyTools.Wpf">
       <Version>3.0.0</Version>
     </PackageReference>
     <PackageReference Include="ReactiveUI">
-      <Version>11.1.1</Version>
+      <Version>11.1.23</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
       <Version>2.9.0</Version>
