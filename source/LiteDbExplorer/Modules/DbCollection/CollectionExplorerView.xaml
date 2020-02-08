@@ -42,8 +42,6 @@
                                           TargetCommand="{Binding FindNextCommand}"/>
         <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FindPrevious" 
                                           TargetCommand="{Binding FindPreviousCommand}"/>
-        <!--<commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.FileDropped" 
-                                          TargetCommand="{Binding FileDroppedCommand}"/>-->
     </commands:CommandToCommand.Bindings>
     <Grid>
         <controls1:SplitContainer x:Name="splitContainer" 
