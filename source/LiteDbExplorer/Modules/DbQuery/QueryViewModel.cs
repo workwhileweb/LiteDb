@@ -42,16 +42,6 @@ namespace LiteDbExplorer.Modules.DbQuery
 
             DisplayName = "Query";
 
-            IconContent = new PackIcon {Kind = PackIconKind.CodeGreaterThan};
-
-            PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == nameof(CurrentDatabase))
-                {
-                    SetDisplay(CurrentDatabase);
-                }
-            };
-
             RunQueryCommand = new AsyncCommand(RunAllRawQuery, () => CanRunQuery);
 
             RunSelectedQueryCommand = new AsyncCommand(RunSelectedQuery, ()=> CanRunSelectedQuery);
@@ -68,6 +58,8 @@ namespace LiteDbExplorer.Modules.DbQuery
 
             CurrentQueryHandlerName = QueryHandlersMetadata.Select(p => p.Name).FirstOrDefault();
         }
+
+        public override object IconContent => new PackIcon { Kind = PackIconKind.CodeGreaterThan };
 
         public ICommand RunQueryCommand { get; }
 
@@ -155,6 +147,16 @@ namespace LiteDbExplorer.Modules.DbQuery
             }
 
             _view?.UpdateCodeCompletion(CurrentDatabase);
+        }
+
+        public override void NotifyOfPropertyChange(string propertyName = null)
+        {
+            base.NotifyOfPropertyChange(propertyName);
+
+            if (propertyName == nameof(CurrentDatabase))
+            {
+                SetDisplay(CurrentDatabase);
+            }
         }
 
         private void SetDisplay(DatabaseReference databaseReference)

@@ -2,7 +2,6 @@
 extern alias v5;
 using System;
 using System.IO;
-using System.Linq;
 using Newtonsoft.Json;
 using LiteDBv4 = v4::LiteDB;
 using LiteDBv5 = v5::LiteDB;
@@ -15,9 +14,20 @@ namespace LiteDbExplorer.Interop
 
         public static void CreateDatabases()
         {
+            OpenV4Database();
+
+            Console.WriteLine();
+
+            OpenV5Database();
+        }
+
+        private static void OpenV4Database()
+        {
             Console.WriteLine("Create v4 database");
 
-            using(var db = new LiteDBv4.LiteDatabase(EnsureDataDirectory("DatabaseV4.db")))
+            var connectionString = EnsureDataDirectory("DatabaseV4.db");
+
+            using(var db = new LiteDBv4.LiteDatabase(connectionString))
             {
                 // Get customer collection
                 var col = db.GetCollection<Customer>("customers");
@@ -26,7 +36,7 @@ namespace LiteDbExplorer.Interop
                 var customer = new Customer
                 { 
                     Name = "John Doe", 
-                    Phones = new string[] { "8000-0000", "9000-0000" }, 
+                    Phones = new[] { "8000-0000", "9000-0000" }, 
                     Age = 39,
                     IsActive = true
                 };
@@ -39,12 +49,17 @@ namespace LiteDbExplorer.Interop
                 // Use LINQ to query documents (with no index)
                 var results = col.Find(x => x.Age > 20);
 
-                Dump(results.ToList());
+                // Dump(results.ToList());
             }
+        }
 
-            Console.WriteLine();
+        private static void OpenV5Database()
+        {
             Console.WriteLine("Create v5 database");
-            using(var db = new LiteDBv5.LiteDatabase(EnsureDataDirectory("DatabaseV5.db")))
+
+            var connectionString = EnsureDataDirectory("DatabaseV5.db");
+
+            using(var db = new LiteDBv5.LiteDatabase(connectionString))
             {
                 // var jsonInfo = JsonConvert.SerializeObject(LiteDBv5., Formatting.Indented);
                 // Get customer collection
@@ -54,7 +69,7 @@ namespace LiteDbExplorer.Interop
                 var customer = new Customer
                 { 
                     Name = "Julian Paulozzi", 
-                    Phones = new string[] { "6000-0000", "7000-0000" }, 
+                    Phones = new[] { "6000-0000", "7000-0000" }, 
                     Age = 24,
                     IsActive = false
                 };
@@ -67,11 +82,9 @@ namespace LiteDbExplorer.Interop
                 // Use LINQ to query documents (with no index)
                 var results = col.Find(x => x.Age > 20);
 
-                Dump(results.ToList());
+                // Dump(results.ToList());
             }
-            
         }
-
 
         private static string EnsureDataDirectory(string fileName)
         {

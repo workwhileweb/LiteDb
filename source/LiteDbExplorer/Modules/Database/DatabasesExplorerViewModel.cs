@@ -92,6 +92,9 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public bool HasAnyDatabaseOpen => Store.Current.Databases.Any();
 
+        [UsedImplicitly]
+        public bool IsEmpty => Databases == null || !Databases.Any();
+
         public DatabaseReference SelectedDatabase { get; private set; }
 
         public CollectionReference SelectedCollection { get; private set; }
@@ -104,6 +107,9 @@ namespace LiteDbExplorer.Modules.Database
         private void OnDatabasesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             Commands.ShowNavigationPanel.ExecuteOnMainWindow(true);
+
+            NotifyOfPropertyChange(nameof(IsEmpty));
+            NotifyOfPropertyChange(nameof(HasAnyDatabaseOpen));
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {

@@ -5,7 +5,6 @@ using System.Collections.Specialized;
 using System.Linq;
 using LiteDB;
 using PropertyChanging;
-using static System.Int64;
 
 namespace LiteDbExplorer.Core
 {

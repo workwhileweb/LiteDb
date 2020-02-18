@@ -147,14 +147,14 @@
                                                                                 <TextBlock Text="{Binding DisplayName}"
                                                                                            MaxWidth="200"
                                                                                            TextTrimming="CharacterEllipsis"
-                                                                                           VerticalAlignment="Center"/>
-                                                                                <TextBlock Margin="8,0,0,0" Opacity="0.7"
+                                                                                           VerticalAlignment="Bottom"/>
+                                                                                <TextBlock Margin="8,0,0,0" Opacity="0.8"
                                                                                            MaxWidth="200"
                                                                                            Text="{Binding GroupDisplayName}"
                                                                                            Style="{StaticResource MaterialDesignSubheadingTextBlock}"
                                                                                            Foreground="{Binding GroupDisplayBackground}"
                                                                                            TextTrimming="CharacterEllipsis"
-                                                                                           VerticalAlignment="Center"
+                                                                                           VerticalAlignment="Bottom"
                                                                                            FontSize="14"/>
                                                                             </StackPanel>
                                                                         </MenuItem.Header>

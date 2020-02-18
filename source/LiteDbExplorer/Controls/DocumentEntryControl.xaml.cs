@@ -359,13 +359,7 @@ namespace LiteDbExplorer.Controls
             }
 
             var valueEdit =
-                BsonValueEditor.GetBsonValueEditor(
-                    expandMode,
-                    $"[{key}]",
-                    bsonValue,
-                    _currentDocument,
-                    isReadOnly,
-                    key);
+                BsonValueEditor.GetBsonValueEditor(new BsonValueEditorContext(expandMode, $"[{key}]", bsonValue, _currentDocument, isReadOnly, key));
 
             return new DocumentFieldData(key, valueEdit, bsonValue.Type, isReadOnly);
         }
@@ -393,13 +387,7 @@ namespace LiteDbExplorer.Controls
 
                     _currentDocument[key] = fieldDefaultValue;
                     documentFieldData.EditControl =
-                        BsonValueEditor.GetBsonValueEditor(
-                            expandMode,
-                            $"[{key}]",
-                            _currentDocument[key],
-                            _currentDocument,
-                            readOnly,
-                            key);
+                        BsonValueEditor.GetBsonValueEditor(new BsonValueEditorContext(expandMode, $"[{key}]", _currentDocument[key], _currentDocument, readOnly, key));
                 }
             });
 

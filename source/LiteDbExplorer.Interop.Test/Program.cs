@@ -13,6 +13,7 @@ namespace LiteDbExplorer.Interop.Test
         {
             DatabaseVersionsTest.CreateDatabases();
 
+            Console.WriteLine();
             Console.ReadKey();
         }
     }

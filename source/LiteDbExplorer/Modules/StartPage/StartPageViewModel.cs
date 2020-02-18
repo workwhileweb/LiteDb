@@ -1,10 +1,17 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using DynamicData;
+using DynamicData.Binding;
 using JetBrains.Annotations;
 using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework.Shell;
+using MaterialDesignExtensions.Model;
 
 namespace LiteDbExplorer.Modules.StartPage
 {
@@ -16,6 +23,9 @@ namespace LiteDbExplorer.Modules.StartPage
         private readonly IDatabaseInteractions _databaseInteractions;
         private readonly IApplicationInteraction _applicationInteraction;
         private bool _showStartPageOnOpen;
+
+        private readonly IDisposable _cleanUp;
+        private readonly ReadOnlyObservableCollection<RecentFileInfo> _recentFilesFiltered;
 
         [ImportingConstructor]
         public StartPageViewModel(
@@ -30,20 +40,36 @@ namespace LiteDbExplorer.Modules.StartPage
 
             ShowStartPageOnOpen = Properties.Settings.Default.ShowStartPageOnOpen;
             
-            PathDefinitions.RecentFiles.CollectionChanged += (sender, args) =>
-            {
-                NotifyOfPropertyChange(nameof(RecentFilesIsEmpty));
-            };
+            var recentFilesTermFilter = this.WhenValueChanged(vm => vm.SearchTerm)
+                .Throttle(TimeSpan.FromMilliseconds(150))
+                .Select(CreatePredicate);
+
+            _cleanUp = PathDefinitions.RecentFiles
+                .AsObservableChangeSet()
+                .Filter(recentFilesTermFilter)
+                .Sort(
+                    SortExpressionComparer<RecentFileInfo>
+                        .Descending(p => p.FixedAt.HasValue)
+                        .ThenByDescending(p => p.FixedAt ?? p.LastOpenedAt)
+                )
+                .ObserveOnDispatcher()
+                .Bind(out _recentFilesFiltered)
+                .Do(p =>
+                {
+                    NotifyOfPropertyChange(nameof(RecentFilesListIsEmpty));
+                    NotifyOfPropertyChange(nameof(RecentFilesListEmptyMessage));
+                })
+                .Subscribe();
         }
         
         public override string DisplayName => "Start";
 
         public override string InstanceId => "StartPage";
 
-        public override object IconContent => IconProvider.GetResourceDrawingImageIcon("AppIconImage", new ImageIconOptions{Height = 16});
+        public override object IconContent => IconProvider.GetResourceDrawingImageIcon(@"AppIconImage", new ImageIconOptions{Height = 16});
 
         public IRecentFilesProvider PathDefinitions { get; }
-        
+
         public bool ShowStartPageOnOpen
         {
             get => _showStartPageOnOpen;
@@ -58,14 +84,52 @@ namespace LiteDbExplorer.Modules.StartPage
         }
 
         [UsedImplicitly]
-        public bool RecentFilesIsEmpty => !PathDefinitions.RecentFiles.Any();
+        public bool RecentFilesListIsEmpty => !_recentFilesFiltered.Any();
+
+        [UsedImplicitly]
+        public string RecentFilesListEmptyMessage
+        {
+            get
+            {
+                if (!RecentFilesListIsEmpty)
+                {
+                    return null;
+                }
+
+                return !string.IsNullOrWhiteSpace(SearchTerm)
+                    ? $"No results found for '{SearchTerm}'"
+                    : "No recent items in the list";
+            }
+        }
+
+        public string SearchTerm { get; set; }
+
+        [UsedImplicitly]
+        public ReadOnlyObservableCollection<RecentFileInfo> RecentFilesFiltered => _recentFilesFiltered;
+
+        private Func<RecentFileInfo, bool> CreatePredicate(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                return info => true;
+            }
+
+            var lowerTerm = term.ToLower();
+            return info => info.FileName.ToLower().Contains(lowerTerm) || info.DirectoryPath.ToLower().Contains(lowerTerm);
+        }
 
         public void SaveSettings()
         {
             Properties.Settings.Default.ShowStartPageOnOpen = ShowStartPageOnOpen;
             Properties.Settings.Default.Save();
         }
-        
+
+        [UsedImplicitly]
+        public void ClearSearch()
+        {
+            SearchTerm = null;
+        }
+
         [UsedImplicitly]
         public async Task OpenDatabase()
         {
@@ -168,4 +232,7 @@ namespace LiteDbExplorer.Modules.StartPage
             return recentFileInfo != null && recentFileInfo.IsFixed;
         }
     }
+
+    
+
 }

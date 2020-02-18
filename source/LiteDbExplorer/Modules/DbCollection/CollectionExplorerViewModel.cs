@@ -199,6 +199,10 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
 
+        public Func<object> GetIconContent { get; set; }
+
+        public override object IconContent => GetIconContent?.Invoke();
+
         public override void Init(CollectionReferencePayload value)
         {
             if (value == null)
@@ -222,7 +226,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                 GroupDisplayName = collectionReference.Database.Name;
             }
 
-            IconContent = collectionReference is FileCollectionReference
+            GetIconContent = () =>  collectionReference is FileCollectionReference
                 ? new PackIcon {Kind = PackIconKind.FileMultiple}
                 : new PackIcon {Kind = PackIconKind.TableLarge, Height = 16};
 
@@ -237,6 +241,8 @@ namespace LiteDbExplorer.Modules.DbCollection
                 SelectedDocument = CollectionReference.Items.FirstOrDefault();
                 SelectedDocuments = new List<DocumentReference> { SelectedDocument };
             }
+
+            
         }
 
         public void HandleError(Exception ex)

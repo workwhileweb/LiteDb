@@ -17,82 +17,87 @@
              d:DesignHeight="450" d:DesignWidth="800"
              Focusable="True">
     <UserControl.Resources>
-        <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}"/>
-        <converters:GroupDisplayColorToForegroundConverter x:Key="GroupDisplayColorToForegroundConverter"/>
+        <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}" />
+        <converters:GroupDisplayColorToForegroundConverter x:Key="GroupDisplayColorToForegroundConverter" />
     </UserControl.Resources>
     <commands:CommandToCommand.Bindings>
-        <commands:CommandToCommandBinding SourceCommand="Close" 
+        <commands:CommandToCommandBinding SourceCommand="Close"
                                           TargetCommand="{Binding CloseDatabaseCommand}"
-                                          CommandParameter="{Binding SelectedDatabase}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties" 
+                                          CommandParameter="{Binding SelectedDatabase}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.EditDbProperties"
                                           TargetCommand="{Binding EditDbPropertiesCommand}"
-                                          CommandParameter="{Binding SelectedDatabase}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs" 
+                                          CommandParameter="{Binding SelectedDatabase}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.SaveCopyAs"
                                           TargetCommand="{Binding SaveDatabaseCopyAsCommand}"
-                                          CommandParameter="{Binding SelectedDatabase}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddFile" 
+                                          CommandParameter="{Binding SelectedDatabase}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddFile"
                                           TargetCommand="{Binding AddFileCommand}"
-                                          CommandParameter="{Binding SelectedDatabase}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddCollection" 
+                                          CommandParameter="{Binding SelectedDatabase}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.AddCollection"
                                           TargetCommand="{Binding AddCollectionCommand}"
-                                          CommandParameter="{Binding SelectedDatabase}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshDatabase" 
+                                          CommandParameter="{Binding SelectedDatabase}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RefreshDatabase"
                                           TargetCommand="{Binding RefreshDatabaseCommand}"
-                                          CommandParameter="{Binding SelectedDatabase}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RevealInExplorer" 
+                                          CommandParameter="{Binding SelectedDatabase}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RevealInExplorer"
                                           TargetCommand="{Binding RevealInExplorerCommand}"
-                                          CommandParameter="{Binding SelectedDatabase}"/>
+                                          CommandParameter="{Binding SelectedDatabase}" />
 
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RenameCollection" 
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.RenameCollection"
                                           TargetCommand="{Binding RenameCollectionCommand}"
-                                          CommandParameter="{Binding SelectedCollection}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.DropCollection" 
+                                          CommandParameter="{Binding SelectedCollection}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.DropCollection"
                                           TargetCommand="{Binding DropCollectionCommand}"
-                                          CommandParameter="{Binding SelectedCollection}"/>
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection" 
+                                          CommandParameter="{Binding SelectedCollection}" />
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.ExportCollection"
                                           TargetCommand="{Binding ExportCollectionCommand}"
-                                          CommandParameter="{Binding SelectedCollection}"/>
-        
-        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Import" 
-                                          TargetCommand="{Binding ImportDataCommand}"/>
+                                          CommandParameter="{Binding SelectedCollection}" />
+
+        <commands:CommandToCommandBinding SourceCommand="liteDbExplorer:Commands.Import"
+                                          TargetCommand="{Binding ImportDataCommand}" />
     </commands:CommandToCommand.Bindings>
     <DockPanel AllowDrop="True"
                behaviors:DropBehavior.PreviewDropCommand="liteDbExplorer:Commands.FileDropped">
 
         <Border DockPanel.Dock="Top" Height="45" Padding="10,0">
             <TextBlock VerticalAlignment="Center" FontSize="14" Opacity="0.7"
-                Style="{StaticResource MaterialDesignSubheadingTextBlock}">
-                Databases
+                       Style="{StaticResource MaterialDesignSubheadingTextBlock}">
+                Explorer
             </TextBlock>
         </Border>
 
         <ToolBarTray DockPanel.Dock="Top">
             <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}" Height="43">
                 <Button x:Name="OpenDatabase" ToolTip="Open..."
-                        ContextMenuService.IsEnabled="False" 
+                        ContextMenuService.IsEnabled="False"
                         Padding="0" VerticalContentAlignment="Stretch">
                     <Button.Content>
                         <StackPanel Orientation="Horizontal">
-                            <controls:AppPackIcon Kind="FolderOutline" Margin="10,0" Height="18" VerticalAlignment="Center"/>
+                            <controls:AppPackIcon Kind="FolderOutline" Margin="10,0" Height="18"
+                                                  VerticalAlignment="Center" />
                             <!--<materialDesign:PackIcon Kind="FolderOpen" Margin="10" Height="18"/>-->
-                            <Border Background="{DynamicResource MaterialDesignToolBarBackground}" Width="1" VerticalAlignment="Stretch"/>
-                            <Border x:Name="SplitBorder" Background="Transparent" Padding="3,0" Margin="0" BorderThickness="1" CornerRadius="0"
-                                    PreviewMouseLeftButtonDown="RecentItemMoreBorder_MouseLeftButtonDown" ClipToBounds="True">
+                            <Border Background="{DynamicResource MaterialDesignToolBarBackground}" Width="1"
+                                    VerticalAlignment="Stretch" />
+                            <Border x:Name="SplitBorder" Background="Transparent" Padding="3,0" Margin="0"
+                                    BorderThickness="1" CornerRadius="0"
+                                    PreviewMouseLeftButtonDown="RecentItemMoreBorder_MouseLeftButtonDown"
+                                    ClipToBounds="True">
                                 <Border.Style>
                                     <Style TargetType="Border">
                                         <Style.Triggers>
                                             <Trigger Property="IsMouseOver" Value="True">
-                                                <Setter Property="TextElement.Foreground" Value="{DynamicResource AccentBaseColorBrush}"/>
-                                                <Setter Property="Opacity" Value="1"/>
+                                                <Setter Property="TextElement.Foreground"
+                                                        Value="{DynamicResource AccentBaseColorBrush}" />
+                                                <Setter Property="Opacity" Value="1" />
                                             </Trigger>
                                             <Trigger Property="IsMouseOver" Value="False">
-                                                <Setter Property="Opacity" Value="0.67"/>
+                                                <Setter Property="Opacity" Value="0.67" />
                                             </Trigger>
                                         </Style.Triggers>
                                     </Style>
                                 </Border.Style>
                                 <Path Margin="4" VerticalAlignment="Center" Width="6"
-                                      Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" 
+                                      Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}"
                                       Stretch="Uniform" HorizontalAlignment="Right"
                                       Data="F1 M 301.14,-189.041L 311.57,-189.041L 306.355,-182.942L 301.14,-189.041 Z " />
                             </Border>
@@ -105,8 +110,9 @@
                                 <Style TargetType="MenuItem" BasedOn="{StaticResource {x:Type MenuItem}}">
                                     <Setter Property="Tag" Value="{Binding FullPath}" />
                                     <Setter Property="Header" Value="{Binding FullPath}" />
-                                    <Setter Property="Command" Value="{Binding Path=Data.OpenRecentItemCommand, Source={StaticResource DataContextProxy}}"/>
-                                    <Setter Property="CommandParameter" Value="{Binding}"/>
+                                    <Setter Property="Command"
+                                            Value="{Binding Path=Data.OpenRecentItemCommand, Source={StaticResource DataContextProxy}}" />
+                                    <Setter Property="CommandParameter" Value="{Binding}" />
                                 </Style>
                             </ContextMenu.ItemContainerStyle>
                         </ContextMenu>
@@ -115,182 +121,226 @@
             </ToolBar>
         </ToolBarTray>
 
-        <TreeView Name="TreeDatabase"
-                  ItemsSource="{Binding Databases}"
-                  Focusable="True" Padding="0"
-                  HorizontalContentAlignment="Stretch"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                  mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="False"
-                  cal:Message.Attach="[Event SelectedItemChanged] = [OnSelectedItemChanged($eventArgs)];"
-                  VirtualizingStackPanel.IsVirtualizing="False"
-                  VirtualizingStackPanel.VirtualizationMode="Standard">
-            <TreeView.Resources>
-                <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
-                    <Setter Property="IsExpanded" Value="True" />
-                    <Setter Property="behaviors:MouseDoubleClick.Command"
-                            Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}"/>
-                    <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
-                            Value="{Binding}"/>
-                    <Setter Property="cal:Message.Attach"
-                            Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]"/>
-                    <Setter Property="ToolTip" Value="{Binding Name}" />
-                    <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnPreviewMouseRightButtonDown" />
-                    <Setter Property="ContextMenu">
-                        <Setter.Value>
-                            <ContextMenu>
-                                <MenuItem Header="New Query" 
-                                          cal:Message.Attach="NewQuery($dataContext)"
-                                          cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="CodeGreaterThan" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <Separator />
-                                <MenuItem Command="liteDbExplorer:Commands.AddFile"
-                                          CommandParameter="{Binding}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="NoteAdd" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Command="liteDbExplorer:Commands.AddCollection"
-                                          CommandParameter="{Binding}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="TablePlus" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <Separator />
-                                <MenuItem Command="liteDbExplorer:Commands.RefreshDatabase"
-                                          CommandParameter="{Binding}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="Refresh" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Command="liteDbExplorer:Commands.EditDbProperties" 
-                                          CommandParameter="{Binding}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="SettingsBox" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <Separator />
-                                <MenuItem Command="liteDbExplorer:Commands.SaveCopyAs" 
-                                          CommandParameter="{Binding}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="DatabaseExport" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Command="liteDbExplorer:Commands.RevealInExplorer" 
-                                          CommandParameter="{Binding}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="OpenInNew" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                                <MenuItem Command="Close" 
-                                          CommandParameter="{Binding}">
-                                    <MenuItem.Icon>
-                                        <materialDesign:PackIcon Kind="DatabaseMinus" />
-                                    </MenuItem.Icon>
-                                </MenuItem>
-                            </ContextMenu>
-                        </Setter.Value>
-                    </Setter>
-                </Style>
-                <HierarchicalDataTemplate DataType="{x:Type core:DatabaseReference}"
-                                          ItemsSource="{Binding Collections}">
-                    <HierarchicalDataTemplate.ItemContainerStyle>
-                        <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
-                            <Setter Property="behaviors:MouseDoubleClick.Command"
-                                    Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}"/>
-                            <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
-                                    Value="{Binding}"/>
-                            <Setter Property="cal:Message.Attach"
-                                    Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]"/>
-                            <Setter Property="ToolTip" Value="{Binding Name}" />
-                            <Setter Property="ContextMenu">
-                                <Setter.Value>
-                                    <ContextMenu>
-                                        <MenuItem Header="New Query" 
-                                                  cal:Message.Attach="NewQuery($dataContext)"
-                                                  cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="CodeGreaterThan" />
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Header="Find Top 100" 
-                                                  cal:Message.Attach="NewFindQuery($dataContext, null, 100)"
-                                                  cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
-                                        </MenuItem>
-                                        <Separator />
-                                        <MenuItem Command="liteDbExplorer:Commands.AddCollection" 
-                                                  CommandParameter="{Binding Database}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="TablePlus" />
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Command="liteDbExplorer:Commands.RenameCollection" 
-                                                  CommandParameter="{Binding}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="RenameBox" />
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <MenuItem Command="liteDbExplorer:Commands.DropCollection" 
-                                                  CommandParameter="{Binding}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="TableRemove" />
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                        <Separator />
-                                        <MenuItem Command="liteDbExplorer:Commands.ExportCollection" 
-                                                  CommandParameter="{Binding}">
-                                            <MenuItem.Icon>
-                                                <materialDesign:PackIcon Kind="FileExport" />
-                                            </MenuItem.Icon>
-                                        </MenuItem>
-                                    </ContextMenu>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </HierarchicalDataTemplate.ItemContainerStyle>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <materialDesign:PackIcon Kind="Database" Height="19" Width="20" 
-                                                 VerticalAlignment="Center" HorizontalAlignment="Center" 
-                                                 Foreground="{Binding Path=InstanceId, Converter={StaticResource GroupDisplayColorToForegroundConverter}}" />
-                        <TextBlock Grid.Column="1" 
-                                   Text="{Binding Name}" ToolTip="{Binding Location}"
-                                   Padding="8,4" FontSize="14" FontWeight="Regular"
-                                   FontFamily="{StaticResource MaterialDesignFont}"
-                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
-                    </Grid>
-                </HierarchicalDataTemplate>
-                <DataTemplate DataType="{x:Type core:CollectionReference}">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="6" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <ContentPresenter Grid.Column="1" Content="{Binding}">
-                            <ContentPresenter.Resources>
-                                <DataTemplate DataType="{x:Type core:FileCollectionReference}">
-                                    <materialDesign:PackIcon Kind="FileMultiple" Height="15" Width="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type core:CollectionReference}">
-                                    <materialDesign:PackIcon Kind="TableLarge" Height="16" Width="20" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                </DataTemplate>
-                            </ContentPresenter.Resources>
-                        </ContentPresenter>
-                        <TextBlock Grid.Column="2" 
-                                   Text="{Binding Name}" ToolTip="{Binding Name}"
-                                   Padding="8,4" FontSize="14" FontWeight="Normal"
-                                   FontFamily="{StaticResource MaterialDesignFont}"
-                                   TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
-                    </Grid>
-                </DataTemplate>
-            </TreeView.Resources>
-        </TreeView>
+        <Grid>
+            <TextBlock HorizontalAlignment="Center" 
+                       VerticalAlignment="Top" Margin="56,16"
+                       Style="{StaticResource MaterialDesignBody1TextBlock}" Opacity="0.6"
+                       Visibility="{Binding Path=IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
+                No database open
+            </TextBlock>
+
+            <TreeView Name="TreeDatabase"
+                      ItemsSource="{Binding Databases}"
+                      Focusable="True" Padding="0"
+                      HorizontalContentAlignment="Stretch"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      mah:ScrollViewerHelper.IsHorizontalScrollWheelEnabled="False"
+                      cal:Message.Attach="[Event SelectedItemChanged] = [OnSelectedItemChanged($eventArgs)];"
+                      VirtualizingStackPanel.IsVirtualizing="False"
+                      VirtualizingStackPanel.VirtualizationMode="Standard"
+                      FocusVisualStyle="{StaticResource SolidFocusVisualStyle}">
+                <TreeView.Resources>
+                    <Style TargetType="TreeViewItem" BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
+                        <Setter Property="IsExpanded" Value="True" />
+                        <Setter Property="behaviors:MouseDoubleClick.Command"
+                                Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}" />
+                        <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
+                                Value="{Binding}" />
+                        <Setter Property="cal:Message.Attach"
+                                Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]" />
+                        <Setter Property="ToolTip" Value="{Binding Name}" />
+                        <EventSetter Event="PreviewMouseRightButtonDown" Handler="OnPreviewMouseRightButtonDown" />
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Header="New Query"
+                                              cal:Message.Attach="NewQuery($dataContext)"
+                                              cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="CodeGreaterThan" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem Command="liteDbExplorer:Commands.AddFile"
+                                              CommandParameter="{Binding}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="NoteAdd" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Command="liteDbExplorer:Commands.AddCollection"
+                                              CommandParameter="{Binding}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="TablePlus" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem Command="liteDbExplorer:Commands.RefreshDatabase"
+                                              CommandParameter="{Binding}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="Refresh" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Command="liteDbExplorer:Commands.EditDbProperties"
+                                              CommandParameter="{Binding}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="SettingsBox" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <Separator />
+                                    <MenuItem Command="liteDbExplorer:Commands.SaveCopyAs"
+                                              CommandParameter="{Binding}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="DatabaseExport" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Command="liteDbExplorer:Commands.RevealInExplorer"
+                                              CommandParameter="{Binding}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="OpenInNew" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                    <MenuItem Command="Close"
+                                              CommandParameter="{Binding}">
+                                        <MenuItem.Icon>
+                                            <materialDesign:PackIcon Kind="DatabaseMinus" />
+                                        </MenuItem.Icon>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                    <HierarchicalDataTemplate DataType="{x:Type core:DatabaseReference}"
+                                              ItemsSource="{Binding Collections}">
+                        <HierarchicalDataTemplate.ItemContainerStyle>
+                            <Style TargetType="TreeViewItem"
+                                   BasedOn="{StaticResource MaterialDesignTreeViewItemFullRow}">
+                                <Setter Property="behaviors:MouseDoubleClick.Command"
+                                        Value="{Binding Path=Data.NodeDefaulActionCommand, Source={StaticResource DataContextProxy}}" />
+                                <Setter Property="behaviors:MouseDoubleClick.CommandParameter"
+                                        Value="{Binding}" />
+                                <Setter Property="cal:Message.Attach"
+                                        Value="[Event KeyDown] = [Action NodeKeyDownAction($eventArgs, $dataContext)]" />
+                                <Setter Property="ToolTip" Value="{Binding Name}" />
+                                <Setter Property="ContextMenu">
+                                    <Setter.Value>
+                                        <ContextMenu>
+                                            <MenuItem Header="New Query"
+                                                      cal:Message.Attach="NewQuery($dataContext)"
+                                                      cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
+                                                <MenuItem.Icon>
+                                                    <materialDesign:PackIcon Kind="CodeGreaterThan" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Header="Find Top 100"
+                                                      cal:Message.Attach="NewFindQuery($dataContext, null, 100)"
+                                                      cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}" />
+                                            <Separator />
+                                            <MenuItem Command="liteDbExplorer:Commands.AddCollection"
+                                                      CommandParameter="{Binding Database}">
+                                                <MenuItem.Icon>
+                                                    <materialDesign:PackIcon Kind="TablePlus" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Command="liteDbExplorer:Commands.RenameCollection"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <materialDesign:PackIcon Kind="RenameBox" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <MenuItem Command="liteDbExplorer:Commands.DropCollection"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <materialDesign:PackIcon Kind="TableRemove" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                            <Separator />
+                                            <MenuItem Command="liteDbExplorer:Commands.ExportCollection"
+                                                      CommandParameter="{Binding}">
+                                                <MenuItem.Icon>
+                                                    <materialDesign:PackIcon Kind="FileExport" />
+                                                </MenuItem.Icon>
+                                            </MenuItem>
+                                        </ContextMenu>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </HierarchicalDataTemplate.ItemContainerStyle>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <materialDesign:PackIcon Kind="Database" Height="19" Width="20"
+                                                     VerticalAlignment="Center" HorizontalAlignment="Center"
+                                                     Foreground="{Binding Path=InstanceId, Converter={StaticResource GroupDisplayColorToForegroundConverter}}" />
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding Name}" ToolTip="{Binding Location}"
+                                       Padding="8,4" FontSize="14" FontWeight="Regular"
+                                       FontFamily="{StaticResource MaterialDesignFont}"
+                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" 
+                                       behaviors:HighlightTextBlock.HightlightText="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                                       behaviors:HighlightTextBlock.HighlightBrush="#CD653723"/>
+                        </Grid>
+                    </HierarchicalDataTemplate>
+                    <DataTemplate DataType="{x:Type core:CollectionReference}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="6" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <ContentPresenter Grid.Column="1" Content="{Binding}">
+                                <ContentPresenter.Resources>
+                                    <DataTemplate DataType="{x:Type core:FileCollectionReference}">
+                                        <materialDesign:PackIcon Kind="FileMultiple" Height="15" Width="20"
+                                                                 VerticalAlignment="Center"
+                                                                 HorizontalAlignment="Center" />
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type core:CollectionReference}">
+                                        <materialDesign:PackIcon Kind="TableLarge" Height="16" Width="20"
+                                                                 VerticalAlignment="Center"
+                                                                 HorizontalAlignment="Center" />
+                                    </DataTemplate>
+                                </ContentPresenter.Resources>
+                            </ContentPresenter>
+                            <TextBlock Grid.Column="2"
+                                       Text="{Binding Name}" ToolTip="{Binding Name}"
+                                       Padding="8,4" FontSize="14" FontWeight="Normal"
+                                       FontFamily="{StaticResource MaterialDesignFont}"
+                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" 
+                                       behaviors:HighlightTextBlock.HightlightText="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                                       behaviors:HighlightTextBlock.HighlightBrush="#CD653723"/>
+                        </Grid>
+                    </DataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+
+            <Grid x:Name="FindTextAdorner" Visibility="Collapsed">
+                <materialDesign:Card
+                    Background="#653723"
+                    materialDesign:ShadowAssist.ShadowDepth="Depth1" 
+                    HorizontalAlignment="Right" Margin="6" Padding="2,3"
+                    BorderThickness="1" BorderBrush="#653723">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,1,0">
+                        <StackPanel.Resources>
+                            <Style TargetType="materialDesign:PackIcon">
+                                <Setter Property="Background" Value="Transparent"/>
+                                <Setter Property="IsHitTestVisible" Value="True"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Margin" Value="1,0"/>
+                            </Style>
+                        </StackPanel.Resources>
+                        <TextBlock x:Name="FindTextContent" Margin="4,0,5,0"
+                                   Text="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                                   TextTrimming="None" TextWrapping="NoWrap"
+                                   Foreground="White"/>
+                        <materialDesign:PackIcon Kind="NotificationClearAll" x:Name="FindDisplayModeHighlight" ToolTip="Disable Filter on Type" Foreground="White"/>
+                        <materialDesign:PackIcon Kind="FilterVariant" x:Name="FindDisplayModeCollapsed" ToolTip="Enable Filter on Type" Foreground="White"/>
+                        <materialDesign:PackIcon Kind="WindowClose" x:Name="FindTextClose" Foreground="White"/>
+                    </StackPanel>
+                </materialDesign:Card>
+            </Grid>
+        </Grid>
 
     </DockPanel>
 </UserControl>

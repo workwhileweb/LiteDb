@@ -195,6 +195,19 @@
                 <Setter Property="Template" Value="{StaticResource MaterialDesignScrollViewerTemplate}" />
             </Style>
 
+            <Style x:Key="SolidFocusVisualStyle">
+                <Setter Property="Control.Template">  
+                    <Setter.Value>  
+                        <ControlTemplate>  
+                            <Rectangle StrokeThickness="1"
+                                       Opacity="0.6"
+                                       Stroke="{DynamicResource AccentColorBrush}"  
+                                       SnapsToDevicePixels="true"/>  
+                        </ControlTemplate>  
+                    </Setter.Value>  
+                </Setter>  
+            </Style>  
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>
