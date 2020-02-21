@@ -174,5 +174,8 @@
   <ItemGroup>
     <EmbeddedResource Include="Resources\Light\Json.xshd" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="package.nuspec" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
