@@ -25,20 +25,20 @@ namespace LiteDbExplorer.Modules.Main
             IWindowManager windowManager,
             IApplicationInteraction applicationInteraction,
             IEventAggregator eventAggregator,
-            IRecentFilesProvider recentFilesProvider)
+            IRecentDatabaseFilesProvider recentDatabaseFilesProvider)
         {
             _databaseInteractions = databaseInteractions;
             _windowManager = windowManager;
             _applicationInteraction = applicationInteraction;
             _eventAggregator = eventAggregator;
 
-            PathDefinitions = recentFilesProvider;
+            PathDefinitions = recentDatabaseFilesProvider;
         }
 
-        public IRecentFilesProvider PathDefinitions { get; }
+        public IRecentDatabaseFilesProvider PathDefinitions { get; }
         
         [UsedImplicitly]
-        public async Task OpenRecentItem(RecentFileInfo info)
+        public async Task OpenRecentItem(RecentDatabaseFileInfo info)
         {
             if (info == null)
             {

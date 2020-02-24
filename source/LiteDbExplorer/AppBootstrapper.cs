@@ -54,7 +54,7 @@ namespace LiteDbExplorer
 
             batch.AddExportedValue<IWindowManager>(windowManager);
             batch.AddExportedValue<IEventAggregator>(new EventAggregator());
-            batch.AddExportedValue<IRecentFilesProvider>(new Paths());
+            batch.AddExportedValue<IRecentDatabaseFilesProvider>(new Paths());
             batch.AddExportedValue<IQueryHistoryProvider>(new QueryHistoryProvider());
             batch.AddExportedValue(NotificationInteraction.Manager);
             

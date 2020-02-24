@@ -12,7 +12,7 @@ using Newtonsoft.Json;
 
 namespace LiteDbExplorer
 {
-    public class Paths : INotifyPropertyChanged, IRecentFilesProvider
+    public class Paths : INotifyPropertyChanged, IRecentDatabaseFilesProvider
     {
         private static readonly JsonSerializerSettings _jsonSerializerSettings = new JsonSerializerSettings
         {
@@ -20,10 +20,10 @@ namespace LiteDbExplorer
             Formatting = Formatting.Indented
         };
 
-        private readonly Lazy<BindableCollection<RecentFileInfo>> _lazyRecentFiles =
-            new Lazy<BindableCollection<RecentFileInfo>>(() =>
+        private readonly Lazy<BindableCollection<RecentDatabaseFileInfo>> _lazyRecentFiles =
+            new Lazy<BindableCollection<RecentDatabaseFileInfo>>(() =>
             {
-                var list = new List<RecentFileInfo>();
+                var list = new List<RecentDatabaseFileInfo>();
 
                 var recentFilesExists = File.Exists(RecentFilesPath);
                 if (recentFilesExists)
@@ -34,7 +34,7 @@ namespace LiteDbExplorer
                         if (!string.IsNullOrEmpty(value))
                         {
                             var recentFileInfos =
-                                JsonConvert.DeserializeObject<RecentFileInfo[]>(value, _jsonSerializerSettings);
+                                JsonConvert.DeserializeObject<RecentDatabaseFileInfo[]>(value, _jsonSerializerSettings);
                             foreach (var recentFileInfo in recentFileInfos)
                             {
                                 recentFileInfo.InvalidateInfo();
@@ -60,7 +60,7 @@ namespace LiteDbExplorer
                                 continue;
                             }
 
-                            list.Add(new RecentFileInfo(filesPath));
+                            list.Add(new RecentDatabaseFileInfo(4, filesPath));
                         }
 
                         File.Delete(LegacyRecentFilesPath);
@@ -71,7 +71,7 @@ namespace LiteDbExplorer
                     }
                 }
 
-                var collection = new BindableCollection<RecentFileInfo>(list);
+                var collection = new BindableCollection<RecentDatabaseFileInfo>(list);
 
                 ReorderRecentFiles(collection);
 
@@ -123,7 +123,7 @@ namespace LiteDbExplorer
             }
         }
 
-        public IObservableCollection<RecentFileInfo> RecentFiles => _lazyRecentFiles.Value;
+        public IObservableCollection<RecentDatabaseFileInfo> RecentFiles => _lazyRecentFiles.Value;
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -156,7 +156,7 @@ namespace LiteDbExplorer
             return lastLogFile?.FullName;
         }
 
-        public void InsertRecentFile(string path, string password = null)
+        public void InsertRecentFile(int databaseVersion, string path, string password = null)
         {
             var recentFileInfo =
                 RecentFiles.FirstOrDefault(p => p.FullPath.Equals(path, StringComparison.OrdinalIgnoreCase));
@@ -167,7 +167,7 @@ namespace LiteDbExplorer
             }
             else
             {
-                recentFileInfo = new RecentFileInfo(path);
+                recentFileInfo = new RecentDatabaseFileInfo(databaseVersion, path);
             }
 
             if (!string.IsNullOrEmpty(password))
@@ -180,6 +180,7 @@ namespace LiteDbExplorer
             }
 
             recentFileInfo.LastOpenedAt = DateTime.Now;
+            recentFileInfo.DatabaseVersion = databaseVersion;
 
             RecentFiles.IsNotifying = false;
             RecentFiles.Insert(0, recentFileInfo);
@@ -256,14 +257,14 @@ namespace LiteDbExplorer
             return false;
         }
 
-        private static void ReorderRecentFiles(IObservableCollection<RecentFileInfo> target)
+        private static void ReorderRecentFiles(IObservableCollection<RecentDatabaseFileInfo> target)
         {
             if (target == null)
             {
                 return;
             }
 
-            var orderedItem = new List<RecentFileInfo>();
+            var orderedItem = new List<RecentDatabaseFileInfo>();
             orderedItem.AddRange(target.Where(p => p.FixedAt.HasValue).OrderByDescending(p => p.FixedAt));
             orderedItem.AddRange(target.Where(p => !p.FixedAt.HasValue).OrderByDescending(p => p.LastOpenedAt));
 
@@ -288,7 +289,7 @@ namespace LiteDbExplorer
 
         private static void RecentFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (sender is IObservableCollection<RecentFileInfo> collection)
+            if (sender is IObservableCollection<RecentDatabaseFileInfo> collection)
             {
                 var json = JsonConvert.SerializeObject(collection, _jsonSerializerSettings);
 

@@ -35,9 +35,14 @@
   <ItemGroup>
     <Reference Include="LiteDB.v4">
       <HintPath>..\LiteDbExplorer.Interop\libs\LiteDB.v4.dll</HintPath>
+      <Aliases>v4</Aliases>
     </Reference>
     <Reference Include="LiteDB.v5">
       <HintPath>..\LiteDbExplorer.Interop\libs\LiteDB.v5.dll</HintPath>
+      <Aliases>v5</Aliases>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -49,11 +54,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Customer.cs" />
+    <Compile Include="DatabaseVersionsTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\LiteDbExplorer.Interop\LiteDbExplorer.Interop.csproj">

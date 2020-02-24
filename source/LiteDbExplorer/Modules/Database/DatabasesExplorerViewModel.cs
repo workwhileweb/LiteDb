@@ -30,12 +30,12 @@ namespace LiteDbExplorer.Modules.Database
         public DatabasesExplorerViewModel(
             IDatabaseInteractions databaseInteractions,
             IApplicationInteraction applicationInteraction, 
-            IRecentFilesProvider recentFilesProvider)
+            IRecentDatabaseFilesProvider recentDatabaseFilesProvider)
         {
             _databaseInteractions = databaseInteractions;
             _applicationInteraction = applicationInteraction;
 
-            PathDefinitions = recentFilesProvider;
+            PathDefinitions = recentDatabaseFilesProvider;
 
             CloseDatabaseCommand = new AsyncCommand<DatabaseReference>(CloseDatabase, CanCloseDatabase, this);
             EditDbPropertiesCommand = new AsyncCommand<DatabaseReference>(EditDbProperties, CanEditDbProperties, this);
@@ -51,14 +51,14 @@ namespace LiteDbExplorer.Modules.Database
             
             ImportDataCommand = new RelayCommand(_ => ImportData(), _ => CanImportData());
 
-            OpenRecentItemCommand = new AsyncCommand<RecentFileInfo>(OpenRecentItem);
+            OpenRecentItemCommand = new AsyncCommand<RecentDatabaseFileInfo>(OpenRecentItem);
 
             NodeDefaulActionCommand = new AsyncCommand<object>(NodeDefaultAction);
 
             Store.Current.Databases.CollectionChanged += OnDatabasesCollectionChanged;
         }
 
-        public IRecentFilesProvider PathDefinitions { get; }
+        public IRecentDatabaseFilesProvider PathDefinitions { get; }
 
         public ICommand CloseDatabaseCommand { get; }
 
@@ -125,7 +125,7 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public async Task OpenRecentItem(RecentFileInfo info)
+        public async Task OpenRecentItem(RecentDatabaseFileInfo info)
         {
             if (info == null)
             {

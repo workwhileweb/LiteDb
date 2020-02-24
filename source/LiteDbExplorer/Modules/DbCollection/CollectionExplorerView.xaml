@@ -124,18 +124,6 @@
                             <materialDesign:PackIcon Kind="FileEyeOutline" />
                         </ToggleButton>
 
-                        <!--<ListBox DockPanel.Dock="Right" SelectedIndex="0">
-                            <i:Interaction.Behaviors>
-                                <behaviors:KeepSelectedItem/>
-                            </i:Interaction.Behaviors>
-                            <ListBoxItem>
-                                <materialDesign:PackIcon Kind="FormatListBulletedSquare" Style="{StaticResource ToolPackIcon}"/>
-                            </ListBoxItem>
-                            <ListBoxItem>
-                                <materialDesign:PackIcon Kind="ViewGrid" Style="{StaticResource ToolPackIcon}"/>
-                            </ListBoxItem>
-                        </ListBox>-->
-
                         <StackPanel Orientation="Horizontal" Opacity="0.5" Margin="10,0">
                             <TextBlock Text="{Binding DocumentsCountInfo}" VerticalAlignment="Center"/>
                             <Separator Style="{StaticResource ToolDockPanelSeparator}"/>

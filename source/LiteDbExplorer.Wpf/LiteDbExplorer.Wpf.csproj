@@ -61,7 +61,7 @@
     <Compile Include="Behaviors\DropBehavior.cs" />
     <Compile Include="Behaviors\EnumCollectionExtension.cs" />
     <Compile Include="Behaviors\FocusActiveGroup.cs" />
-    <Compile Include="Behaviors\HighlightTextBlock.cs" />
+    <Compile Include="Behaviors\TextBlockSetHighlight.cs" />
     <Compile Include="Behaviors\KeepSelectedItem.cs" />
     <Compile Include="Behaviors\KeyGestureExtension.cs" />
     <Compile Include="Behaviors\MouseDoubleClick.cs" />

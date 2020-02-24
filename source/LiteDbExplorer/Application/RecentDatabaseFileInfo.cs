@@ -8,15 +8,16 @@ using PropertyChanged;
 
 namespace LiteDbExplorer
 {
-    public class RecentFileInfo : INotifyPropertyChanged
+    public class RecentDatabaseFileInfo : INotifyPropertyChanged
     {
-        public RecentFileInfo()
+        public RecentDatabaseFileInfo()
         {
         }
 
-        public RecentFileInfo(string fullPath)
+        public RecentDatabaseFileInfo(int databaseVersion, string fullPath)
         {
             FullPath = fullPath;
+            DatabaseVersion = databaseVersion;
             InvalidateInfo();
         }
 
@@ -32,6 +33,8 @@ namespace LiteDbExplorer
         public DateTime? LastOpenedAt { get; set; }
 
         public DateTime? FixedAt { get; set; }
+
+        public int DatabaseVersion { get; set; }
 
         [DoNotNotify]
         public string ProtectedPassword { get; set; }

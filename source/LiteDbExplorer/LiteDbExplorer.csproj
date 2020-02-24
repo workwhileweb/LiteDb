@@ -80,8 +80,8 @@
     </ApplicationDefinition>
     <Compile Include="AppConstants.cs" />
     <Compile Include="Application\DataProtectionProvider.cs" />
-    <Compile Include="Application\IRecentFilesProvider.cs" />
-    <Compile Include="Application\RecentFileInfo.cs" />
+    <Compile Include="Application\IRecentDatabaseFilesProvider.cs" />
+    <Compile Include="Application\RecentDatabaseFileInfo.cs" />
     <Compile Include="Controls\AppHeader.xaml.cs">
       <DependentUpon>AppHeader.xaml</DependentUpon>
     </Compile>
@@ -90,6 +90,7 @@
     <Compile Include="Controls\Editor\Completion\DefaultCompletionData.cs" />
     <Compile Include="Controls\Editor\ImageOrIconPresenter.cs" />
     <Compile Include="Controls\HighlightTextBlock.cs" />
+    <Compile Include="Controls\ListViewFindController.cs" />
     <Compile Include="Controls\SplitContainerSelectionController.cs" />
     <Compile Include="Controls\Highlighting\LiteDbCmdHighlightingProvider.cs" />
     <Compile Include="Controls\TextBockExtensions.cs" />

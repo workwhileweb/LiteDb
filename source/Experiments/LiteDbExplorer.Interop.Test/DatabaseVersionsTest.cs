@@ -6,7 +6,7 @@ using Newtonsoft.Json;
 using LiteDBv4 = v4::LiteDB;
 using LiteDBv5 = v5::LiteDB;
 
-namespace LiteDbExplorer.Interop
+namespace LiteDbExplorer.Interop.Test
 {
     public static class DatabaseVersionsTest
     {
@@ -64,7 +64,7 @@ namespace LiteDbExplorer.Interop
                 // var jsonInfo = JsonConvert.SerializeObject(LiteDBv5., Formatting.Indented);
                 // Get customer collection
                 var col = db.GetCollection<Customer>("customers");
-
+                
                 // Create your new customer instance
                 var customer = new Customer
                 { 
@@ -100,16 +100,7 @@ namespace LiteDbExplorer.Interop
         private static void Dump(object value)
         {
             var json = JsonConvert.SerializeObject(value, Formatting.Indented);
-            Console.WriteLine(json);
+            Console.WriteLine((string) json);
         }
-    }
-
-    public class Customer
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public int Age { get; set; }
-        public string[] Phones { get; set; }
-        public bool IsActive { get; set; }
     }
 }

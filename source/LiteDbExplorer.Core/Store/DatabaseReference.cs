@@ -13,9 +13,9 @@ namespace LiteDbExplorer.Core
     public sealed class DatabaseReference : ReferenceNode<DatabaseReference>
     {
         private readonly bool _enableLog;
+        private bool _beforeDisposeHandled;
         private ObservableCollection<CollectionReference> _collections;
         private bool _isDisposing;
-        private bool _beforeDisposeHandled;
 
         public DatabaseReference([NotNull] DatabaseConnectionOptions options)
         {
@@ -38,7 +38,6 @@ namespace LiteDbExplorer.Core
             UpdateCollections();
 
             OnReferenceChanged(ReferenceNodeChangeAction.Add, this);
-
         }
 
         public LiteDatabase LiteDatabase { get; }
@@ -46,6 +45,14 @@ namespace LiteDbExplorer.Core
         public string Name { get; set; }
 
         public string Location { get; set; }
+
+        public int DatabaseVersion => 4;
+
+        public int UserVersion
+        {
+            get => LiteDatabase.Engine.UserVersion;
+            set => LiteDatabase.Engine.UserVersion = (ushort) value;
+        }
 
         public ObservableCollection<CollectionReferenceLookup> CollectionsLookup { get; private set; }
 
@@ -59,13 +66,14 @@ namespace LiteDbExplorer.Core
                 {
                     _collections.CollectionChanged -= OnCollectionChanged;
                 }
-                
+
                 _collections = value;
 
                 if (_collections != null)
                 {
                     _collections.CollectionChanged += OnCollectionChanged;
                 }
+
                 OnPropertyChanged();
             }
         }
@@ -75,113 +83,9 @@ namespace LiteDbExplorer.Core
             get { return Collections.FirstOrDefault(p => p.Name.Equals(name)); }
         }
 
-        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        public void Refresh()
         {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                    if (e.NewItems != null)
-                    {
-                        BroadcastChanges(ReferenceNodeChangeAction.Add, e.NewItems.Cast<CollectionReference>());
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Reset:
-                    if (e.OldItems != null)
-                    {
-                        BroadcastChanges(ReferenceNodeChangeAction.Remove, e.OldItems.Cast<CollectionReference>());
-                    }
-                    break;
-            }
-        }
-
-        private void BroadcastChanges(ReferenceNodeChangeAction action, DatabaseReference reference)
-        {
-            BroadcastChanges(action, Collections);
-
-            OnReferenceChanged(action, reference);
-        }
-
-        private void BroadcastChanges(ReferenceNodeChangeAction action, IEnumerable<CollectionReference> items)
-        {
-            foreach (var referenceCollection in items)
-            {
-                foreach (var documentReference in referenceCollection.Items)
-                {
-                    documentReference.OnReferenceChanged(action, documentReference);
-                }
-                
-                referenceCollection.OnReferenceChanged(action, referenceCollection);
-            }
-        }
-
-        public void BeforeDispose()
-        {
-            if (_isDisposing)
-            {
-                return;
-            }
-
-            _beforeDisposeHandled = true;
-
-            BroadcastChanges(ReferenceNodeChangeAction.Dispose, this);
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            if (_isDisposing)
-            {
-                return;
-            }
-
-            _isDisposing = true;
-
-            if (!_beforeDisposeHandled)
-            {
-                BroadcastChanges(ReferenceNodeChangeAction.Dispose, this);
-            }
-            
-            Log.Information("Dispose database {path}", Location);
-
-            LiteDatabase.Dispose();
-        }
-
-        private Logger GetLogger()
-        {
-            if (_enableLog)
-            {
-                return new Logger(Logger.FULL, log =>
-                {
-                    Log.ForContext("DatabaseName", Name).Information(log);
-                });
-            }
-
-            return null;
-        }
-
-        private void UpdateCollections()
-        {
-            // TODO: Bind database tree and lazy load CollectionReference
-            CollectionsLookup = new ObservableCollection<CollectionReferenceLookup>(
-                LiteDatabase.GetCollectionNames()
-                    .Where(name => name != @"_chunks")
-                    .OrderBy(name => name)
-                    .Select(name => new CollectionReferenceLookup(name))
-            );
-
-            Collections = new ObservableCollection<CollectionReference>(MapCollectionReference(CollectionsLookup));
-        }
-
-        private IEnumerable<CollectionReference> MapCollectionReference(IEnumerable<CollectionReferenceLookup> lookups)
-        {
-            return lookups.Select(MapCollectionReference);
-        }
-
-        private CollectionReference MapCollectionReference(CollectionReferenceLookup lookup)
-        {
-            return lookup.Type == CollectionHandlerType.Files
-                ? new FileCollectionReference(lookup.Name, this)
-                : new CollectionReference(lookup.Name, this);
+            UpdateCollections();
         }
 
         public DocumentReference AddFile(string id, string path)
@@ -226,11 +130,13 @@ namespace LiteDbExplorer.Core
             {
                 item.Name = newName;
             }
+
             var lookupItem = CollectionsLookup.FirstOrDefault(p => p.Name.Equals(oldName, StringComparison.Ordinal));
             if (lookupItem != null)
             {
                 lookupItem.Name = newName;
             }
+
             // UpdateCollections();
         }
 
@@ -242,12 +148,45 @@ namespace LiteDbExplorer.Core
             {
                 Collections.Remove(item);
             }
+
             // UpdateCollections();
         }
 
         public bool ContainsCollection(string name)
         {
             return Collections.Any(p => p.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        public long ShrinkDatabase()
+        {
+            return LiteDatabase.Shrink();
+        }
+
+        public long ShrinkDatabase(string password)
+        {
+            return LiteDatabase.Shrink(password);
+        }
+
+        public IList<BsonValue> RunCommand(string command)
+        {
+            return LiteDatabase.Engine.Run(command);
+        }
+
+        public BsonDocument InternalDatabaseInfo()
+        {
+            return LiteDatabase.Engine.Info();
+        }
+
+        public void BeforeDispose()
+        {
+            if (_isDisposing)
+            {
+                return;
+            }
+
+            _beforeDisposeHandled = true;
+
+            BroadcastChanges(ReferenceNodeChangeAction.Dispose, this);
         }
 
         public static bool IsDbPasswordProtected(string path)
@@ -271,9 +210,101 @@ namespace LiteDbExplorer.Core
             }
         }
 
-        public void Refresh()
+        protected override void Dispose(bool disposing)
         {
-            UpdateCollections();
+            if (_isDisposing)
+            {
+                return;
+            }
+
+            _isDisposing = true;
+
+            if (!_beforeDisposeHandled)
+            {
+                BroadcastChanges(ReferenceNodeChangeAction.Dispose, this);
+            }
+
+            Log.Information("Dispose database {path}", Location);
+
+            LiteDatabase.Dispose();
         }
+
+        private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (e.NewItems != null)
+                    {
+                        BroadcastChanges(ReferenceNodeChangeAction.Add, e.NewItems.Cast<CollectionReference>());
+                    }
+
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Reset:
+                    if (e.OldItems != null)
+                    {
+                        BroadcastChanges(ReferenceNodeChangeAction.Remove, e.OldItems.Cast<CollectionReference>());
+                    }
+
+                    break;
+            }
+        }
+
+        private void BroadcastChanges(ReferenceNodeChangeAction action, DatabaseReference reference)
+        {
+            BroadcastChanges(action, Collections);
+
+            OnReferenceChanged(action, reference);
+        }
+
+        private void BroadcastChanges(ReferenceNodeChangeAction action, IEnumerable<CollectionReference> items)
+        {
+            foreach (var referenceCollection in items)
+            {
+                foreach (var documentReference in referenceCollection.Items)
+                {
+                    documentReference.OnReferenceChanged(action, documentReference);
+                }
+
+                referenceCollection.OnReferenceChanged(action, referenceCollection);
+            }
+        }
+
+        private Logger GetLogger()
+        {
+            if (_enableLog)
+            {
+                return new Logger(Logger.FULL, log => { Log.ForContext("DatabaseName", Name).Information(log); });
+            }
+
+            return null;
+        }
+
+        private void UpdateCollections()
+        {
+            // TODO: Bind database tree and lazy load CollectionReference
+            CollectionsLookup = new ObservableCollection<CollectionReferenceLookup>(
+                LiteDatabase.GetCollectionNames()
+                    .Where(name => name != @"_chunks")
+                    .OrderBy(name => name)
+                    .Select(name => new CollectionReferenceLookup(name))
+            );
+
+            Collections = new ObservableCollection<CollectionReference>(MapCollectionReference(CollectionsLookup));
+        }
+
+        private IEnumerable<CollectionReference> MapCollectionReference(IEnumerable<CollectionReferenceLookup> lookups)
+        {
+            return lookups.Select(MapCollectionReference);
+        }
+
+        private CollectionReference MapCollectionReference(CollectionReferenceLookup lookup)
+        {
+            return lookup.Type == CollectionHandlerType.Files
+                ? new FileCollectionReference(lookup.Name, this)
+                : new CollectionReference(lookup.Name, this);
+        }
+
     }
 }

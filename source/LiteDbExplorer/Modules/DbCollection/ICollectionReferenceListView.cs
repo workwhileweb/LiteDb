@@ -13,5 +13,6 @@ namespace LiteDbExplorer.Modules.DbCollection
         void FocusListView();
         Action CollectionLoadedAction { get; set; }
         void SelectItem(object item);
+        void FindClear();
     }
 }

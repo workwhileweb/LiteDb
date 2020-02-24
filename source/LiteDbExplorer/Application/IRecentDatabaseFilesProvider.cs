@@ -2,10 +2,10 @@
 
 namespace LiteDbExplorer
 {
-    public interface IRecentFilesProvider
+    public interface IRecentDatabaseFilesProvider
     {
-        IObservableCollection<RecentFileInfo> RecentFiles { get; }
-        void InsertRecentFile(string path, string password = null);
+        IObservableCollection<RecentDatabaseFileInfo> RecentFiles { get; }
+        void InsertRecentFile(int databaseVersion, string path, string password = null);
         bool RemoveRecentFile(string path);
         void SetRecentFileFixed(string path, bool add);
         bool TryGetPassword(string path, out string storedPassword);

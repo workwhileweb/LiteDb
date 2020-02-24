@@ -4,13 +4,9 @@ using LiteDB;
 
 namespace LiteDbExplorer.Core
 {
-    public sealed class DocumentReference : ReferenceNode<DocumentReference>, IJsonSerializerProvider
+    public class DocumentReference : ReferenceNode<DocumentReference>, IJsonSerializerProvider
     {
-        public DocumentReference()
-        {
-        }
-
-        public DocumentReference(BsonDocument document, CollectionReference collection) : this()
+        public DocumentReference(BsonDocument document, CollectionReference collection)
         {
             LiteDocument = document;
             Collection = collection;
@@ -37,9 +33,26 @@ namespace LiteDbExplorer.Core
             return Collection.InstanceId.Equals(collectionReference?.InstanceId);
         }
 
+        public BsonDocument FindFromCollectionRef()
+        {
+            return Collection.LiteCollection.FindById(LiteDocument["_id"]);
+        }
+
         public void RemoveSelf()
         {
-            Collection?.RemoveItem(this);
+            Collection?.RemoveDocument(this);
+        }
+
+        public bool TryGetValue(string key, out BsonValue value)
+        {
+            if (LiteDocument.ContainsKey(key))
+            {
+                value = LiteDocument[key];
+                return true;
+            }
+
+            value = null;
+            return false;
         }
 
         public void NotifyDocumentChanged()

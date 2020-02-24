@@ -185,7 +185,7 @@
                                                    Text="{Binding FileName}"
                                                    TextTrimming="CharacterEllipsis"
                                                    Style="{StaticResource MaterialDesignBody2TextBlock}" 
-                                                   behaviors:HighlightTextBlock.HightlightText="{Binding Path=Data.SearchTerm, Source={StaticResource DataContextProxy}}"/>
+                                                   behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=Data.SearchTerm, Source={StaticResource DataContextProxy}}"/>
 
                                         <TextBlock Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2"
                                                    Text="{Binding DirectoryPath}"
@@ -193,7 +193,7 @@
                                                    Opacity="0.8"
                                                    Style="{StaticResource MaterialDesignBody2TextBlock}"
                                                    Foreground="{DynamicResource MaterialDesignBody}" 
-                                                   behaviors:HighlightTextBlock.HightlightText="{Binding Path=Data.SearchTerm, Source={StaticResource DataContextProxy}}"/>
+                                                   behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=Data.SearchTerm, Source={StaticResource DataContextProxy}}"/>
 
                                         <TextBlock Grid.Column="3" Grid.Row="1"
                                                    Text="{Binding LastOpenedAt,StringFormat=g}"

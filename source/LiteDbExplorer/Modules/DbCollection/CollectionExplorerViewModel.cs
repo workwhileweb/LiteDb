@@ -366,7 +366,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         [UsedImplicitly]
         public async Task AddDocument()
         {
-            var result = await _databaseInteractions.CreateItem(this, CollectionReference);
+            var result = await _databaseInteractions.CreateDocument(this, CollectionReference);
             await result.Tap(async reference =>
             {
                 await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference,
@@ -502,6 +502,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         public void CloseFind()
         {
             IsFindOpen = false;
+            _view?.FindClear();
         }
 
         [UsedImplicitly]

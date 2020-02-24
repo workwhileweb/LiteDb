@@ -41,7 +41,7 @@ namespace LiteDbExplorer.Modules.DbQuery
                     IList<BsonValue> results;
                     using (resultViewModel.StartTime())
                     {
-                        results = databaseReference.LiteDatabase.Engine.Run(rawQuery);
+                        results = databaseReference.RunCommand(rawQuery);
                     }
                     resultViewModel.SetResult(
                         $"Result {resultCount}", 
@@ -62,9 +62,10 @@ namespace LiteDbExplorer.Modules.DbQuery
             {
                 QueryHandlerName = Name,
                 RawQuery = query.Trim(),
-                DatabaseLocation = databaseReference?.Location,
+                DatabaseLocation = databaseReference.Location,
+                DatabaseVersion = databaseReference.DatabaseVersion,
                 CreatedAt = DateTime.UtcNow,
-                LastRunAt = DateTime.UtcNow
+                LastRunAt = DateTime.UtcNow,
             };
 
             queryHistoryProvider.Upsert(queryHistory);

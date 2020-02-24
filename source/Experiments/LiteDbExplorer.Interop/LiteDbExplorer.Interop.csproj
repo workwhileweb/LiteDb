@@ -95,7 +95,6 @@
   <ItemGroup>
     <Compile Include="Proxies\BsonArray.cs" />
     <Compile Include="Proxies\BsonValue.cs" />
-    <Compile Include="DatabaseVersionsTest.cs" />
     <Compile Include="Proxies\BsonDocument.cs" />
     <Compile Include="Events\CollectionReferenceChangedEventArgs.cs" />
     <Compile Include="Events\EventArgs.cs" />

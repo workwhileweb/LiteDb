@@ -85,6 +85,11 @@ namespace LiteDbExplorer.Modules.DbCollection
             CollectionListView.FindPrevious(text, matchCase);
         }
 
+        public void FindClear()
+        {
+            CollectionListView.FindClear();
+        }
+
         public void FocusListView()
         {
             CollectionListView.ListCollectionData.Focus();

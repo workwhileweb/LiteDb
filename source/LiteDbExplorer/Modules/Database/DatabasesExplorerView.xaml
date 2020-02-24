@@ -15,7 +15,7 @@
              xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
-             Focusable="True">
+             Focusable="True" x:Name="DatabasesExplorerViewControl">
     <UserControl.Resources>
         <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}" />
         <converters:GroupDisplayColorToForegroundConverter x:Key="GroupDisplayColorToForegroundConverter" />
@@ -278,8 +278,8 @@
                                        Padding="8,4" FontSize="14" FontWeight="Regular"
                                        FontFamily="{StaticResource MaterialDesignFont}"
                                        TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" 
-                                       behaviors:HighlightTextBlock.HightlightText="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                                       behaviors:HighlightTextBlock.HighlightBrush="#CD653723"/>
+                                       behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                                       behaviors:TextBlockSetHighlight.HighlightBrush="#CD653723"/>
                         </Grid>
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type core:CollectionReference}">
@@ -308,8 +308,8 @@
                                        Padding="8,4" FontSize="14" FontWeight="Normal"
                                        FontFamily="{StaticResource MaterialDesignFont}"
                                        TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" 
-                                       behaviors:HighlightTextBlock.HightlightText="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                                       behaviors:HighlightTextBlock.HighlightBrush="#CD653723"/>
+                                       behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=FindTerm, ElementName=DatabasesExplorerViewControl}"
+                                       behaviors:TextBlockSetHighlight.HighlightBrush="#CD653723"/>
                         </Grid>
                     </DataTemplate>
                 </TreeView.Resources>

@@ -1,4 +1,6 @@
-﻿using LiteDB;
+﻿using System.Collections.Generic;
+using System.Linq;
+using LiteDB;
 
 namespace LiteDbExplorer.Core
 {
@@ -8,7 +10,12 @@ namespace LiteDbExplorer.Core
         {
         }
 
-        public override void RemoveItem(DocumentReference document)
+        protected override IEnumerable<DocumentReference> GetAllItem(LiteCollection<BsonDocument> liteCollection)
+        {
+            return LiteCollection.FindAll().Select(bsonDocument => new FileDocumentReference(bsonDocument, this));
+        }
+
+        public override void RemoveDocument(DocumentReference document)
         {
             Database.LiteDatabase.FileStorage.Delete(document.LiteDocument["_id"]);
             Items.Remove(document);

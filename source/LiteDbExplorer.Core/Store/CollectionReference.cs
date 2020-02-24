@@ -71,7 +71,7 @@ namespace LiteDbExplorer.Core
 
         public event EventHandler<CollectionReferenceChangedEventArgs<DocumentReference>> DocumentsCollectionChanged;
 
-        public virtual void UpdateItem(DocumentReference document)
+        public virtual void UpdateDocument(DocumentReference document)
         {
             LiteCollection.Update(document.LiteDocument);
 
@@ -80,13 +80,13 @@ namespace LiteDbExplorer.Core
             OnDocumentsCollectionChanged(ReferenceNodeChangeAction.Update, new[] {document});
         }
 
-        public virtual void RemoveItem(DocumentReference document)
+        public virtual void RemoveDocument(DocumentReference document)
         {
             LiteCollection.Delete(document.LiteDocument["_id"]);
             Items.Remove(document);
         }
 
-        public virtual DocumentReference AddItem(BsonDocument document)
+        public virtual DocumentReference AddDocument(BsonDocument document)
         {
             LiteCollection.Insert(document);
             var newDoc = new DocumentReference(document, this);
@@ -122,6 +122,11 @@ namespace LiteDbExplorer.Core
 
         protected virtual IEnumerable<DocumentReference> GetAllItem(LiteCollection<BsonDocument> liteCollection)
         {
+            /*if (IsFilesOrChunks)
+            {
+                return LiteCollection.FindAll().Select(bsonDocument => new FileDocumentReference(bsonDocument, this));
+            }*/
+
             return LiteCollection.FindAll().Select(bsonDocument => new DocumentReference(bsonDocument, this));
         }
 

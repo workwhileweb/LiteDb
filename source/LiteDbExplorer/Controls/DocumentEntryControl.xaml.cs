@@ -244,7 +244,7 @@ namespace LiteDbExplorer.Controls
                 FileView.LoadFile(fileInfo);
             }
 
-            _currentDocument = document.Collection.LiteCollection.FindById(document.LiteDocument["_id"]);
+            _currentDocument = document.FindFromCollectionRef();
             _documentReference = document;
             _entryControls = new ObservableCollection<DocumentFieldData>();
 
@@ -498,7 +498,7 @@ namespace LiteDbExplorer.Controls
             {
                 _currentDocument.CopyTo(_documentReference.LiteDocument);
                 _documentReference.LiteDocument = _currentDocument;
-                _documentReference.Collection.UpdateItem(_documentReference);
+                _documentReference.Collection.UpdateDocument(_documentReference);
 
                 _documentReference.NotifyDocumentChanged();
             }
