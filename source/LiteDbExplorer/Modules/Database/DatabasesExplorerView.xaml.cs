@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Threading;
 using LiteDbExplorer.Presentation;
 
@@ -61,7 +62,7 @@ namespace LiteDbExplorer.Modules.Database
 
                 if (findTextHandled)
                 {
-                    FindTextAdorner.Visibility = string.IsNullOrEmpty(resultText) ? Visibility.Collapsed : Visibility.Visible;
+                    FindTextPanel.Visibility = string.IsNullOrEmpty(resultText) ? Visibility.Collapsed : Visibility.Visible;
                     FindTerm = resultText;
                     args.Handled = true;
                 }
@@ -78,7 +79,7 @@ namespace LiteDbExplorer.Modules.Database
                 
                 resultText += args.Text;
                 
-                FindTextAdorner.Visibility = string.IsNullOrEmpty(resultText) ? Visibility.Collapsed : Visibility.Visible;
+                FindTextPanel.Visibility = string.IsNullOrEmpty(resultText) ? Visibility.Collapsed : Visibility.Visible;
 
                 FindTerm = resultText;
             };
@@ -86,7 +87,7 @@ namespace LiteDbExplorer.Modules.Database
             FindTextClose.MouseDown += (sender, args) =>
             {
                 FindTerm = null;
-                FindTextAdorner.Visibility = Visibility.Collapsed;
+                FindTextPanel.Visibility = Visibility.Collapsed;
             };
 
             FindDisplayModeHighlight.MouseDown += (sender, args) =>
@@ -248,7 +249,9 @@ namespace LiteDbExplorer.Modules.Database
                 }
             }
 
-            FindTextContent.Opacity = hasMatchRank > 0 ? 1 : 0.6;
+            // FindTextContent.Opacity = hasMatchRank > 0 ? 1 : 0.6;
+            FindTextPlaceholderBorder.BorderBrush =
+                hasMatchRank > 0 ? FindTextPlaceholderBorder.Background : new SolidColorBrush(Colors.Red);
 
             Dispatcher.Invoke(() =>
             {

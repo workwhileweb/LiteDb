@@ -101,13 +101,12 @@ namespace LiteDbExplorer.Controls
                 theme = JsonHighlightingProvider.ThemeDark;
                 jsonEditor.TextArea.Foreground = new SolidColorBrush(Colors.White);
                 
-                // _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(129, 206, 145, 120));
-                _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(63, 144, 238, 144));
+                // _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(63, 144, 238, 144));
                 jsonEditor.TextArea.TextView.LinkTextForegroundBrush = new SolidColorBrush(Color.FromRgb(206, 145, 120));
             }
             else
             {
-                _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(153, 144, 238, 144));
+                // _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(153, 144, 238, 144));
                 jsonEditor.TextArea.TextView.LinkTextForegroundBrush = new SolidColorBrush(Color.FromRgb(26, 13, 171));
                 jsonEditor.TextArea.Foreground = new SolidColorBrush(Colors.Black);
             }

@@ -19,6 +19,8 @@
     <UserControl.Resources>
         <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}" />
         <converters:GroupDisplayColorToForegroundConverter x:Key="GroupDisplayColorToForegroundConverter" />
+        <!--<SolidColorBrush x:Key="HighlightColorBrush" Color="#CD653723"/>-->
+        <SolidColorBrush x:Key="HighlightColorBrush" Color="SaddleBrown" />
     </UserControl.Resources>
     <commands:CommandToCommand.Bindings>
         <commands:CommandToCommandBinding SourceCommand="Close"
@@ -122,7 +124,7 @@
         </ToolBarTray>
 
         <Grid>
-            <TextBlock HorizontalAlignment="Center" 
+            <TextBlock HorizontalAlignment="Center"
                        VerticalAlignment="Top" Margin="56,16"
                        Style="{StaticResource MaterialDesignBody1TextBlock}" Opacity="0.6"
                        Visibility="{Binding Path=IsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
@@ -277,9 +279,9 @@
                                        Text="{Binding Name}" ToolTip="{Binding Location}"
                                        Padding="8,4" FontSize="14" FontWeight="Regular"
                                        FontFamily="{StaticResource MaterialDesignFont}"
-                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" 
+                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
                                        behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                                       behaviors:TextBlockSetHighlight.HighlightBrush="#CD653723"/>
+                                       behaviors:TextBlockSetHighlight.HighlightBrush="#CD653723" />
                         </Grid>
                     </HierarchicalDataTemplate>
                     <DataTemplate DataType="{x:Type core:CollectionReference}">
@@ -307,37 +309,45 @@
                                        Text="{Binding Name}" ToolTip="{Binding Name}"
                                        Padding="8,4" FontSize="14" FontWeight="Normal"
                                        FontFamily="{StaticResource MaterialDesignFont}"
-                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" 
+                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"
                                        behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=FindTerm, ElementName=DatabasesExplorerViewControl}"
-                                       behaviors:TextBlockSetHighlight.HighlightBrush="#CD653723"/>
+                                       behaviors:TextBlockSetHighlight.HighlightBrush="{StaticResource HighlightColorBrush}" />
                         </Grid>
                     </DataTemplate>
                 </TreeView.Resources>
             </TreeView>
 
-            <Grid x:Name="FindTextAdorner" Visibility="Collapsed">
-                <materialDesign:Card
-                    Background="#653723"
-                    materialDesign:ShadowAssist.ShadowDepth="Depth1" 
-                    HorizontalAlignment="Right" Margin="6" Padding="2,3"
-                    BorderThickness="1" BorderBrush="#653723">
-                    <StackPanel Orientation="Horizontal" Margin="0,0,1,0">
-                        <StackPanel.Resources>
-                            <Style TargetType="materialDesign:PackIcon">
-                                <Setter Property="Background" Value="Transparent"/>
-                                <Setter Property="IsHitTestVisible" Value="True"/>
-                                <Setter Property="Cursor" Value="Hand"/>
-                                <Setter Property="Margin" Value="1,0"/>
-                            </Style>
-                        </StackPanel.Resources>
-                        <TextBlock x:Name="FindTextContent" Margin="4,0,5,0"
-                                   Text="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
-                                   TextTrimming="None" TextWrapping="NoWrap"
-                                   Foreground="White"/>
-                        <materialDesign:PackIcon Kind="NotificationClearAll" x:Name="FindDisplayModeHighlight" ToolTip="Disable Filter on Type" Foreground="White"/>
-                        <materialDesign:PackIcon Kind="FilterVariant" x:Name="FindDisplayModeCollapsed" ToolTip="Enable Filter on Type" Foreground="White"/>
-                        <materialDesign:PackIcon Kind="WindowClose" x:Name="FindTextClose" Foreground="White"/>
-                    </StackPanel>
+            <Grid x:Name="FindTextPanel" Visibility="Collapsed">
+                <materialDesign:Card Margin="5,4" VerticalAlignment="Top" HorizontalAlignment="Right"
+                                     materialDesign:ShadowAssist.ShadowDepth="Depth1"
+                                     Background="{StaticResource HighlightColorBrush}">
+                    <Border
+                        x:Name="FindTextPlaceholderBorder"
+                        Background="Transparent"
+                        Padding="2,3"
+                        BorderThickness="1" CornerRadius="2"
+                        BorderBrush="{StaticResource HighlightColorBrush}"
+                        SnapsToDevicePixels="True">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,1,0">
+                            <StackPanel.Resources>
+                                <Style TargetType="materialDesign:PackIcon">
+                                    <Setter Property="Background" Value="Transparent" />
+                                    <Setter Property="IsHitTestVisible" Value="True" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="Margin" Value="1,0" />
+                                </Style>
+                            </StackPanel.Resources>
+                            <TextBlock x:Name="FindTextContent" Margin="4,0,5,0"
+                                       Text="{Binding Path=FindTerm, RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=UserControl}}"
+                                       TextTrimming="None" TextWrapping="NoWrap"
+                                       Foreground="White" />
+                            <materialDesign:PackIcon Kind="NotificationClearAll" x:Name="FindDisplayModeHighlight"
+                                                     ToolTip="Disable Filter on Type" Foreground="White" />
+                            <materialDesign:PackIcon Kind="FilterVariant" x:Name="FindDisplayModeCollapsed"
+                                                     ToolTip="Enable Filter on Type" Foreground="White" />
+                            <materialDesign:PackIcon Kind="WindowClose" x:Name="FindTextClose" Foreground="White" />
+                        </StackPanel>
+                    </Border>
                 </materialDesign:Card>
             </Grid>
         </Grid>
