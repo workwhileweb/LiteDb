@@ -8,8 +8,10 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
-             mc:Ignorable="d"
-             d:DesignHeight="400" d:DesignWidth="600">
+             xmlns:cal="http://www.caliburnproject.org"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600"
+             x:Name="documentEntryUserControl">
 
     <UserControl.Resources>
         <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
@@ -115,8 +117,7 @@
                         </Grid>
                         
                         <ListView Name="ListItems"
-                              SizeChanged="ItemsField_SizeChanged"
-                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                               BorderThickness="0"
                               FocusVisualStyle="{x:Null}">
                             <ListView.Resources>
@@ -159,7 +160,7 @@
                                                         Content="{Binding BsonType}"
                                                         Padding="0" Height="25" Margin="0,6,0,0"
                                                         HorizontalContentAlignment="Right"
-                                                        />
+                                                        Click="DocumentFieldType_OnClick"/>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>

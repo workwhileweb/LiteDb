@@ -7,14 +7,18 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interactivity;
+using Caliburn.Micro;
 using JetBrains.Annotations;
 using LiteDB;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
+using LiteDbExplorer.Modules;
 using LiteDbExplorer.Wpf.Behaviors;
+using Action = System.Action;
 
 namespace LiteDbExplorer.Controls
 {
@@ -133,6 +137,7 @@ namespace LiteDbExplorer.Controls
         private ObservableCollection<DocumentFieldData> _entryControls;
         private bool _loaded = false;
         private Dictionary<string, BsonType> _allFieldsWithTypes;
+        private bool _documentHasChanges;
 
         public DocumentEntryControl()
         {
@@ -213,14 +218,30 @@ namespace LiteDbExplorer.Controls
 
         public bool DialogResult { get; set; }
 
+        public bool DocumentHasChanges
+        {
+            get => _documentHasChanges;
+            private set
+            {
+                _documentHasChanges = value;
+                if (_windowController != null)
+                {
+                    _windowController.ShowChangeIndicator = _documentHasChanges;
+                }
+            }
+        }
+
+        private void SetDocumentChanged()
+        {
+            DocumentHasChanges = true;
+        }
+
         private void ListItemsOnLoaded(object sender, RoutedEventArgs e)
         {
             if (_loaded)
             {
                 return;
             }
-
-            InvalidateItemsSize();
 
             _loaded = true;
 
@@ -236,6 +257,8 @@ namespace LiteDbExplorer.Controls
 
         public void LoadDocument(DocumentReference document)
         {
+            DocumentHasChanges = false;
+
             if (document.Collection is FileCollectionReference reference)
             {
                 IsFileCollection = true;
@@ -358,8 +381,13 @@ namespace LiteDbExplorer.Controls
                 return new DocumentFieldData(key, docTypePicker, bsonValue.Type);
             }
 
+            var editorContext = new BsonValueEditorContext(expandMode, $"[{key}]", bsonValue, _currentDocument, isReadOnly, key)
+            {
+                ChangedCallback = SetDocumentChanged
+            };
+
             var valueEdit =
-                BsonValueEditor.GetBsonValueEditor(new BsonValueEditorContext(expandMode, $"[{key}]", bsonValue, _currentDocument, isReadOnly, key));
+                BsonValueEditor.GetBsonValueEditor(editorContext);
 
             return new DocumentFieldData(key, valueEdit, bsonValue.Type, isReadOnly);
         }
@@ -386,8 +414,14 @@ namespace LiteDbExplorer.Controls
                     var fieldDefaultValue = GetFieldDefaultValue(keyValuePair.Value.Value);
 
                     _currentDocument[key] = fieldDefaultValue;
+
+                    var editorContext = new BsonValueEditorContext(expandMode, $"[{key}]", _currentDocument[key], _currentDocument, readOnly, key)
+                    {
+                        ChangedCallback = SetDocumentChanged
+                    };
+
                     documentFieldData.EditControl =
-                        BsonValueEditor.GetBsonValueEditor(new BsonValueEditorContext(expandMode, $"[{key}]", _currentDocument[key], _currentDocument, readOnly, key));
+                        BsonValueEditor.GetBsonValueEditor(editorContext);
                 }
             });
 
@@ -475,6 +509,15 @@ namespace LiteDbExplorer.Controls
                 return;
             }
 
+            SaveChanges();
+
+            DialogResult = true;
+
+            Close();
+        }
+
+        private void SaveChanges()
+        {
             // TODO make array and document types use this as well
             foreach (var ctrl in _entryControls)
             {
@@ -503,9 +546,7 @@ namespace LiteDbExplorer.Controls
                 _documentReference.NotifyDocumentChanged();
             }
 
-            DialogResult = true;
-
-            Close();
+            DocumentHasChanges = false;
         }
 
         private void ReadOnly_CanNotExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -583,7 +624,6 @@ namespace LiteDbExplorer.Controls
             }
         }
 
-
         private async Task AddNewField(string fieldName, BsonType bsonType, bool isLast = true)
         {
             var newValue = GetFieldDefaultValue(bsonType);
@@ -591,13 +631,13 @@ namespace LiteDbExplorer.Controls
             _currentDocument.Add(fieldName, newValue);
 
             var newField = NewField(fieldName, false);
+            
+            SetDocumentChanged();
 
             _entryControls.Add(newField);
 
             if (isLast)
             {
-                ItemsField_SizeChanged(ListItems, null);
-
                 LoadExistingFieldsPicker();
 
                 await Task.Delay(150);
@@ -616,36 +656,72 @@ namespace LiteDbExplorer.Controls
             LoadExistingFieldsPicker();
         }
 
-        private void ItemsField_SizeChanged(object sender, SizeChangedEventArgs e)
+        private void DocumentFieldType_OnClick(object sender, RoutedEventArgs e)
         {
-            /*if (_invalidatingSize)
+            if (!(sender is FrameworkElement element) || !(element.DataContext is DocumentFieldData fieldData))
             {
                 return;
             }
 
-            _invalidatingSize = true;
-
-            var listView = sender as ListView;
-            var grid = listView.View as GridView;
-
-            var workingWidth = listView.ActualWidth - SystemParameters.VerticalScrollBarWidth - 50;
-            var col1 = 0.34;
-            var col2 = 0.66;
-
-            grid.Columns[0].Width = workingWidth*col1;
-            grid.Columns[1].Width = workingWidth*col2;
-
-            if (_loaded)
+            var key = fieldData.Name;
+            var bsonValue = _currentDocument[key];
+            var options = BsonValueConverter.ConvertibleTypes(bsonValue);
+            if (!options.Any())
             {
-                await Task.Delay(25);
+                return;
             }
 
-            _invalidatingSize = false;*/
-        }
+            var contextMenu = new ContextMenu
+            {
+                MinWidth = 160,
+                Placement = PlacementMode.Bottom,
+                PlacementTarget = element
+            };
+            contextMenu.Closed += (o, args) =>
+            {
+                element.ContextMenu = null;
+            };
 
-        private void InvalidateItemsSize()
-        {
-            ItemsField_SizeChanged(ListItems, null);
+            void ChangeType(Func<BsonValue> getValue)
+            {
+                var value = getValue();
+                fieldData.EditControl = null;
+                _currentDocument[key] = value;
+                fieldData.BsonType = value.Type;
+
+                var editorContext = new BsonValueEditorContext(OpenEditorMode.Window, $"[{key}]", value, _currentDocument, IsReadOnly, key)
+                {
+                    ChangedCallback = SetDocumentChanged
+                };
+
+                fieldData.EditControl = BsonValueEditor.GetBsonValueEditor(editorContext);
+                
+                SetDocumentChanged();
+            }
+
+            foreach (var option in options)
+            {
+                Action convertAction = () => ChangeType(option.Value);
+                var menuItem = new MenuItem
+                {
+                    Header = $"Convert to {option.Key}",
+                    Command = new RelayCommand(param =>
+                    {
+                        if (param is Action action)
+                        {
+                            action();
+                        }
+
+                        element.ContextMenu = null;
+                    }),
+                    CommandParameter = convertAction
+                };
+                contextMenu.Items.Add(menuItem);
+            }
+
+            
+            element.ContextMenu = contextMenu;
+            contextMenu.IsOpen = true;
         }
 
         private void NextItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -663,6 +739,11 @@ namespace LiteDbExplorer.Controls
 
         private void NextItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            if (!CanChangeCurrentDocument())
+            {
+                return;
+            }
+
             var index = _documentReference.Collection.Items.IndexOf(_documentReference);
             if (index + 1 < _documentReference.Collection.Items.Count)
             {
@@ -686,8 +767,12 @@ namespace LiteDbExplorer.Controls
 
         private void PreviousItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var index = _documentReference.Collection.Items.IndexOf(_documentReference);
+            if (!CanChangeCurrentDocument())
+            {
+                return;
+            }
 
+            var index = _documentReference.Collection.Items.IndexOf(_documentReference);
             if (index > 0)
             {
                 var newDocument = _documentReference.Collection.Items[index - 1];
@@ -695,9 +780,28 @@ namespace LiteDbExplorer.Controls
             }
         }
 
+        private bool CanChangeCurrentDocument()
+        {
+            if (DocumentHasChanges)
+            {
+                var applicationInteraction = IoC.Get<IApplicationInteraction>();
+                var result = applicationInteraction.ShowChangesActionDialog();
+
+                if (result == ChangesActionResult.Save)
+                {
+                    SaveChanges();
+                }
+
+                return result != ChangesActionResult.Cancel;
+            }
+
+            return true;
+        }
+
         protected virtual void OnCloseRequested()
         {
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
+
     }
 }

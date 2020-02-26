@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -34,6 +35,13 @@ namespace LiteDbExplorer.Controls
         public object BindingSource { get; private set; }
         public bool ReadOnly { get; private set; }
         public string KeyName { get; private set; }
+
+        public Action ChangedCallback { get; set; }
+
+        public void SetChanged(object sender)
+        {
+            ChangedCallback?.Invoke();
+        }
     }
 
     public class BsonValueEditor
@@ -49,8 +57,23 @@ namespace LiteDbExplorer.Controls
                 Source = editorContext.BindingSource,
                 Mode = BindingMode.TwoWay,
                 Converter = new BsonValueToNetValueConverter(),
-                UpdateSourceTrigger = UpdateSourceTrigger.Explicit
+                UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
             };
+
+            void AddValueChangedListener(FrameworkElement associatedObject, DependencyProperty dependencyProperty)
+            {
+                if (associatedObject == null || dependencyProperty == null)
+                {
+                    return;
+                }
+
+                var descriptor =
+                    DependencyPropertyDescriptor.FromProperty(dependencyProperty, associatedObject.GetType());
+                descriptor?.AddValueChanged(associatedObject, (sender, args) =>
+                {
+                    editorContext.SetChanged(sender);
+                });
+            }
 
             if (editorContext.BindingValue.IsArray)
             {
@@ -82,8 +105,8 @@ namespace LiteDbExplorer.Controls
                         {
                             arrayValue?.Clear();
                             arrayValue?.AddRange(control.EditedItems);
-                            
                             button.Content = $"[Array] {arrayValue?.Count} {editorContext.KeyName}";
+                            editorContext.SetChanged(control);
                         }
                     };
 
@@ -176,6 +199,9 @@ namespace LiteDbExplorer.Controls
                 };
 
                 check.SetBinding(ToggleButton.IsCheckedProperty, binding);
+
+                AddValueChangedListener(check, ToggleButton.IsCheckedProperty);
+
                 return check;
             }
 
@@ -187,9 +213,12 @@ namespace LiteDbExplorer.Controls
                     IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0),
+                    Format = DateTimeFormat.UniversalSortableDateTime
                 };
 
                 datePicker.SetBinding(DateTimePicker.ValueProperty, binding);
+
+                AddValueChangedListener(datePicker, DateTimePicker.ValueProperty);
 
                 return datePicker;
             }
@@ -205,6 +234,8 @@ namespace LiteDbExplorer.Controls
                 };
 
                 numberEditor.SetBinding(DoubleUpDown.ValueProperty, binding);
+                AddValueChangedListener(numberEditor, DoubleUpDown.ValueProperty);
+
                 return numberEditor;
             }
 
@@ -219,6 +250,8 @@ namespace LiteDbExplorer.Controls
                 };
 
                 numberEditor.SetBinding(DecimalUpDown.ValueProperty, binding);
+                AddValueChangedListener(numberEditor, DecimalUpDown.ValueProperty);
+
                 return numberEditor;
             }
 
@@ -233,7 +266,8 @@ namespace LiteDbExplorer.Controls
                 };
 
                 numberEditor.SetBinding(IntegerUpDown.ValueProperty, binding);
-
+                AddValueChangedListener(numberEditor, IntegerUpDown.ValueProperty);
+                
                 return numberEditor;
             }
 
@@ -248,6 +282,8 @@ namespace LiteDbExplorer.Controls
                 };
 
                 numberEditor.SetBinding(LongUpDown.ValueProperty, binding);
+                AddValueChangedListener(numberEditor, LongUpDown.ValueProperty);
+
                 return numberEditor;
             }
 
@@ -262,6 +298,8 @@ namespace LiteDbExplorer.Controls
                 };
 
                 guidEditor.SetBinding(MaskedTextBox.ValueProperty, binding);
+                AddValueChangedListener(guidEditor, MaskedTextBox.ValueProperty);
+
                 return guidEditor;
             }
 
@@ -278,6 +316,8 @@ namespace LiteDbExplorer.Controls
                 };
 
                 stringEditor.SetBinding(TextBox.TextProperty, binding);
+                AddValueChangedListener(stringEditor, TextBox.TextProperty);
+
                 return stringEditor;
             }
 
@@ -312,6 +352,8 @@ namespace LiteDbExplorer.Controls
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             };
             defaultEditor.SetBinding(TextBox.TextProperty, binding);
+            AddValueChangedListener(defaultEditor, TextBox.TextProperty);
+
             return defaultEditor;
         }
     }
