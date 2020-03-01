@@ -70,6 +70,15 @@ namespace LiteDbExplorer.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Culture and Format.
+        /// </summary>
+        public static string SettingsPageCultureFormat {
+            get {
+                return ResourceManager.GetString("SettingsPageCultureFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Environment.
         /// </summary>
         public static string SettingsPageEnvironment {

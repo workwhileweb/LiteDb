@@ -6,7 +6,7 @@ namespace LiteDbExplorer.Core
 {
     public class BsonValueConverter
     {
-        public static IDictionary<BsonType, Func<BsonValue>> ConvertibleTypes(BsonValue bsonValue)
+        public static IReadOnlyDictionary<BsonType, Func<BsonValue>> ConvertibleTypes(BsonValue bsonValue)
         {
             var options = new Dictionary<BsonType, Func<BsonValue>>();
 

@@ -355,7 +355,7 @@ namespace LiteDbExplorer.Controls
             Value = value;
 
             // Improve performance by removing converters
-            DisplayValue = value.ToDisplayValue(ValueMaxLength);
+            DisplayValue = value.ToDisplayValue(ValueMaxLength, UserDefinedCultureFormat.Default);
             Foreground = BsonValueForeground.GetBsonValueForeground(value);
 
             // TODO: Infer Null value type to handle

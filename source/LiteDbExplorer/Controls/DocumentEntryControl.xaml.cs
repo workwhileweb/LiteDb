@@ -387,7 +387,7 @@ namespace LiteDbExplorer.Controls
             };
 
             var valueEdit =
-                BsonValueEditor.GetBsonValueEditor(editorContext);
+                BsonValueEditor.GetBsonValueEditor(editorContext, UserDefinedCultureFormat.Default);
 
             return new DocumentFieldData(key, valueEdit, bsonValue.Type, isReadOnly);
         }
@@ -421,7 +421,7 @@ namespace LiteDbExplorer.Controls
                     };
 
                     documentFieldData.EditControl =
-                        BsonValueEditor.GetBsonValueEditor(editorContext);
+                        BsonValueEditor.GetBsonValueEditor(editorContext, UserDefinedCultureFormat.Default);
                 }
             });
 
@@ -694,7 +694,7 @@ namespace LiteDbExplorer.Controls
                     ChangedCallback = SetDocumentChanged
                 };
 
-                fieldData.EditControl = BsonValueEditor.GetBsonValueEditor(editorContext);
+                fieldData.EditControl = BsonValueEditor.GetBsonValueEditor(editorContext, UserDefinedCultureFormat.Default);
                 
                 SetDocumentChanged();
             }

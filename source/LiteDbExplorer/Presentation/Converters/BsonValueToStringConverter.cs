@@ -11,11 +11,13 @@ namespace LiteDbExplorer.Presentation.Converters
 
         public int? MaxLength { get; set; }
 
+        public ICultureFormat CultureFormat { get; set; }
+
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             if (value != null && value is BsonValue bsonValue)
             {
-                return bsonValue.ToDisplayValue(MaxLength);
+                return bsonValue.ToDisplayValue(MaxLength, CultureFormat);
             }
 
             return string.Empty;

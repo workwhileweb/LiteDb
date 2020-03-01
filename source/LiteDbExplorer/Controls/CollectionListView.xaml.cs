@@ -72,7 +72,7 @@ namespace LiteDbExplorer.Controls
         {
             InitializeComponent();
 
-            _bsonValueToStringConverter = new BsonValueToStringConverter { MaxLength = ContentMaxLength };
+            _bsonValueToStringConverter = new BsonValueToStringConverter { MaxLength = ContentMaxLength, CultureFormat = UserDefinedCultureFormat.Default };
 
             ListCollectionData.MouseDoubleClick += ListCollectionDataOnMouseDoubleClick;
             ListCollectionData.SelectionChanged += OnListViewSelectionChanged;

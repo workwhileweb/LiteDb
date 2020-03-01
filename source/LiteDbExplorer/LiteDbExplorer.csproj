@@ -98,6 +98,7 @@
     <Compile Include="Controls\ZoomAndPanView.xaml.cs">
       <DependentUpon>ZoomAndPanView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Modules\CultureSupport\CultureSettingsViewModel.cs" />
     <Compile Include="Modules\Database\DatabaseSettingsViewModel.cs" />
     <Compile Include="Modules\Database\IDatabasesExplorerView.cs" />
     <Compile Include="Modules\DbDocument\DocumentEditorSettingsViewModel.cs" />
@@ -300,6 +301,7 @@
     <Compile Include="Presentation\Behaviors\BsonValueForeground.cs" />
     <Compile Include="Presentation\Behaviors\EscapeAccessKeyColumnHeaderBehavior.cs" />
     <Compile Include="Presentation\Behaviors\TabablzControlAssist.cs" />
+    <Compile Include="Presentation\Behaviors\UserDefinedCultureFormatDataGridBehavior.cs" />
     <Compile Include="Presentation\Converters\DateTimeHumanizeConverter.cs" />
     <Compile Include="Presentation\Converters\GroupDisplayColorToForegloud.cs" />
     <Compile Include="Presentation\GroupDisplayColor.cs" />
@@ -320,6 +322,7 @@
     <Compile Include="Presentation\Windows\InputBoxWindow.xaml.cs">
       <DependentUpon>InputBoxWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Application\UserDefinedCultureFormat.cs" />
     <Page Include="Controls\AppHeader.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

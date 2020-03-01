@@ -9,10 +9,12 @@ namespace LiteDbExplorer.Core
 {
     public class QueryResult : IReferenceNode, IJsonSerializerProvider
     {
+        private readonly ICultureFormat _cultureFormat;
         private const string EXPR_PATH = @"expr";
 
-        public QueryResult(IEnumerable<BsonValue> bsonValues)
+        public QueryResult(IEnumerable<BsonValue> bsonValues, ICultureFormat cultureFormat)
         {
+            _cultureFormat = cultureFormat;
             InstanceId = Guid.NewGuid().ToString("D");
 
             Initialize(bsonValues);
@@ -34,7 +36,7 @@ namespace LiteDbExplorer.Core
 
         public BsonDocument AsDocument { get; private set; }
 
-        public DataTable DataTable => Source.ToDataTable();
+        public DataTable DataTable => Source.ToDataTable(_cultureFormat);
 
         public string Serialize(bool pretty = false, bool decoded = true)
         {

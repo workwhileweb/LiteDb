@@ -222,5 +222,29 @@ namespace LiteDbExplorer.Properties {
                 this["QueryEditor_EnableShellCommandAutocomplete"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CultureFormat_CultureName {
+            get {
+                return ((string)(this["CultureFormat_CultureName"]));
+            }
+            set {
+                this["CultureFormat_CultureName"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CultureFormat_DateTimeFormat {
+            get {
+                return ((string)(this["CultureFormat_DateTimeFormat"]));
+            }
+            set {
+                this["CultureFormat_DateTimeFormat"] = value;
+            }
+        }
     }
 }

@@ -6,9 +6,13 @@ namespace LiteDbExplorer.Core
 {
     public static class QueryResultExtensions
     {
-        public static DataTable ToDataTable(this IEnumerable<BsonValue> bsonValues)
+        public static DataTable ToDataTable(this IEnumerable<BsonValue> bsonValues,
+            ICultureFormat cultureFormat)
         {
+            DefaultCultureFormat.EnsureValue(ref cultureFormat);
+
             var table = new DataTable();
+
             if (bsonValues == null)
             {
                 return table;
@@ -43,13 +47,14 @@ namespace LiteDbExplorer.Core
                 foreach (var key in doc.Keys)
                 {
                     var bsonValue = doc[key];
-                    if (bsonValue.IsNull || bsonValue.IsArray || bsonValue.IsDocument || bsonValue.IsBinary)
+
+                    if (bsonValue.IsNull || bsonValue.IsArray || bsonValue.IsDocument || bsonValue.IsBinary) // convertToString || 
                     {
-                        row[key] = bsonValue.ToDisplayValue();
+                        row[key] = bsonValue.ToDisplayValue(null, cultureFormat);
                     }
                     else
                     {
-                        row[key] = bsonValue.RawValue;                        
+                        row[key] = bsonValue.RawValue;
                     }
                 }
 
@@ -60,8 +65,10 @@ namespace LiteDbExplorer.Core
         }
 
 
-        public static LookupTable ToLookupTable(this IEnumerable<BsonValue> bsonValues)
+        public static LookupTable ToLookupTable(this IEnumerable<BsonValue> bsonValues, ICultureFormat cultureFormat)
         {
+            DefaultCultureFormat.EnsureValue(ref cultureFormat);
+
             var table = new LookupTable();
             if (bsonValues == null)
             {
@@ -94,7 +101,7 @@ namespace LiteDbExplorer.Core
                     var bsonValue = doc[key];
                     if (bsonValue.IsNull || bsonValue.IsArray || bsonValue.IsDocument || bsonValue.IsBinary)
                     {
-                        row[key] = bsonValue.ToDisplayValue();
+                        row[key] = bsonValue.ToDisplayValue(null, cultureFormat);
                     }
                     else
                     {

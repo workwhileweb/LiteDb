@@ -99,22 +99,24 @@ namespace LiteDbExplorer.Core
             return string.Join(" - ", documentReference.Collection?.Name, documentReference.LiteDocument["_id"].AsString);
         }
 
-        public static string ToDisplayValue(this BsonValue bsonValue, int? maxLength = null, CultureInfo cultureInfo = null)
+        public static string ToDisplayValue(this BsonValue bsonValue, int? maxLength = null, ICultureFormat cultureFormat = null)
         {
             if (bsonValue == null)
             {
                 return string.Empty;
             }
 
-            if (cultureInfo == null)
+            if (cultureFormat == null)
             {
-                cultureInfo = CultureInfo.InvariantCulture;
+                cultureFormat = DefaultCultureFormat.Invariant;
             }
 
-            string result;
+            var cultureInfo = cultureFormat.Culture ?? CultureInfo.InvariantCulture;
 
             try
             {
+                string result;
+
                 switch (bsonValue.Type)
                 {
                     case BsonType.MinValue:
@@ -127,7 +129,7 @@ namespace LiteDbExplorer.Core
                         result = bsonValue.AsBoolean.ToString(cultureInfo).ToLower();
                         break;
                     case BsonType.DateTime:
-                        result = bsonValue.AsDateTime.ToString(cultureInfo);
+                        result = !string.IsNullOrEmpty(cultureFormat.DateTimeFormat) ? bsonValue.AsDateTime.ToString(cultureFormat.DateTimeFormat, cultureInfo) : bsonValue.AsDateTime.ToString(cultureInfo);
                         break;
                     case BsonType.Null:
                         result = "(null)";

@@ -7,6 +7,7 @@ using System.Windows.Data;
 using LiteDbExplorer.Presentation.Converters;
 using LiteDbExplorer.Windows;
 using LiteDB;
+using LiteDbExplorer.Core;
 using Xceed.Wpf.Toolkit;
 
 namespace LiteDbExplorer.Controls
@@ -49,7 +50,7 @@ namespace LiteDbExplorer.Controls
         private static double DefaultWindowHeight =>
             Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight);
 
-        public static FrameworkElement GetBsonValueEditor(BsonValueEditorContext editorContext)
+        public static FrameworkElement GetBsonValueEditor(BsonValueEditorContext editorContext, ICultureFormat cultureFormat)
         {
             var binding = new Binding
             {
@@ -213,7 +214,9 @@ namespace LiteDbExplorer.Controls
                     IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0),
-                    Format = DateTimeFormat.UniversalSortableDateTime
+                    Format = DateTimeFormat.Custom,
+                    CultureInfo = cultureFormat.Culture,
+                    FormatString = cultureFormat.DateTimeFormat,
                 };
 
                 datePicker.SetBinding(DateTimePicker.ValueProperty, binding);

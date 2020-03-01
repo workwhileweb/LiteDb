@@ -276,7 +276,7 @@ namespace LiteDbExplorer.Controls
             else
             {
                 var editorContext = new BsonValueEditorContext(openMode: expandMode, bindingPath: @"Value", bindingValue: value, bindingSource: arrayItem, readOnly: IsReadOnly, keyName: keyName);
-                var valueEdit = BsonValueEditor.GetBsonValueEditor(editorContext);
+                var valueEdit = BsonValueEditor.GetBsonValueEditor(editorContext, UserDefinedCultureFormat.Default);
 
                 arrayItem.Control = valueEdit;
             }
