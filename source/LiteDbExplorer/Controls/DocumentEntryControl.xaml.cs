@@ -80,7 +80,7 @@ namespace LiteDbExplorer.Controls
 
         public static readonly RoutedUICommand OkCommand = new RoutedUICommand
         (
-            "Save",
+            "Ok",
             nameof(OkCommand),
             typeof(Commands),
             new InputGestureCollection
@@ -108,6 +108,28 @@ namespace LiteDbExplorer.Controls
             new InputGestureCollection
             {
                 new KeyGesture(Key.N, ModifierKeys.Control)
+            }
+        );
+
+        public static readonly RoutedUICommand SaveChangesCommand = new RoutedUICommand
+        (
+            "Save",
+            nameof(SaveChangesCommand),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                // new KeyGesture(Key.S, ModifierKeys.Control)
+            }
+        );
+
+        public static readonly RoutedUICommand DiscardChangesCommand = new RoutedUICommand
+        (
+            "Discard",
+            nameof(DiscardChangesCommand),
+            typeof(Commands),
+            new InputGestureCollection
+            {
+                // new KeyGesture(Key.S, ModifierKeys.Control)
             }
         );
 
@@ -178,20 +200,14 @@ namespace LiteDbExplorer.Controls
         {
             IsReadOnly = readOnly;
 
-            _currentDocument = document;
-            _entryControls = new ObservableCollection<DocumentFieldData>();
+            LoadDocument(document);
 
-            for (var i = 0; i < document.Keys.Count; i++)
-            {
-                var key = document.Keys.ElementAt(i);
-                _entryControls.Add(NewField(key, IsReadOnly));
-            }
-
-            ListItems.ItemsSource = _entryControls;
-
-            ButtonNext.Visibility = Visibility.Collapsed;
-            ButtonPrev.Visibility = Visibility.Collapsed;
+            // ButtonNext.Visibility = Visibility.Collapsed;
+            // ButtonPrev.Visibility = Visibility.Collapsed;
             AddExistingFieldsButton.Visibility = Visibility.Collapsed;
+            SaveChangesButton.Visibility = Visibility.Collapsed;
+            DiscardChangesButton.Visibility = Visibility.Collapsed;
+            PagePanel.Visibility = Visibility.Collapsed;
 
             if (readOnly)
             {
@@ -255,6 +271,22 @@ namespace LiteDbExplorer.Controls
             control?.LoadDocument(documentReference);
         }
 
+        public void LoadDocument(BsonDocument document)
+        {
+            DocumentHasChanges = false;
+
+            _currentDocument = document;
+            _entryControls = new ObservableCollection<DocumentFieldData>();
+
+            for (var i = 0; i < document.Keys.Count; i++)
+            {
+                var key = document.Keys.ElementAt(i);
+                _entryControls.Add(NewField(key, IsReadOnly));
+            }
+
+            ListItems.ItemsSource = _entryControls;
+        }
+
         public void LoadDocument(DocumentReference document)
         {
             DocumentHasChanges = false;
@@ -267,8 +299,8 @@ namespace LiteDbExplorer.Controls
                 FileView.LoadFile(fileInfo);
             }
 
-            _currentDocument = document.FindFromCollectionRef();
             _documentReference = document;
+            _currentDocument = document.FindFromCollectionRef();
             _entryControls = new ObservableCollection<DocumentFieldData>();
 
             for (var i = 0; i < document.LiteDocument.Keys.Count; i++)
@@ -281,6 +313,13 @@ namespace LiteDbExplorer.Controls
             ListItems.ItemsSource = _entryControls;
 
             LoadExistingFieldsPicker();
+
+            if (_documentReference?.Collection != null)
+            {
+                var index = _documentReference.Collection.Items.IndexOf(_documentReference);
+                var itemsCount = _documentReference.Collection.Items.Count;
+                SetPageInfo(index, itemsCount);
+            }
         }
 
         public bool IsFileCollection { get; private set; }
@@ -484,37 +523,13 @@ namespace LiteDbExplorer.Controls
         {
             OnCloseRequested();
 
+            _documentReference = null;
+            _currentDocument = null;
+            
             _windowController?.Close(DialogResult);
         }
 
-        private void CancelCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (dialogHost.IsOpen)
-            {
-                dialogHost.CurrentSession?.Close(false);
-                e.Handled = true;
-                return;    
-            }
-
-            DialogResult = false;
-            Close();
-        }
-
-        private void OkCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (dialogHost.IsOpen)
-            {
-                dialogHost.CurrentSession?.Close(true);
-                e.Handled = true;
-                return;
-            }
-
-            SaveChanges();
-
-            DialogResult = true;
-
-            Close();
-        }
+        
 
         private void SaveChanges()
         {
@@ -547,27 +562,6 @@ namespace LiteDbExplorer.Controls
             }
 
             DocumentHasChanges = false;
-        }
-
-        private void ReadOnly_CanNotExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            e.CanExecute = !IsReadOnly;
-        }
-
-        private void NewCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (dialogHost.IsOpen)
-            {
-                e.Handled = true;
-                return;    
-            }
-
-            if (DropNewField.ContextMenu != null)
-            {
-                DropNewField.ContextMenu.IsOpen = true;
-                DropNewField.ContextMenu.Focus();
-                DropNewField.ContextMenu.Items.OfType<MenuItem>().FirstOrDefault()?.Focus();
-            }
         }
 
         private async Task AddNewFieldHandler(BsonType? bsonType)
@@ -632,9 +626,9 @@ namespace LiteDbExplorer.Controls
 
             var newField = NewField(fieldName, false);
             
-            SetDocumentChanged();
-
             _entryControls.Add(newField);
+
+            SetDocumentChanged();
 
             if (isLast)
             {
@@ -650,8 +644,12 @@ namespace LiteDbExplorer.Controls
         private void RemoveField(string name)
         {
             var item = _entryControls.First(a => a.Name == name);
+            
             _entryControls.Remove(item);
+
             _currentDocument.Remove(name);
+
+            SetDocumentChanged();
 
             LoadExistingFieldsPicker();
         }
@@ -724,62 +722,6 @@ namespace LiteDbExplorer.Controls
             contextMenu.IsOpen = true;
         }
 
-        private void NextItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (_documentReference == null)
-            {
-                e.CanExecute = false;
-            }
-            else
-            {
-                var index = _documentReference.Collection.Items.IndexOf(_documentReference);
-                e.CanExecute = index + 1 < _documentReference.Collection.Items.Count;
-            }
-        }
-
-        private void NextItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (!CanChangeCurrentDocument())
-            {
-                return;
-            }
-
-            var index = _documentReference.Collection.Items.IndexOf(_documentReference);
-            if (index + 1 < _documentReference.Collection.Items.Count)
-            {
-                var newDocument = _documentReference.Collection.Items[index + 1];
-                LoadDocument(newDocument);
-            }
-        }
-
-        private void PreviousItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
-        {
-            if (_documentReference == null)
-            {
-                e.CanExecute = false;
-            }
-            else
-            {
-                var index = _documentReference.Collection.Items.IndexOf(_documentReference);
-                e.CanExecute = index > 0;
-            }
-        }
-
-        private void PreviousItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
-        {
-            if (!CanChangeCurrentDocument())
-            {
-                return;
-            }
-
-            var index = _documentReference.Collection.Items.IndexOf(_documentReference);
-            if (index > 0)
-            {
-                var newDocument = _documentReference.Collection.Items[index - 1];
-                LoadDocument(newDocument);
-            }
-        }
-
         private bool CanChangeCurrentDocument()
         {
             if (DocumentHasChanges)
@@ -803,5 +745,155 @@ namespace LiteDbExplorer.Controls
             CloseRequested?.Invoke(this, EventArgs.Empty);
         }
 
+        private void SetPageInfo(int pageIndex, int count)
+        {
+            PageInfoText.Text = $"{pageIndex+1} of {count}";
+        }
+
+        #region Commamnd Handlers
+
+        private void ReadOnly_CanNotExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !IsReadOnly;
+        }
+
+        private void CancelCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (dialogHost.IsOpen)
+            {
+                dialogHost.CurrentSession?.Close(false);
+                e.Handled = true;
+                return;    
+            }
+
+            DialogResult = false;
+            Close();
+        }
+
+        private void OkCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (dialogHost.IsOpen)
+            {
+                dialogHost.CurrentSession?.Close(true);
+                e.Handled = true;
+                return;
+            }
+
+            SaveChanges();
+
+            DialogResult = true;
+
+            Close();
+        }
+
+        private void NewCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (dialogHost.IsOpen)
+            {
+                e.Handled = true;
+                return;    
+            }
+
+            if (DropNewField.ContextMenu != null)
+            {
+                DropNewField.ContextMenu.IsOpen = true;
+                DropNewField.ContextMenu.Focus();
+                DropNewField.ContextMenu.Items.OfType<MenuItem>().FirstOrDefault()?.Focus();
+            }
+        }
+
+        private void NextItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!CanChangeCurrentDocument())
+            {
+                return;
+            }
+
+            var index = _documentReference.Collection.Items.IndexOf(_documentReference);
+            var itemsCount = _documentReference.Collection.Items.Count;
+            var newIndex = index + 1;
+            if (newIndex < itemsCount)
+            {
+                var newDocument = _documentReference.Collection.Items[newIndex];
+                LoadDocument(newDocument);
+            }
+
+            SetPageInfo(newIndex, itemsCount);
+        }
+
+        private void NextItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (_documentReference?.Collection == null)
+            {
+                e.CanExecute = false;
+            }
+            else
+            {
+                var index = _documentReference.Collection.Items.IndexOf(_documentReference);
+                e.CanExecute = index + 1 < _documentReference.Collection.Items.Count;
+            }
+        }
+
+        private void PreviousItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (!CanChangeCurrentDocument())
+            {
+                return;
+            }
+
+            var index = _documentReference.Collection.Items.IndexOf(_documentReference);
+            var itemsCount = _documentReference.Collection.Items.Count;
+            var newIndex = index - 1;
+            if (index > 0)
+            {
+                var newDocument = _documentReference.Collection.Items[newIndex];
+                LoadDocument(newDocument);
+            }
+            SetPageInfo(newIndex, itemsCount);
+        }
+
+        private void PreviousItemCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            if (_documentReference?.Collection == null)
+            {
+                e.CanExecute = false;
+            }
+            else
+            {
+                var index = _documentReference.Collection.Items.IndexOf(_documentReference);
+                e.CanExecute = index > 0;
+            }
+        }        
+
+        private void SaveChangesCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            SaveChanges();
+        }
+
+        private void SaveChangesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = _currentDocument != null && DocumentHasChanges;
+        }
+
+        private void DiscardChangesCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
+        {
+            if (_documentReference != null)
+            {
+                LoadDocument(_documentReference);
+            }
+            else if (_currentDocument != null)
+            {
+                LoadDocument(_currentDocument);
+            }
+        }
+
+        private void DiscardChangesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = _currentDocument != null && DocumentHasChanges;
+        }
+
+        #endregion
+
+        
     }
 }

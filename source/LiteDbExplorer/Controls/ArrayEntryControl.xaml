@@ -26,6 +26,22 @@
     </UserControl.Resources>
 
     <DockPanel>
+
+        <ToolBarTray DockPanel.Dock="Top">
+            <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}"
+                     ClipToBounds="False">
+
+                <Button x:Name="ButtonAddItem"
+                        DockPanel.Dock="Left"
+                        behaviors:RoutedCommandToolTip.ShowToolTipForCommand="local:ArrayEntryControl.NewCommand">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="PlaylistAdd" />
+                        <TextBlock Text="Add Item" Margin="6,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+            </ToolBar>
+        </ToolBarTray>
+
         <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
             <Button Name="ButtonClose" Content="CLOSE" IsCancel="True"
                     Visibility="Collapsed"
@@ -46,33 +62,23 @@
                     Command="local:ArrayEntryControl.OkCommand"
                     behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
 
-            <Button x:Name="ButtonAddItem"
-                    Margin="10" DockPanel.Dock="Left"
-                    Style="{StaticResource MaterialDesignFlatButton}"
-                    behaviors:RoutedCommandToolTip.ShowToolTipForCommand="local:ArrayEntryControl.NewCommand">
-                <StackPanel Orientation="Horizontal">
-                    <materialDesign:PackIcon Kind="PlaylistAdd" />
-                    <TextBlock Text="ADD ITEM" Margin="6,0,0,0" FontSize="14" FontWeight="Medium"
-                               VerticalAlignment="Center" />
-                </StackPanel>
-            </Button>
             <Canvas />
         </DockPanel>
 
-        <Grid DockPanel.Dock="Top">
+        <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <ScrollViewer x:Name="ScrollViewer" Padding="5" VerticalScrollBarVisibility="Disabled">
-                <ItemsControl Name="ItemsItems" Margin="15,0,80,0" FocusVisualStyle="{x:Null}" 
+                <ItemsControl Name="ItemsItems" Margin="15,0" FocusVisualStyle="{x:Null}" 
                               Grid.IsSharedSizeScope="True" HorizontalContentAlignment="Stretch">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="5">
+                            <Grid Margin="5,2">
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="3*" MinWidth="140"/>
-                                    <ColumnDefinition Width="6*" />
+                                    <ColumnDefinition Width="1*" MinWidth="100"/>
+                                    <ColumnDefinition Width="2.6*" MinWidth="100" />
                                     <ColumnDefinition Width="40" />
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Column="0" Text="{Binding Name}" TextAlignment="Right" Margin="3,8,6,3"

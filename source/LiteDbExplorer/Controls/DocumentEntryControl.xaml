@@ -9,35 +9,74 @@
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              xmlns:cal="http://www.caliburnproject.org"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="400" d:DesignWidth="600"
              x:Name="documentEntryUserControl">
 
     <UserControl.Resources>
-        <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" TrueValue="Collapsed" FalseValue="Visible"/>
+        <converters:BooleanToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" TrueValue="Collapsed"
+                                                 FalseValue="Visible" />
     </UserControl.Resources>
 
     <UserControl.CommandBindings>
-        <CommandBinding Command="local:DocumentEntryControl.PreviousItem" 
+        <CommandBinding Command="local:DocumentEntryControl.PreviousItem"
                         Executed="PreviousItemCommand_Executed"
                         CanExecute="PreviousItemCommand_CanExecute" />
-        <CommandBinding Command="local:DocumentEntryControl.NextItem" 
+        <CommandBinding Command="local:DocumentEntryControl.NextItem"
                         Executed="NextItemCommand_Executed"
                         CanExecute="NextItemCommand_CanExecute" />
         <CommandBinding Command="local:DocumentEntryControl.OkCommand"
                         Executed="OkCommand_OnExecuted"
-                        CanExecute="ReadOnly_CanNotExecute"/>
+                        CanExecute="ReadOnly_CanNotExecute" />
         <CommandBinding Command="local:DocumentEntryControl.CancelCommand"
-                        Executed="CancelCommand_OnExecuted"/>
+                        Executed="CancelCommand_OnExecuted" />
         <CommandBinding Command="local:DocumentEntryControl.NewCommand"
                         Executed="NewCommand_OnExecuted"
-                        CanExecute="ReadOnly_CanNotExecute"/>
+                        CanExecute="ReadOnly_CanNotExecute" />
+
+        <CommandBinding Command="local:DocumentEntryControl.SaveChangesCommand"
+                        Executed="SaveChangesCommand_OnExecuted"
+                        CanExecute="SaveChangesCommand_CanExecute" />
+
+        <CommandBinding Command="local:DocumentEntryControl.DiscardChangesCommand"
+                        Executed="DiscardChangesCommand_OnExecuted"
+                        CanExecute="DiscardChangesCommand_CanExecute" />
     </UserControl.CommandBindings>
     <materialDesign:DialogHost
         x:Name="dialogHost"
         DialogTheme="Inherit">
 
         <DockPanel>
+
+            <ToolBarTray DockPanel.Dock="Top">
+                <ToolBar Style="{DynamicResource AppMaterialDesignToolBar}"
+                         ClipToBounds="False">
+
+                    <Button x:Name="SaveChangesButton"
+                            Command="local:DocumentEntryControl.SaveChangesCommand"
+                            ToolTip="Save Changes">
+                        <TextBlock Text="Save" />
+                    </Button>
+                    <Button x:Name="DiscardChangesButton"
+                            Command="local:DocumentEntryControl.DiscardChangesCommand"
+                            ToolTip="Discard Changes">
+                        <TextBlock Text="Discard" />
+                    </Button>
+                    <Separator />
+                    <Button x:Name="DropNewField"
+                            behaviors:RoutedCommandToolTip.ShowToolTipForCommand="local:DocumentEntryControl.NewCommand">
+                        <StackPanel Orientation="Horizontal">
+                            <materialDesign:PackIcon Kind="PlaylistAdd" />
+                            <TextBlock Text="Add Field" />
+                        </StackPanel>
+                    </Button>
+
+                    <Button x:Name="AddExistingFieldsButton">
+                        <TextBlock Text="Add Existing Field" />
+                    </Button>
+                </ToolBar>
+            </ToolBarTray>
+
             <DockPanel DockPanel.Dock="Bottom" LastChildFill="False">
 
                 <Button Name="ButtonClose" Content="Close" IsCancel="True"
@@ -49,55 +88,62 @@
                         Command="local:DocumentEntryControl.CancelCommand"
                         DockPanel.Dock="Right" Margin="10"
                         MinWidth="85"
-                        Style="{StaticResource MaterialDesignFlatButton}" 
-                        behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
+                        Style="{StaticResource MaterialDesignFlatButton}"
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True" />
 
                 <Button Name="ButtonOK" Content="OK" IsDefault="True"
                         Command="local:DocumentEntryControl.OkCommand"
                         DockPanel.Dock="Right" Margin="10"
                         MinWidth="85"
-                        Style="{StaticResource MaterialDesignFlatButton}" 
-                        behaviors:RoutedCommandToolTip.ShowToolTip="True"/>
-
-                <Button x:Name="DropNewField"
-                        Margin="10" DockPanel.Dock="Left"
                         Style="{StaticResource MaterialDesignFlatButton}"
-                        behaviors:RoutedCommandToolTip.ShowToolTipForCommand="local:DocumentEntryControl.NewCommand">
-                    <StackPanel Orientation="Horizontal">
-                        <materialDesign:PackIcon Kind="PlaylistAdd" />
-                        <TextBlock Text="ADD FIELD" Margin="6,0,0,0" FontSize="14" FontWeight="Medium"
-                                   VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
+                        behaviors:RoutedCommandToolTip.ShowToolTip="True" />
 
-                <Canvas />
-                <Button x:Name="AddExistingFieldsButton"
-                        Style="{StaticResource MaterialDesignFlatButton}" Content="ADD EXISTING FIELD" />
+                <StackPanel x:Name="PagePanel" Margin="20,0" Orientation="Horizontal">
+                    <TextBlock x:Name="PageInfoText"
+                               DockPanel.Dock="Left"
+                               VerticalAlignment="Center"
+                               Opacity="0.9" Margin="0,0,22,0"/>
+                    <Button Style="{StaticResource SmallRoundedIconButton}" 
+                            Margin="0,0,10,0" VerticalAlignment="Center"
+                            Command="local:DocumentEntryControl.PreviousItem"
+                            behaviors:RoutedCommandToolTip.ShowToolTip="True">
+                        <materialDesign:PackIcon Kind="NavigateBefore" Height="22" Width="22" />
+                    </Button>
+
+                    <Button Style="{StaticResource SmallRoundedIconButton}"
+                            VerticalAlignment="Center"
+                            Command="local:DocumentEntryControl.NextItem"
+                            behaviors:RoutedCommandToolTip.ShowToolTip="True">
+                        <materialDesign:PackIcon Kind="NavigateNext" Height="22" Width="22"/>
+                    </Button>
+                    
+                </StackPanel>
+                
             </DockPanel>
 
-            <Grid DockPanel.Dock="Top">
+            <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" MinWidth="80" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" MinWidth="80" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Button Name="ButtonPrev" Grid.Column="0" Grid.Row="0" Margin="20"
-                        Command="local:DocumentEntryControl.PreviousItem"
+                <!--<Button Name="ButtonPrev" Grid.Column="0" Grid.Row="0" Margin="20"
                         Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                        Command="local:DocumentEntryControl.PreviousItem"
                         behaviors:RoutedCommandToolTip.ShowToolTip="True">
                     <materialDesign:PackIcon Kind="ArrowLeft" />
                 </Button>
                 <Button Name="ButtonNext" Grid.Column="2" Grid.Row="0" Margin="20"
-                        Command="local:DocumentEntryControl.NextItem"
                         Style="{StaticResource MaterialDesignFloatingActionMiniButton}"
+                        Command="local:DocumentEntryControl.NextItem"
                         behaviors:RoutedCommandToolTip.ShowToolTip="True">
                     <materialDesign:PackIcon Kind="ArrowRight" />
-                </Button>
+                </Button>-->
 
 
                 <UniformGrid Grid.Column="1" Grid.Row="0" Rows="1">
@@ -107,50 +153,51 @@
                                 <ColumnDefinition Width="*" MinWidth="100" />
                                 <ColumnDefinition Width="1.6*" MinWidth="100" />
                                 <ColumnDefinition Width="80" />
-                                <ColumnDefinition Width="40" />
-                                <ColumnDefinition Width="5" />
+                                <ColumnDefinition Width="50" />
+                                <ColumnDefinition Width="20" />
                             </Grid.ColumnDefinitions>
-                            <Border Grid.Column="0" Name="ListViewColDef1" Height="1" HorizontalAlignment="Stretch"/>
-                            <Border Grid.Column="1" Name="ListViewColDef2" Height="1" HorizontalAlignment="Stretch"/>
-                            <Border Grid.Column="2" Name="ListViewColDef3" Height="1" HorizontalAlignment="Stretch"/>
-                            <Border Grid.Column="3" Name="ListViewColDef4" Height="1" HorizontalAlignment="Stretch"/>
+                            <Border Grid.Column="0" Name="ListViewColDef1" Height="1" HorizontalAlignment="Stretch" />
+                            <Border Grid.Column="1" Name="ListViewColDef2" Height="1" HorizontalAlignment="Stretch" />
+                            <Border Grid.Column="2" Name="ListViewColDef3" Height="1" HorizontalAlignment="Stretch" />
+                            <Border Grid.Column="3" Name="ListViewColDef4" Height="1" HorizontalAlignment="Stretch" />
                         </Grid>
-                        
+
                         <ListView Name="ListItems"
                                   ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                              BorderThickness="0"
-                              FocusVisualStyle="{x:Null}">
-                            <ListView.Resources>
-                                <Style TargetType="{x:Type ScrollViewer}"
-                                   BasedOn="{StaticResource GridViewWithoutHeaderScrollViewerStyleKey}"/>
-                            </ListView.Resources>
+                                  BorderThickness="0"
+                                  FocusVisualStyle="{x:Null}"
+                                  Style="{StaticResource MaterialDesignListViewWithoutHeader}">
                             <ListView.ItemContainerStyle>
                                 <Style TargetType="ListViewItem"
-                                   BasedOn="{StaticResource MaterialDesignGridViewItemNoBorder}">
+                                       BasedOn="{StaticResource MaterialDesignGridViewItemNoBorder}">
                                     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                    <Setter Property="Padding" Value="0,3,0,2"/>
                                 </Style>
                             </ListView.ItemContainerStyle>
                             <ListView.View>
                                 <GridView>
-                                    <GridViewColumn Width="{Binding Path=ActualWidth, ElementName=ListViewColDef1, Mode=OneWay}">
+                                    <GridViewColumn
+                                        Width="{Binding Path=ActualWidth, ElementName=ListViewColDef1, Mode=OneWay}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding Name}" ToolTip="{Binding Name}"
-                                                       TextAlignment="Right" Margin="3,11,6,3"
-                                                       VerticalAlignment="Top" TextTrimming="CharacterEllipsis" />
+                                                           TextAlignment="Right" Margin="25,11,6,3"
+                                                           VerticalAlignment="Top" TextTrimming="CharacterEllipsis" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Width="{Binding Path=ActualWidth, ElementName=ListViewColDef2, Mode=OneWay}">
+                                    <GridViewColumn
+                                        Width="{Binding Path=ActualWidth, ElementName=ListViewColDef2, Mode=OneWay}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <ContentPresenter Content="{Binding EditControl}" MinHeight="32"
-                                                              Margin="0,3,0,3" VerticalAlignment="Top"
-                                                              ScrollViewer.VerticalScrollBarVisibility="Disabled" />
+                                                                  Margin="0,3,0,3" VerticalAlignment="Top"
+                                                                  ScrollViewer.VerticalScrollBarVisibility="Disabled" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Width="{Binding Path=ActualWidth, ElementName=ListViewColDef3, Mode=OneWay}">
+                                    <GridViewColumn
+                                        Width="{Binding Path=ActualWidth, ElementName=ListViewColDef3, Mode=OneWay}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button Tag="{Binding BsonType}"
@@ -160,21 +207,23 @@
                                                         Content="{Binding BsonType}"
                                                         Padding="0" Height="25" Margin="0,6,0,0"
                                                         HorizontalContentAlignment="Right"
-                                                        Click="DocumentFieldType_OnClick"/>
+                                                        Click="DocumentFieldType_OnClick" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>
-                                    <GridViewColumn Width="{Binding Path=ActualWidth, ElementName=ListViewColDef4, Mode=OneWay}">
+                                    <GridViewColumn
+                                        Width="{Binding Path=ActualWidth, ElementName=ListViewColDef4, Mode=OneWay}">
                                         <GridViewColumn.CellTemplate>
                                             <DataTemplate>
                                                 <Button DockPanel.Dock="Right" Tag="{Binding Name}"
-                                                    Click="RemoveButton_Click"
-                                                    ToolTip="Remove Item"
-                                                    Style="{StaticResource MaterialDesignFlatButton}"
-                                                    Foreground="{DynamicResource MaterialDesignBody}"
-                                                    Padding="4" Margin="0,4" Height="32" Width="32"
-                                                    Visibility="{Binding IsReadOnly, Converter={StaticResource InverseBoolToVisibilityConverter}}">
-                                                    <materialDesign:PackIcon Kind="DeleteForever" Height="20" Width="20" />
+                                                        Click="RemoveButton_Click"
+                                                        ToolTip="Remove Item"
+                                                        Style="{StaticResource MaterialDesignFlatButton}"
+                                                        Foreground="{DynamicResource MaterialDesignBody}"
+                                                        Padding="4" Margin="0,4,4,4" Height="32" Width="32"
+                                                        Visibility="{Binding IsReadOnly, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                                    <materialDesign:PackIcon Kind="DeleteForever" Height="20"
+                                                                             Width="20" />
                                                 </Button>
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
@@ -185,12 +234,11 @@
                     </Grid>
 
 
-
-                    <DockPanel x:Name="GroupFile" DockPanel.Dock="Top" 
-                               Visibility="Collapsed" Margin="20,0,0,0">
-                        <Border BorderBrush="{StaticResource MaterialDesignDivider}" 
+                    <DockPanel x:Name="GroupFile" DockPanel.Dock="Top"
+                               Visibility="Collapsed" Margin="0">
+                        <Border BorderBrush="{StaticResource MaterialDesignDivider}"
                                 Background="{DynamicResource MaterialDesignToolBarBackground}"
-                                BorderThickness="0,1,0,0" Margin="0,32,00,15">
+                                BorderThickness="0" Margin="0">
                             <controls:FileView x:Name="FileView" />
                         </Border>
                     </DockPanel>

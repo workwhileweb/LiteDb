@@ -85,7 +85,8 @@ namespace LiteDbExplorer.Controls
                     var button = new Button
                     {
                         Content = $"[Array] {arrayValue?.Count} {editorContext.KeyName}",
-                        Style = StyleKit.MaterialDesignEntryButtonStyle
+                        Style = StyleKit.MaterialDesignEntryButtonStyle,
+                        Height = 25
                     };
 
                     button.Click += (s, a) =>
@@ -143,7 +144,8 @@ namespace LiteDbExplorer.Controls
                     var button = new Button
                     {
                         Content = expandLabel,
-                        Style = StyleKit.MaterialDesignEntryButtonStyle
+                        Style = StyleKit.MaterialDesignEntryButtonStyle,
+                        Height = 25
                     };
 
                     button.Click += (s, a) =>
@@ -159,7 +161,13 @@ namespace LiteDbExplorer.Controls
                             MinHeight = 400,
                         };
 
-                        window.ShowDialog();
+                        if (window.ShowDialog() == true)
+                        {
+                            if (control.DocumentHasChanges)
+                            {
+                                editorContext.SetChanged(control);
+                            }    
+                        }
                     };
 
                     return button;
