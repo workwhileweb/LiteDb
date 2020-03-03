@@ -12,6 +12,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Interactivity;
 using Caliburn.Micro;
+using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
 using LiteDB;
 using LiteDbExplorer.Core;
@@ -187,6 +188,7 @@ namespace LiteDbExplorer.Controls
         private DocumentEntryControl(WindowController windowController) : this()
         {
             _windowController = windowController;
+            _windowController.CanClose = CanDiscardChanges;
         }
 
         public DocumentEntryControl(DocumentReference document, WindowController windowController = null) : this(
@@ -525,13 +527,17 @@ namespace LiteDbExplorer.Controls
 
             _documentReference = null;
             _currentDocument = null;
-            
-            _windowController?.Close(DialogResult);
+
+            if (_windowController != null)
+            {
+                _windowController.CanClose = null;
+                _windowController.Close(DialogResult);
+            }
         }
 
         
 
-        private void SaveChanges()
+        private void SaveChanges(bool reload)
         {
             // TODO make array and document types use this as well
             foreach (var ctrl in _entryControls)
@@ -562,39 +568,45 @@ namespace LiteDbExplorer.Controls
             }
 
             DocumentHasChanges = false;
+
+            if (reload)
+            {
+                Reload();
+            }
         }
 
-        private async Task AddNewFieldHandler(BsonType? bsonType)
+        private void Reload()
         {
-            if (!bsonType.HasValue)
+            if (_documentReference != null)
             {
-                return;
+                LoadDocument(_documentReference);
+            }
+            else if (_currentDocument != null)
+            {
+                LoadDocument(_currentDocument);
             }
 
-            var maybeFieldName =
-                await InputDialogView.Show(_dialogHostIdentifier, "Enter name of new field.", "New field name");
+            DocumentHasChanges = false;
+        }
 
-            if (maybeFieldName.HasNoValue)
+        private Result ValidateFieldName(string value)
+        {
+            if (string.IsNullOrEmpty(value))
             {
-                return;
+                return Result.Failure("Name cannot be empty.");
             }
 
-            var fieldName = maybeFieldName.Value.Trim();
-            if (fieldName.Any(char.IsWhiteSpace))
+            if (value.Any(char.IsWhiteSpace))
             {
-                MessageBox.Show("Field name can not contain white spaces.", "", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                return;
+                return Result.Failure("Field name can not contain white spaces.");
             }
 
-            if (_currentDocument.Keys.Contains(fieldName))
+            if (_currentDocument.Keys.Contains(value))
             {
-                MessageBox.Show($"Field \"{fieldName}\" already exists!", "", MessageBoxButton.OK,
-                    MessageBoxImage.Error);
-                return;
+                return Result.Failure($"Field \"{value}\" already exists!");
             }
 
-            await AddNewField(fieldName, bsonType.Value);
+            return Result.Ok();
         }
 
         private async Task AddExistingFieldHandler(KeyValuePair<string, BsonType>? keyValuePair)
@@ -616,6 +628,26 @@ namespace LiteDbExplorer.Controls
                     await AddNewField(pair.Key, pair.Value, count == 0);
                 }
             }
+        }
+
+        private async Task AddNewFieldHandler(BsonType? bsonType)
+        {
+            if (!bsonType.HasValue)
+            {
+                return;
+            }
+
+            var maybeFieldName =
+                await InputDialogView.Show(_dialogHostIdentifier, "Enter name of new field.", "New field name", string.Empty, ValidateFieldName);
+
+            if (maybeFieldName.HasNoValue)
+            {
+                return;
+            }
+
+            var fieldName = maybeFieldName.Value.Trim();
+            
+            await AddNewField(fieldName, bsonType.Value);
         }
 
         private async Task AddNewField(string fieldName, BsonType bsonType, bool isLast = true)
@@ -643,9 +675,9 @@ namespace LiteDbExplorer.Controls
 
         private void RemoveField(string name)
         {
-            var item = _entryControls.First(a => a.Name == name);
+            var documentFieldData = _entryControls.First(a => a.Name == name);
             
-            _entryControls.Remove(item);
+            _entryControls.Remove(documentFieldData);
 
             _currentDocument.Remove(name);
 
@@ -654,7 +686,60 @@ namespace LiteDbExplorer.Controls
             LoadExistingFieldsPicker();
         }
 
-        private void DocumentFieldType_OnClick(object sender, RoutedEventArgs e)
+        private async Task RenameField(string currentName)
+        {
+            if (string.IsNullOrEmpty(currentName))
+            {
+                return;
+            }
+
+            var maybeFieldName =
+                await InputDialogView.Show(_dialogHostIdentifier, "Rename Field", "New field Name", currentName, ValidateFieldName);
+
+            if (maybeFieldName.HasNoValue)
+            {
+                return;
+            }
+
+            var newName = maybeFieldName.Value.Trim();
+
+            RenameField(currentName, newName);
+        }
+
+        private void RenameField(string currentName, string newName)
+        {
+            if (string.IsNullOrEmpty(currentName) || string.IsNullOrEmpty(newName) || newName.Equals(currentName, StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+
+            var documentFieldData = _entryControls.FirstOrDefault(p => p.Name.Equals(currentName));
+            var documentFieldIndex = -1;
+            if (documentFieldData != null)
+            {
+                documentFieldIndex = _entryControls.IndexOf(documentFieldData);
+                _entryControls.RemoveAt(documentFieldIndex);
+            }
+
+            if (documentFieldIndex < 0)
+            {
+                documentFieldIndex = _entryControls.Count - 1;
+            }
+
+            var value = _currentDocument[currentName];
+            _currentDocument.Remove(currentName);
+            _currentDocument.Add(newName, value);
+
+            var newField = NewField(newName, false);
+            _entryControls.Insert(documentFieldIndex, newField);
+
+            SetDocumentChanged();
+
+            LoadExistingFieldsPicker();
+        }
+
+        private void DocumentFieldActions_OnClick(object sender, RoutedEventArgs e)
         {
             if (!(sender is FrameworkElement element) || !(element.DataContext is DocumentFieldData fieldData))
             {
@@ -663,12 +748,8 @@ namespace LiteDbExplorer.Controls
 
             var key = fieldData.Name;
             var bsonValue = _currentDocument[key];
-            var options = BsonValueConverter.ConvertibleTypes(bsonValue);
-            if (!options.Any())
-            {
-                return;
-            }
-
+            var convertibleTypes = BsonValueConverter.ConvertibleTypes(bsonValue);
+            
             var contextMenu = new ContextMenu
             {
                 MinWidth = 160,
@@ -695,34 +776,58 @@ namespace LiteDbExplorer.Controls
                 fieldData.EditControl = BsonValueEditor.GetBsonValueEditor(editorContext, UserDefinedCultureFormat.Default);
                 
                 SetDocumentChanged();
+
+                LoadExistingFieldsPicker();
             }
 
-            foreach (var option in options)
+            var renameMenuItem = new MenuItem
             {
-                Action convertAction = () => ChangeType(option.Value);
-                var menuItem = new MenuItem
-                {
-                    Header = $"Convert to {option.Key}",
-                    Command = new RelayCommand(param =>
-                    {
-                        if (param is Action action)
-                        {
-                            action();
-                        }
+                Header = "Rename",
+                Command = new AsyncCommand<string>(RenameField),
+                CommandParameter = key
+            };
+            contextMenu.Items.Add(renameMenuItem);
+            
+            if (convertibleTypes.Any())
+            {
+                contextMenu.Items.Add(new Separator());
 
-                        element.ContextMenu = null;
-                    }),
-                    CommandParameter = convertAction
-                };
-                contextMenu.Items.Add(menuItem);
+                foreach (var option in convertibleTypes)
+                {
+                    Action convertAction = () => ChangeType(option.Value);
+                    var menuItem = new MenuItem
+                    {
+                        Header = $"Convert to {option.Key}",
+                        Command = new RelayCommand(param =>
+                        {
+                            if (param is Action action)
+                            {
+                                action();
+                            }
+
+                            element.ContextMenu = null;
+                        }),
+                        CommandParameter = convertAction
+                    };
+                    contextMenu.Items.Add(menuItem);
+                }
             }
+            /*else
+            {
+                contextMenu.Items.Add(new TextBlock
+                {
+                    Text = "No Actions",
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Opacity = 0.5
+                });
+            }*/
 
             
             element.ContextMenu = contextMenu;
             contextMenu.IsOpen = true;
         }
 
-        private bool CanChangeCurrentDocument()
+        private bool CanDiscardChanges()
         {
             if (DocumentHasChanges)
             {
@@ -731,7 +836,7 @@ namespace LiteDbExplorer.Controls
 
                 if (result == ChangesActionResult.Save)
                 {
-                    SaveChanges();
+                    SaveChanges(true);
                 }
 
                 return result != ChangesActionResult.Cancel;
@@ -779,7 +884,7 @@ namespace LiteDbExplorer.Controls
                 return;
             }
 
-            SaveChanges();
+            SaveChanges(false);
 
             DialogResult = true;
 
@@ -804,7 +909,7 @@ namespace LiteDbExplorer.Controls
 
         private void NextItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!CanChangeCurrentDocument())
+            if (!CanDiscardChanges())
             {
                 return;
             }
@@ -836,7 +941,7 @@ namespace LiteDbExplorer.Controls
 
         private void PreviousItemCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            if (!CanChangeCurrentDocument())
+            if (!CanDiscardChanges())
             {
                 return;
             }
@@ -867,7 +972,7 @@ namespace LiteDbExplorer.Controls
 
         private void SaveChangesCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            SaveChanges();
+            SaveChanges(true);
         }
 
         private void SaveChangesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
@@ -877,14 +982,7 @@ namespace LiteDbExplorer.Controls
 
         private void DiscardChangesCommand_OnExecuted(object sender, ExecutedRoutedEventArgs e)
         {
-            if (_documentReference != null)
-            {
-                LoadDocument(_documentReference);
-            }
-            else if (_currentDocument != null)
-            {
-                LoadDocument(_currentDocument);
-            }
+            Reload();
         }
 
         private void DiscardChangesCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)

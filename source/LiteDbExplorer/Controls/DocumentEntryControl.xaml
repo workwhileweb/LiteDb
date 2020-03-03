@@ -207,7 +207,7 @@
                                                         Content="{Binding BsonType}"
                                                         Padding="0" Height="25" Margin="0,6,0,0"
                                                         HorizontalContentAlignment="Right"
-                                                        Click="DocumentFieldType_OnClick" />
+                                                        Click="DocumentFieldActions_OnClick" />
                                             </DataTemplate>
                                         </GridViewColumn.CellTemplate>
                                     </GridViewColumn>

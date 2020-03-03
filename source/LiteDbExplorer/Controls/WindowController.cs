@@ -16,6 +16,8 @@ namespace LiteDbExplorer.Controls
 
         public Action Activated { get; set; }
 
+        public Func<bool> CanClose { get; set; }
+
         public string Title { get; set; } = string.Empty;
 
         [AlsoNotifyFor(nameof(Title))]
@@ -36,6 +38,7 @@ namespace LiteDbExplorer.Controls
 
             _window = window;
             _window.Activated += WindowOnActivated;
+            _window.Closing += WindowOnClosing;
             _window.Closed += WindowOnClosed;
 
             _window.SetBinding(Window.TitleProperty, new Binding
@@ -47,7 +50,7 @@ namespace LiteDbExplorer.Controls
                 Converter = new WindowTitleConverter(this)
             });
         }
-        
+
         public virtual Window InferOwnerOf(Window window)
         {
             var current = Application.Current;
@@ -70,6 +73,7 @@ namespace LiteDbExplorer.Controls
             if (_window != null)
             {
                 _window.Activated -= WindowOnActivated;
+                _window.Closing -= WindowOnClosing;
                 _window.Closed -= WindowOnClosed;
             }
 
@@ -79,6 +83,14 @@ namespace LiteDbExplorer.Controls
         private void WindowOnActivated(object sender, EventArgs e)
         {
             Activated?.Invoke();
+        }
+
+        private void WindowOnClosing(object sender, CancelEventArgs e)
+        {
+            if (CanClose != null && !CanClose())
+            {
+                e.Cancel = true;
+            }
         }
 
         private void WindowOnClosed(object sender, EventArgs e)
