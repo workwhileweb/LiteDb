@@ -18,6 +18,7 @@ namespace LiteDbExplorer.Modules.Main
     public sealed class ShellViewModel : Screen, IShell
     {
         private readonly IEventAggregator _eventAggregator;
+
         private IOwnerViewModelMessageHandler _view;
 
         [ImportingConstructor]
@@ -112,10 +113,12 @@ namespace LiteDbExplorer.Modules.Main
 
             CommandManager.InvalidateRequerySuggested();
 
-#if (!DEBUG)
-            await Task.Delay(TimeSpan.FromSeconds(40))
-                .ContinueWith(task => { OnUIThread(() => AppUpdateManager.Current.CheckForUpdates(false).ConfigureAwait(false)); });
-#endif
+            if (!AppConstants.IsDebug)
+            {
+                _ = Task.Delay(TimeSpan.FromSeconds(30))
+                    .ContinueWith(task => { OnUIThread(async () => await AppUpdateManager.Current.CheckForUpdates(false)); })
+                    .ConfigureAwait(false);
+            }
         }
 
         private void OnSettingsPropertyChanged(object sender, PropertyChangedEventArgs e)

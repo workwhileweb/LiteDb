@@ -8,6 +8,7 @@ using LiteDbExplorer.Presentation.Converters;
 using LiteDbExplorer.Windows;
 using LiteDB;
 using LiteDbExplorer.Core;
+using Serilog;
 using Xceed.Wpf.Toolkit;
 
 namespace LiteDbExplorer.Controls
@@ -47,6 +48,8 @@ namespace LiteDbExplorer.Controls
 
     public class BsonValueEditor
     {
+        private static readonly ILogger Logger = Log.ForContext<BsonValueEditor>();
+
         private static double DefaultWindowHeight =>
             Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight);
 
@@ -72,6 +75,13 @@ namespace LiteDbExplorer.Controls
                     DependencyPropertyDescriptor.FromProperty(dependencyProperty, associatedObject.GetType());
                 descriptor?.AddValueChanged(associatedObject, (sender, args) =>
                 {
+                    if (sender is FrameworkElement frameworkElement && !frameworkElement.IsLoaded)
+                    {
+                        return;
+                    }
+
+                    // Logger.Debug("BsonValue changed: {senderType}, {propertyName}", sender.GetType(), dependencyProperty.Name);
+
                     editorContext.SetChanged(sender);
                 });
             }
@@ -310,6 +320,7 @@ namespace LiteDbExplorer.Controls
 
                 guidEditor.SetBinding(MaskedTextBox.ValueProperty, binding);
                 AddValueChangedListener(guidEditor, MaskedTextBox.ValueProperty);
+                
 
                 return guidEditor;
             }

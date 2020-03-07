@@ -80,7 +80,7 @@
 
                         <!--removed all GridViewHeaderRowPresenter-->
 
-                        <DockPanel Margin="{TemplateBinding Padding}">
+                        <DockPanel Margin="{Binding Padding, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}">
                             
                             <ScrollContentPresenter Name="PART_ScrollContentPresenter"
                                                     CanContentScroll="{TemplateBinding CanContentScroll}"

@@ -10,6 +10,7 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Caliburn.Micro;
 using Enterwell.Clients.Wpf.Notifications;
+using Humanizer;
 using JetBrains.Annotations;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Framework;
@@ -88,13 +89,13 @@ namespace LiteDbExplorer.Modules
             }
 
             // Limit request per hour
-            if (!userInitiated && Properties.Settings.Default.UpdateManager_LastCheck.HasValue &&
-                Properties.Settings.Default.UpdateManager_LastCheck.Value.AddHours(1) < DateTime.UtcNow)
+            var lastCheck = Properties.Settings.Default.UpdateManager_LastCheck;
+            if (!userInitiated && lastCheck.HasValue && lastCheck.Value.AddHours(1) < DateTime.UtcNow)
             {
                 return;
             }
 
-            Logger.Information("Start check for updates. Last check {LastCheck}.", Properties.Settings.Default.UpdateManager_LastCheck);
+            Logger.Information("Start check for updates. Last check {LastCheck}.", lastCheck);
 
             IsBusy = true;
             HasUpdate = false;

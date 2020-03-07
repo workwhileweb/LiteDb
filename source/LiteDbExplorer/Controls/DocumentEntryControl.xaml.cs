@@ -119,7 +119,7 @@ namespace LiteDbExplorer.Controls
             typeof(Commands),
             new InputGestureCollection
             {
-                // new KeyGesture(Key.S, ModifierKeys.Control)
+                new KeyGesture(Key.S, ModifierKeys.Shift | ModifierKeys.Control)
             }
         );
 
@@ -130,7 +130,7 @@ namespace LiteDbExplorer.Controls
             typeof(Commands),
             new InputGestureCollection
             {
-                // new KeyGesture(Key.S, ModifierKeys.Control)
+                new KeyGesture(Key.Z, ModifierKeys.Shift | ModifierKeys.Control)
             }
         );
 
@@ -393,7 +393,7 @@ namespace LiteDbExplorer.Controls
                 existingFieldsPickerMenu.Items.Add(new Separator());
                 var allAllMenuItem = new MenuItem
                 {
-                    Header = "Add all",
+                    Header = "Add All Fields",
                     Command = AddAllExistingFieldCommand
                 };
                 existingFieldsPickerMenu.Items.Add(allAllMenuItem);
@@ -794,6 +794,11 @@ namespace LiteDbExplorer.Controls
 
                 foreach (var option in convertibleTypes)
                 {
+                    if (option.Key == bsonValue.Type)
+                    {
+                        continue;
+                    }
+
                     Action convertAction = () => ChangeType(option.Value);
                     var menuItem = new MenuItem
                     {

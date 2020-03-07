@@ -445,6 +445,7 @@ namespace LiteDbExplorer.Controls
                 Mode = BindingMode.OneWay,
                 Converter = _bsonValueToStringConverter
             });
+            
             factory.SetBinding(Wpf.Behaviors.TextBlockSetHighlight.HightlightTextProperty, new Binding
             {
                 Path = new PropertyPath(nameof(HighlightText)),
@@ -452,18 +453,13 @@ namespace LiteDbExplorer.Controls
                 Source = this
             });
 
-            /*var highlightTextBlock = new HighlightTextBlock
-            {
-                SyntaxHighlightingName = "Json"
-            };
-            highlightTextBlock.SetBinding(HighlightTextBlock.HighlightTextProperty, new Binding
+            /*factory.SetBinding(TextBlock.ForegroundProperty, new Binding
             {
                 Path = new PropertyPath($"LiteDocument[{key}]"),
-                Mode = BindingMode.OneWay
-            });
-            factory.SetValue(TextBlock.ToolTipProperty, highlightTextBlock);
-            */
-            
+                Mode = BindingMode.OneWay,
+                Converter = BsonValueToForegroundConverter.Instance
+            });*/
+
             template.VisualTree = factory;
 
             return template;

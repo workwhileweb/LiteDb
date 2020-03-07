@@ -302,6 +302,7 @@
     <Compile Include="Presentation\Behaviors\EscapeAccessKeyColumnHeaderBehavior.cs" />
     <Compile Include="Presentation\Behaviors\TabablzControlAssist.cs" />
     <Compile Include="Presentation\Behaviors\UserDefinedCultureFormatDataGridBehavior.cs" />
+    <Compile Include="Presentation\Converters\BsonTypeToForegroundConverter.cs" />
     <Compile Include="Presentation\Converters\DateTimeHumanizeConverter.cs" />
     <Compile Include="Presentation\Converters\GroupDisplayColorToForegloud.cs" />
     <Compile Include="Presentation\GroupDisplayColor.cs" />
