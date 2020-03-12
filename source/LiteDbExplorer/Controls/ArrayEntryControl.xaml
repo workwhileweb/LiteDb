@@ -70,24 +70,50 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <ScrollViewer x:Name="ScrollViewer" Padding="5" VerticalScrollBarVisibility="Disabled">
-                <ItemsControl Name="ItemsItems" Margin="15,0" FocusVisualStyle="{x:Null}" 
+            <ScrollViewer x:Name="ScrollViewer" Padding="0,11,0,0" VerticalScrollBarVisibility="Disabled">
+                <ItemsControl Name="ItemSetControl" FocusVisualStyle="{x:Null}" 
                               Grid.IsSharedSizeScope="True" HorizontalContentAlignment="Stretch">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <Grid Margin="5,2">
+                            <Grid Margin="2,2">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1*" MinWidth="100"/>
-                                    <ColumnDefinition Width="2.6*" MinWidth="100" />
-                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="1.6*" MinWidth="100" />
+                                    <ColumnDefinition Width="100" />
+                                    <ColumnDefinition Width="50" />
+                                    <ColumnDefinition Width="20" />
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Name}" TextAlignment="Right" Margin="3,8,6,3"
+                                <TextBlock Grid.Column="0" Text="{Binding Name}" TextAlignment="Right" Margin="25,11,12,3"
                                            VerticalAlignment="Top" />
+                                
                                 <ContentPresenter Grid.Column="1" Content="{Binding Control}"
-                                                  MinHeight="32" Margin="10,0,10,0" 
+                                                  MinHeight="32" Margin="6,3,4,3"
                                                   HorizontalAlignment="Stretch" 
                                                   VerticalAlignment="Top" />
-                                <Button Grid.Column="2" Tag="{Binding Value}"
+
+                                <Button Grid.Column="2" 
+                                        ToolTip="Options"
+                                        Style="{StaticResource MaterialDesignEntryButton}"
+                                        IsEnabled="{Binding IsEnable}"
+                                        Padding="0" Height="25" Margin="8,6,4,0"
+                                        HorizontalContentAlignment="Right" VerticalAlignment="Top"
+                                        Click="ArrayFieldActions_OnClick"
+                                        Foreground="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}">
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding Value.Type}" VerticalAlignment="Center"/>
+                                                        
+                                        <Path x:Name="arrow"
+                                              Width="7" Height="8"
+                                              Margin="6,0,4,0" Opacity="0.6"
+                                              Stretch="Uniform"
+                                              HorizontalAlignment="Right"
+                                              VerticalAlignment="Center"
+                                              Data="M7,10L12,15L17,10H7Z"
+                                              Fill="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}" />
+                                    </StackPanel>
+                                </Button>
+
+                                <Button Grid.Column="3" Tag="{Binding Value}"
                                         Click="ButtonRemove_Click" ToolTip="Remove Item"
                                         Style="{StaticResource MaterialDesignFlatButton}"
                                         Foreground="{DynamicResource MaterialDesignBody}"

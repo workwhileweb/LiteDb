@@ -18,6 +18,8 @@ namespace LiteDbExplorer.Controls
 
         public Func<bool> CanClose { get; set; }
 
+        public Func<bool> DialogResult { get; set; }
+
         public string Title { get; set; } = string.Empty;
 
         [AlsoNotifyFor(nameof(Title))]
@@ -90,6 +92,14 @@ namespace LiteDbExplorer.Controls
             if (CanClose != null && !CanClose())
             {
                 e.Cancel = true;
+            }
+            else
+            {
+                if (DialogResult != null)
+                {
+                    var dialogResult = DialogResult();
+                    _window.DialogResult = dialogResult;
+                }
             }
         }
 

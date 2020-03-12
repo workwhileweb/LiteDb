@@ -817,16 +817,6 @@ namespace LiteDbExplorer.Controls
                     contextMenu.Items.Add(menuItem);
                 }
             }
-            /*else
-            {
-                contextMenu.Items.Add(new TextBlock
-                {
-                    Text = "No Actions",
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    Opacity = 0.5
-                });
-            }*/
-
             
             element.ContextMenu = contextMenu;
             contextMenu.IsOpen = true;
