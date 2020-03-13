@@ -43,7 +43,7 @@ namespace LiteDbExplorer.Modules.StartPage
                 .Select(CreatePredicate);
 
             _cleanUp = PathDefinitions.RecentFiles
-                .AsObservableChangeSet()
+                .ToObservableChangeSet()
                 .Filter(recentFilesTermFilter)
                 .Sort(
                     SortExpressionComparer<RecentDatabaseFileInfo>

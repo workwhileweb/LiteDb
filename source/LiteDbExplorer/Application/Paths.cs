@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
@@ -123,7 +124,7 @@ namespace LiteDbExplorer
             }
         }
 
-        public IObservableCollection<RecentDatabaseFileInfo> RecentFiles => _lazyRecentFiles.Value;
+        public BindableCollection<RecentDatabaseFileInfo> RecentFiles => _lazyRecentFiles.Value;
 
         public event PropertyChangedEventHandler PropertyChanged;
 

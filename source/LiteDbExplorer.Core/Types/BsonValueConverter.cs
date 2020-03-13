@@ -21,7 +21,7 @@ namespace LiteDbExplorer.Core
 
             if (bsonValue.Type != BsonType.String)
             {
-                options.Add(BsonType.String, () => new BsonValue(bsonValue.ToString()));
+                options.Add(BsonType.String, () => new BsonValue(bsonValue.AsString));
             }
 
             if (bool.TryParse(bsonValue.AsString, out var boolResult))
