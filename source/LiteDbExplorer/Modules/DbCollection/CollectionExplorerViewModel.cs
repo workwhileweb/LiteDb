@@ -65,6 +65,8 @@ namespace LiteDbExplorer.Modules.DbCollection
             FindCommand = new RelayCommand(_ => OpenFind(), o => CanOpenFind());
             FindNextCommand = new RelayCommand(_ => Find(), o => CanFind());
             FindPreviousCommand = new RelayCommand(_ => FindPrevious(), o => CanFind());
+
+            FileDroppedCommand = new AsyncCommand<IDataObject>(OnFileDropped);
         }
 
         public CollectionItemDoubleClickAction DoubleClickAction { get; }
@@ -96,6 +98,8 @@ namespace LiteDbExplorer.Modules.DbCollection
         public ICommand FindNextCommand { get; }
 
         public ICommand FindPreviousCommand { get; }
+
+        public ICommand FileDroppedCommand { get; }
 
         public FindTextModel FindTextModel { get; }
 
@@ -195,6 +199,10 @@ namespace LiteDbExplorer.Modules.DbCollection
             }
         }
 
+        public Func<object> GetIconContent { get; set; }
+
+        public override object IconContent => GetIconContent?.Invoke();
+
         public override void Init(CollectionReferencePayload value)
         {
             if (value == null)
@@ -218,7 +226,7 @@ namespace LiteDbExplorer.Modules.DbCollection
                 GroupDisplayName = collectionReference.Database.Name;
             }
 
-            IconContent = collectionReference is FileCollectionReference
+            GetIconContent = () =>  collectionReference is FileCollectionReference
                 ? new PackIcon {Kind = PackIconKind.FileMultiple}
                 : new PackIcon {Kind = PackIconKind.TableLarge, Height = 16};
 
@@ -233,6 +241,8 @@ namespace LiteDbExplorer.Modules.DbCollection
                 SelectedDocument = CollectionReference.Items.FirstOrDefault();
                 SelectedDocuments = new List<DocumentReference> { SelectedDocument };
             }
+
+            
         }
 
         public void HandleError(Exception ex)
@@ -356,7 +366,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         [UsedImplicitly]
         public async Task AddDocument()
         {
-            var result = await _databaseInteractions.CreateItem(this, CollectionReference);
+            var result = await _databaseInteractions.CreateDocument(this, CollectionReference);
             await result.Tap(async reference =>
             {
                 await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference,
@@ -492,6 +502,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         public void CloseFind()
         {
             IsFindOpen = false;
+            _view?.FindClear();
         }
 
         [UsedImplicitly]
@@ -504,6 +515,27 @@ namespace LiteDbExplorer.Modules.DbCollection
         public bool CanFind()
         {
             return CollectionReference != null && IsFindOpen;
+        }
+
+        private async Task OnFileDropped(IDataObject dataObject)
+        {
+            if (dataObject.GetDataPresent(DataFormats.FileDrop) &&
+                dataObject.GetData(DataFormats.FileDrop, false) is string[] paths)
+            {
+                if (CollectionReference.IsFilesOrChunks)
+                {
+                    var result = await _databaseInteractions.AddFileToDatabase(this, CollectionReference.Database, filePath: paths.FirstOrDefault());
+                    if (result.IsSuccess)
+                    {
+                        Init(new CollectionReferencePayload(result.Value.CollectionReference));
+                        _view?.SelectItem(result.Value.DocumentReference);
+                    }
+                    
+                    return;
+                }
+
+                await _databaseInteractions.OpenDatabases(paths);
+            }
         }
 
         #endregion

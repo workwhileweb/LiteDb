@@ -15,6 +15,10 @@
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Primary/MaterialDesignColor.Blue.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Blue.xaml" />
+        <!-- Material Design Extensions -->
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/Generic.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml" />
+        <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />-->
         <!-- Material Design: MahApps Compatibility -->
         <ResourceDictionary
             Source="pack://application:,,,/MaterialDesignThemes.MahApps;component/Themes/MaterialDesignTheme.MahApps.Fonts.xaml" />
@@ -24,12 +28,10 @@
         <ResourceDictionary
             Source="pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/ApplicationColors.Light.xaml" />
         
-        <!-- Material Design Extensions -->
-        <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignLightTheme.xaml" />-->
-        <!--<ResourceDictionary Source="pack://application:,,,/MaterialDesignExtensions;component/Themes/MaterialDesignDarkTheme.xaml" />-->
 
         <ResourceDictionary Source="Generic.xaml"/>
         <ResourceDictionary Source="MaterialDesignTheme.Window.xaml" />
+        <ResourceDictionary Source="MaterialDesignTheme.AppButtons.xaml" />
         <ResourceDictionary Source="MaterialDesignTheme.ListView.xaml" />
         <ResourceDictionary Source="MaterialDesignTheme.Tabs.xaml" />
         <ResourceDictionary Source="MaterialDesignTheme.AppToolBar.xaml" />
@@ -38,7 +40,7 @@
         <ResourceDictionary Source="Controls.ContextMenu.xaml" />
         <ResourceDictionary Source="Controls.SplitContainer.xaml" />
         <ResourceDictionary Source="Controls.SearchableTextControl.xaml" />
-        
+
     </ResourceDictionary.MergedDictionaries>
 
 </ResourceDictionary>

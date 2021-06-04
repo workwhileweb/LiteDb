@@ -114,7 +114,7 @@
                                     ToolTip="More...">
                                     <materialDesign:PackIcon Kind="DotsVertical" />
                                     <i:Interaction.Behaviors>
-                                        <behaviors:ButtonClickOpenMenuBehavior/>
+                                        <behaviors:ButtonClickOpenMenuBehavior PlacementMode="Left"/>
                                     </i:Interaction.Behaviors>
                                     <Button.ContextMenu>
                                         <ContextMenu MinWidth="120" 
@@ -132,7 +132,7 @@
                                                               FontSize="11pt"
                                                               TextWrapping="Wrap"
                                                               HighlightText="{Binding RawQuery}"
-                                                              SyntaxHighlightingSrc="LiteDbExplorer.Controls.SyntaxDefinitions.LiteDbCmd.xshd"
+                                                              SyntaxHighlightingName="LiteDbCmd"
                                                               Margin="12,16"/>
                             </controls:ChildScrollViewer>
                             

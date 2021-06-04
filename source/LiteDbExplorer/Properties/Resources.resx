@@ -120,6 +120,9 @@
   <data name="SettingsPageAdvanced" xml:space="preserve">
     <value>_Advanced</value>
   </data>
+  <data name="SettingsPageCultureFormat" xml:space="preserve">
+    <value>_Culture and Format</value>
+  </data>
   <data name="SettingsPageEnvironment" xml:space="preserve">
     <value>_Environment</value>
   </data>

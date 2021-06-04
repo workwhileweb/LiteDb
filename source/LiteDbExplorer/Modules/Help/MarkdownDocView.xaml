@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:LiteDbExplorer.Modules.Help"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:wpf="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
+             xmlns:markdig="clr-namespace:Markdig.Wpf;assembly=Markdig.Wpf"
              xmlns:converters="clr-namespace:LiteDbExplorer.Wpf.Converters;assembly=LiteDbExplorer.Wpf"
              xmlns:controls="clr-namespace:LiteDbExplorer.Wpf.Controls;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d" 
@@ -19,7 +19,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <UserControl.CommandBindings>
-        <CommandBinding Command="{x:Static wpf:Commands.Hyperlink}" Executed="OpenHyperlink" />
+        <CommandBinding Command="{x:Static markdig:Commands.Hyperlink}" Executed="OpenHyperlink" />
     </UserControl.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
@@ -48,8 +48,9 @@
         </controls:ToolDockPanel>
 
         <Border Grid.Row="1">
-            <wpf:MarkdownViewer x:Name="markdownViewer" 
-                                Markdown="{Binding MarkdownContent, Mode=OneWay}" />
+            <markdig:MarkdownViewer x:Name="markdownViewer" 
+                                    Style="{StaticResource PageMarkdownViewer}"
+                                    Markdown="{Binding MarkdownContent, Mode=OneWay}" />
         </Border>
 
         <materialDesign:Card Grid.Row="0" Grid.RowSpan="3" UniformCornerRadius="14" Padding="4" HorizontalAlignment="Center" Margin="50"

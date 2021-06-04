@@ -24,6 +24,7 @@ namespace LiteDbExplorer.Modules.Main
         }
 
         [SelectorStyle(SelectorStyle.ComboBox), Width(120)]
+        [DisplayName("Color theme")]
         public ColorTheme ColorTheme { get; set; }
 
         public bool ShowNavigationPanelOnOpen { get; set; }

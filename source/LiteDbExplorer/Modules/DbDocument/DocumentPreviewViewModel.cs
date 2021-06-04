@@ -61,9 +61,11 @@ namespace LiteDbExplorer.Modules.DbDocument
         public bool IsDocumentView { get; private set; }
 
         public bool HasDocument => Document != null;
-
+        
+        [UsedImplicitly]
         public bool HasFileInfo => FileInfo != null;
 
+        [UsedImplicitly]
         public bool HideFileInfo => FileInfo == null;
 
         public bool CanOpenAsDocument => Document != null && !IsDocumentView;

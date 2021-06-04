@@ -31,9 +31,9 @@ namespace LiteDbExplorer.Wpf
                 @"(\/LiteDbExplorer.Wpf;component\/Themes\/ApplicationColors\.)((Light)|(Dark))",
                 $"pack://application:,,,/LiteDbExplorer.Wpf;component/Themes/ApplicationColors.{(isDark ? "Dark" : "Light")}.xaml");
 
-            /*TryFindAndReplaceMergedDictionary(
+            TryFindAndReplaceMergedDictionary(
                 @"(\/MaterialDesignExtensions;component\/Themes\/MaterialDesign((Light)|(Dark))Theme)",
-                $"pack://application:,,,/MaterialDesignExtensions;component/Themes/{(isDark ? "MaterialDesignDarkTheme" : "MaterialDesignLightTheme")}.xaml");*/
+                $"pack://application:,,,/MaterialDesignExtensions;component/Themes/{(isDark ? "MaterialDesignDarkTheme" : "MaterialDesignLightTheme")}.xaml");
         }
 
         private bool TryFindAndReplaceMergedDictionary(string pattern, string newResourceDictionarySource)

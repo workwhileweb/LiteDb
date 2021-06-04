@@ -21,10 +21,20 @@ using LiteDbExplorer.Windows;
 using LiteDbExplorer.Wpf.Framework;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
+using Ookii.Dialogs.Wpf;
 using DialogOptions = LiteDbExplorer.Framework.Windows.DialogOptions;
+using TaskDialog = Microsoft.WindowsAPICodePack.Dialogs.TaskDialog;
+using TaskDialogButton = Microsoft.WindowsAPICodePack.Dialogs.TaskDialogButton;
 
 namespace LiteDbExplorer.Modules
 {
+    public enum ChangesActionResult
+    {
+        Save,
+        Discard,
+        Cancel
+    }
+
     [Export(typeof(IApplicationInteraction))]
     [PartCreationPolicy(CreationPolicy.Shared)]
     public class ApplicationInteraction : IApplicationInteraction
@@ -377,6 +387,60 @@ namespace LiteDbExplorer.Modules
                 return Maybe<PasswordInput>.None;
             }
             return result.Model;
+        }
+
+
+        public ChangesActionResult ShowChangesActionDialog(string message = null)
+        {
+            if (string.IsNullOrEmpty(message))
+            {
+                message = "There are unsaved changes.";
+            }
+            
+            if(Ookii.Dialogs.Wpf.TaskDialog.OSSupportsTaskDialogs)
+            {
+                using(var dialog = new Ookii.Dialogs.Wpf.TaskDialog())
+                {
+                    dialog.WindowTitle = AppConstants.Application.DisplayName;
+                    dialog.MainInstruction = message;
+                    dialog.MainIcon = TaskDialogIcon.Information;
+                    dialog.ButtonStyle = TaskDialogButtonStyle.CommandLinks;
+                    
+                    var saveButton = new Ookii.Dialogs.Wpf.TaskDialogButton("Save Changes");
+                    var discardButton = new Ookii.Dialogs.Wpf.TaskDialogButton("Discard Changes");
+                    var cancelButton = new Ookii.Dialogs.Wpf.TaskDialogButton(ButtonType.Cancel);
+
+                    dialog.Buttons.Add(saveButton);
+                    dialog.Buttons.Add(discardButton);
+                    dialog.Buttons.Add(cancelButton);
+                    var button = dialog.ShowDialog();
+
+                    if (button == saveButton)
+                    {
+                        return ChangesActionResult.Save;
+                    }
+
+                    if (button == discardButton)
+                    {
+                        return ChangesActionResult.Discard;
+                    }
+
+                    return ChangesActionResult.Cancel;
+                }
+            }
+
+            var messageBoxResult = MessageBox.Show(message, null, MessageBoxButton.YesNoCancel, MessageBoxImage.Information);
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                return ChangesActionResult.Save;
+            }
+
+            if (messageBoxResult == MessageBoxResult.No)
+            {
+                return ChangesActionResult.Discard;
+            }
+
+            return ChangesActionResult.Cancel;
         }
 
     }

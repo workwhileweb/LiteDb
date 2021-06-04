@@ -10,6 +10,8 @@
              xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              xmlns:liteDbExplorer="clr-namespace:LiteDbExplorer"
              xmlns:controls="clr-namespace:LiteDbExplorer.Controls"
+             xmlns:materialDesignEx="clr-namespace:MaterialDesignExtensions.Controls;assembly=MaterialDesignExtensions"
+             xmlns:mah="http://metro.mahapps.com/winfx/xaml/controls"
              mc:Ignorable="d"
              d:DesignHeight="650" d:DesignWidth="800"
              Background="{DynamicResource TabActiveBackground}"
@@ -18,6 +20,8 @@
         <framework:DataContextProxy x:Key="DataContextProxy" Data="{Binding}" />
         <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
         <converters:BooleanToVisibilityConverter x:Key="InverseBooleanToVisibilityConverter" Inverse="True" />
+        <converters:NullOrEmptyValueToBooleanConverter x:Key="NullOrEmptyValueToBooleanConverter" SeeEmpty="True" SeeDefaultTypeValue="True"/>
+        <converters:NullOrEmptyToVisibilityConverter x:Key="NullOrEmptyToVisibilityConverter" SeeEmpty="True" SeeDefaultTypeValue="True" />
         <Style x:Key="PinButtonStyle" TargetType="Button" BasedOn="{StaticResource MaterialDesignFlatButton}">
             <Setter Property="Visibility" Value="Collapsed"/>
             <Setter Property="Padding" Value="0"/>
@@ -60,6 +64,7 @@
             <Grid x:Name="PART_Left" Grid.Column="0" Grid.Row="0" Grid.RowSpan="2">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
@@ -79,9 +84,41 @@
                     </Grid>
                 </Border>
 
-                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <Grid Grid.Row="1" Margin="58,0,15,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBox Grid.Column="0" x:Name="SearchTextBox" 
+                             Text="{Binding SearchTerm, UpdateSourceTrigger=PropertyChanged}"
+                             materialDesign:HintAssist.Hint="Search"
+                             materialDesign:HintAssist.IsFloating="False">
+                        <TextBox.Style>
+                            <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+                                <Setter Property="BorderBrush" Value="Transparent"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding Path=Text, ElementName=SearchTextBox, Converter={StaticResource NullOrEmptyValueToBooleanConverter}}" Value="False">
+                                        <Setter Property="BorderBrush" Value="{DynamicResource MaterialDesignDivider}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Style>
+                    </TextBox>
+                    <Button x:Name="ClearSearchButton" Grid.Column="1" 
+                            Margin="-25,0,0,1"
+                            Height="24" Width="25"
+                            Padding="0" VerticalAlignment="Bottom"
+                            Focusable="False"
+                            Style="{DynamicResource MaterialDesignToolForegroundButton}"
+                            Visibility="{Binding ElementName=SearchTextBox, Path=Text, Converter={StaticResource NullOrEmptyToVisibilityConverter}}">
+                        <materialDesign:PackIcon Kind="Close" Width="16" Height="16" />
+                    </Button>
+                </Grid>
+                
+
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
                     <ItemsControl
-                        ItemsSource="{Binding Path=PathDefinitions.RecentFiles}">
+                        ItemsSource="{Binding Path=RecentFilesFiltered}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Button x:Name="OpenRecentButton"
@@ -93,14 +130,14 @@
                                     <Button.ContextMenu>
                                         <ContextMenu
                                             cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}">
-                                            <MenuItem Header="Remove from list"
+                                            <MenuItem Header="Remove From List"
                                                       cal:Message.Attach="RemoveFromList($dataContext)">
                                                 <MenuItem.Icon>
                                                     <materialDesign:PackIcon Kind="PlaylistRemove" />
                                                 </MenuItem.Icon>
                                             </MenuItem>
 
-                                            <MenuItem Header="Pin this item on list"
+                                            <MenuItem Header="Pin This Item on List"
                                                       cal:Message.Attach="PinItem($dataContext)"
                                                       Visibility="{Binding Path=IsFixed, Converter={StaticResource InverseBooleanToVisibilityConverter}}">
                                                 <MenuItem.Icon>
@@ -108,7 +145,7 @@
                                                 </MenuItem.Icon>
                                             </MenuItem>
 
-                                            <MenuItem Header="Unpin this item on list"
+                                            <MenuItem Header="Unpin This Item on List"
                                                       cal:Message.Attach="UnPinItem($dataContext)"
                                                       Visibility="{Binding Path=IsFixed, Converter={StaticResource BooleanToVisibilityConverter}}">
                                                 <MenuItem.Icon>
@@ -116,7 +153,7 @@
                                                 </MenuItem.Icon>
                                             </MenuItem>
                                             <Separator />
-                                            <MenuItem Header="Copy path"
+                                            <MenuItem Header="Copy Path"
                                                       cal:Message.Attach="CopyPath($dataContext)">
                                                 <MenuItem.Icon>
                                                     <materialDesign:PackIcon Kind="ContentCopy" />
@@ -147,14 +184,16 @@
                                         <TextBlock x:Name="FileNameTextBlock" Grid.Column="1" Grid.Row="1"
                                                    Text="{Binding FileName}"
                                                    TextTrimming="CharacterEllipsis"
-                                                   Style="{StaticResource MaterialDesignBody2TextBlock}" />
+                                                   Style="{StaticResource MaterialDesignBody2TextBlock}" 
+                                                   behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=Data.SearchTerm, Source={StaticResource DataContextProxy}}"/>
 
                                         <TextBlock Grid.Column="1" Grid.ColumnSpan="3" Grid.Row="2"
                                                    Text="{Binding DirectoryPath}"
                                                    TextTrimming="CharacterEllipsis"
                                                    Opacity="0.8"
                                                    Style="{StaticResource MaterialDesignBody2TextBlock}"
-                                                   Foreground="{DynamicResource MaterialDesignBody}" />
+                                                   Foreground="{DynamicResource MaterialDesignBody}" 
+                                                   behaviors:TextBlockSetHighlight.HightlightText="{Binding Path=Data.SearchTerm, Source={StaticResource DataContextProxy}}"/>
 
                                         <TextBlock Grid.Column="3" Grid.Row="1"
                                                    Text="{Binding LastOpenedAt,StringFormat=g}"
@@ -167,6 +206,7 @@
                                         <Button x:Name="PinedItemButton" Grid.Column="4" Grid.Row="1"
                                                 Style="{StaticResource PinButtonStyle}"
                                                 ToolTip="Unpin this item on list"
+                                                IsTabStop="False"
                                                 cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}"
                                                 cal:Message.Attach="UnPinItem($dataContext)">
                                             <materialDesign:PackIcon x:Name="PinedIcon" 
@@ -179,6 +219,7 @@
                                                 Grid.Column="4" Grid.Row="1"
                                                 Style="{StaticResource PinButtonStyle}"
                                                 ToolTip="Pin this item on list"
+                                                IsTabStop="False"
                                                 cal:Action.TargetWithoutContext="{Binding Path=Data, Source={StaticResource DataContextProxy}}"
                                                 cal:Message.Attach="PinItem($dataContext)">
                                             <materialDesign:PackIcon x:Name="PinIcon" Kind="PinOutline"
@@ -229,14 +270,13 @@
                     </ItemsControl>
                 </ScrollViewer>
 
-                <TextBlock Grid.Row="1" HorizontalAlignment="Left" 
+                <TextBlock Grid.Row="2" HorizontalAlignment="Left" 
                            VerticalAlignment="Top" Margin="56,16"
                            Style="{StaticResource MaterialDesignBody1TextBlock}" Opacity="0.6"
-                           Visibility="{Binding Path=RecentFilesIsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}">
-                    No recent items in the list
-                </TextBlock>
+                           Visibility="{Binding Path=RecentFilesListIsEmpty, Converter={StaticResource BooleanToVisibilityConverter}}"
+                           Text="{Binding RecentFilesListEmptyMessage}"/>
 
-                <CheckBox Grid.Row="2" Margin="56,5"
+                <CheckBox Grid.Row="3" Margin="56,5"
                           Content="Show start page on open" 
                           IsChecked="{Binding ShowStartPageOnOpen}"/>
             </Grid>
@@ -366,6 +406,7 @@
                                Foreground="{DynamicResource MaterialDesignBodyLight}">
                         <TextBlock.Resources>
                             <Style TargetType="Hyperlink">
+                                <Setter Property="Focusable" Value="False"/>
                                 <Setter Property="Foreground" Value="{DynamicResource AccentColorBrush2}" />
                                 <EventSetter Event="RequestNavigate" Handler="Hyperlink_RequestNavigate" />
                             </Style>

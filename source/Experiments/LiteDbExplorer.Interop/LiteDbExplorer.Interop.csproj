@@ -1,0 +1,163 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\PropertyChanging.Fody.1.30.0\build\PropertyChanging.Fody.props" Condition="Exists('..\..\packages\PropertyChanging.Fody.1.30.0\build\PropertyChanging.Fody.props')" />
+  <Import Project="..\..\packages\PropertyChanged.Fody.3.2.6\build\PropertyChanged.Fody.props" Condition="Exists('..\..\packages\PropertyChanged.Fody.3.2.6\build\PropertyChanged.Fody.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{6F6B560C-A0D1-4A08-A4AA-6C9A65B80321}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LiteDbExplorer.Interop</RootNamespace>
+    <AssemblyName>LiteDbExplorer.Interop</AssemblyName>
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Humanizer, Version=2.7.0.0, Culture=neutral, PublicKeyToken=979442b78dfc278e, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Humanizer.Core.2.7.9\lib\netstandard2.0\Humanizer.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Annotations, Version=2019.1.3.0, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\JetBrains.Annotations.2019.1.3\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="LiteDB.v4, Version=4.1.4.0, Culture=neutral, PublicKeyToken=4ee40123013c9f27, processorArchitecture=MSIL">
+      <HintPath>packages\LiteDB.v4.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Aliases>v4</Aliases>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="LiteDB.v5">
+      <HintPath>packages\LiteDB.v5.dll</HintPath>
+      <Aliases>v5</Aliases>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyChanged, Version=3.2.6.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PropertyChanged.Fody.3.2.6\lib\net40\PropertyChanged.dll</HintPath>
+    </Reference>
+    <Reference Include="PropertyChanging, Version=1.30.0.0, Culture=neutral, PublicKeyToken=8b75edd8e1086950, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\PropertyChanging.Fody.1.30.0\lib\net452\PropertyChanging.dll</HintPath>
+    </Reference>
+    <Reference Include="Serilog, Version=2.0.0.0, Culture=neutral, PublicKeyToken=24c2f752a8e58a10, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Serilog.2.9.0\lib\net46\Serilog.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ComponentModel.Annotations.4.7.0\lib\net461\System.ComponentModel.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Reactive, Version=4.3.0.0, Culture=neutral, PublicKeyToken=94bc3704cddfc263, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Reactive.4.3.2\lib\net46\System.Reactive.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=4.0.6.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.CompilerServices.Unsafe.4.7.0\lib\netstandard2.0\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Threading.Tasks.Extensions.4.5.3\lib\netstandard2.0\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.ValueTuple.4.5.0\lib\net461\System.ValueTuple.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Proxies\BsonArray.cs" />
+    <Compile Include="Proxies\BsonValue.cs" />
+    <Compile Include="Proxies\BsonDocument.cs" />
+    <Compile Include="Events\CollectionReferenceChangedEventArgs.cs" />
+    <Compile Include="Events\EventArgs.cs" />
+    <Compile Include="Events\InteractionEvents.cs" />
+    <Compile Include="Events\ReferenceChangedEventArgs.cs" />
+    <Compile Include="Events\ReferenceNodeChangeAction.cs" />
+    <Compile Include="Events\ReferenceNodeChangeEventArgs.cs" />
+    <Compile Include="Extensions\EncodingExtensions.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
+    <Compile Include="Proxies\LiteDatabase.cs" />
+    <Compile Include="v4\JsonSerializerExtension.cs" />
+    <Compile Include="v4\LiteDbReferenceExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="Infrastructure\NetFileSystemWatcher.cs" />
+    <Compile Include="Proxies\ObjectId.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="v4\CollectionReference.cs" />
+    <Compile Include="v4\DatabaseReference.cs" />
+    <Compile Include="v4\DocumentReference.cs" />
+    <Compile Include="v4\FileCollectionReference.cs" />
+    <Compile Include="v4\NewIdLookup.cs" />
+    <Compile Include="v4\QueryResult.cs" />
+    <Compile Include="v4\QueryResultExtensions.cs" />
+    <Compile Include="Store.cs" />
+    <Compile Include="Types\CollectionHandlerType.cs" />
+    <Compile Include="Types\CollectionReferenceLookup.cs" />
+    <Compile Include="Types\CountingSubject.cs" />
+    <Compile Include="Types\DatabaseConnectionOptions.cs" />
+    <Compile Include="Types\DatabaseFileMode.cs" />
+    <Compile Include="Types\DocumentTypeFilter.cs" />
+    <Compile Include="Types\FieldSortOrder.cs" />
+    <Compile Include="Types\IJsonSerializerProvider.cs" />
+    <Compile Include="Types\IReferenceNode.cs" />
+    <Compile Include="Types\LookupTable\LookupTable.cs" />
+    <Compile Include="Types\ReferenceNode.cs" />
+    <Compile Include="Types\SortBsonValue.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="FodyWeavers.xml" />
+    <Content Include="libs\LiteDB.v4.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\LiteDB.v4.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\LiteDB.v5.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="libs\LiteDB.v5.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\..\packages\Fody.6.1.0\build\Fody.targets" Condition="Exists('..\..\packages\Fody.6.1.0\build\Fody.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\Fody.6.1.0\build\Fody.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\Fody.6.1.0\build\Fody.targets'))" />
+    <Error Condition="!Exists('..\..\packages\PropertyChanged.Fody.3.2.6\build\PropertyChanged.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PropertyChanged.Fody.3.2.6\build\PropertyChanged.Fody.props'))" />
+    <Error Condition="!Exists('..\..\packages\PropertyChanging.Fody.1.30.0\build\PropertyChanging.Fody.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\PropertyChanging.Fody.1.30.0\build\PropertyChanging.Fody.props'))" />
+  </Target>
+</Project>

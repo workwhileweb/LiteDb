@@ -43,7 +43,7 @@ namespace LiteDbExplorer.Controls.Editor
         public bool UseRegex
         {
             get => (bool)GetValue(UseRegexProperty);
-            set { SetValue(UseRegexProperty, value); }
+            set => SetValue(UseRegexProperty, value);
         }
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace LiteDbExplorer.Controls.Editor
         public bool MatchCase
         {
             get => (bool)GetValue(MatchCaseProperty);
-            set { SetValue(MatchCaseProperty, value); }
+            set => SetValue(MatchCaseProperty, value);
         }
 
         /// <summary>
@@ -75,7 +75,7 @@ namespace LiteDbExplorer.Controls.Editor
         public bool WholeWords
         {
             get => (bool)GetValue(WholeWordsProperty);
-            set { SetValue(WholeWordsProperty, value); }
+            set => SetValue(WholeWordsProperty, value);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@ namespace LiteDbExplorer.Controls.Editor
         public string SearchPattern
         {
             get => (string)GetValue(SearchPatternProperty);
-            set { SetValue(SearchPatternProperty, value); }
+            set => SetValue(SearchPatternProperty, value);
         }
 
         /// <summary>
@@ -99,7 +99,7 @@ namespace LiteDbExplorer.Controls.Editor
         /// </summary>
         public static readonly DependencyProperty MarkerBrushProperty =
             DependencyProperty.Register("MarkerBrush", typeof(Brush), typeof(SearchReplacePanel),
-                new FrameworkPropertyMetadata(Brushes.LightGreen, MarkerBrushChangedCallback));
+                new FrameworkPropertyMetadata(SearchReplaceBrushes.MarkerBrush, MarkerBrushChangedCallback));
 
         /// <summary>
         /// Gets/sets the Brush used for marking search results in the TextView.
@@ -107,7 +107,7 @@ namespace LiteDbExplorer.Controls.Editor
         public Brush MarkerBrush
         {
             get => (Brush)GetValue(MarkerBrushProperty);
-            set { SetValue(MarkerBrushProperty, value); }
+            set => SetValue(MarkerBrushProperty, value);
         }
 
         /// <summary>
@@ -123,7 +123,7 @@ namespace LiteDbExplorer.Controls.Editor
         public Localization Localization
         {
             get => (Localization)GetValue(LocalizationProperty);
-            set { SetValue(LocalizationProperty, value); }
+            set => SetValue(LocalizationProperty, value);
         }
 
         public static readonly DependencyProperty IsFindOnlyProperty = DependencyProperty.Register(
@@ -131,8 +131,8 @@ namespace LiteDbExplorer.Controls.Editor
 
         public bool IsFindOnly
         {
-            get { return (bool) GetValue(IsFindOnlyProperty); }
-            set { SetValue(IsFindOnlyProperty, value); }
+            get => (bool) GetValue(IsFindOnlyProperty);
+            set => SetValue(IsFindOnlyProperty, value);
         }
 
         #endregion
@@ -332,14 +332,45 @@ namespace LiteDbExplorer.Controls.Editor
 
                 if (!_renderer.CurrentResults.Any())
                 {
-                    _messageView.IsOpen = true;
-                    _messageView.Content = Localization.NoMatchesFoundText;
-                    _messageView.PlacementTarget = _searchTextBox;
+                    SetSearchInlineError(true, Localization.NoMatchesFoundText);
+
+                    // _messageView.IsOpen = true;
+                    // _messageView.Content = Localization.NoMatchesFoundText;
+                    // _messageView.PlacementTarget = _searchTextBox;
                 }
                 else
-                    _messageView.IsOpen = false;
+                {
+                    // _messageView.IsOpen = false;
+                    SetSearchInlineError(false);
+                }
             }
             _textArea.TextView.InvalidateLayer(KnownLayer.Selection);
+        }
+
+        void SetSearchInlineError(bool isInvalid, string message = "")
+        {
+            var bindingExpressionBase = _searchTextBox?.GetBindingExpression(TextBox.TextProperty);
+            if (bindingExpressionBase == null)
+            {
+                return;
+            }
+
+            if (isInvalid)
+            {
+                var validationError =
+                    new ValidationError(new ExceptionValidationRule(), bindingExpressionBase)
+                    {
+                        ErrorContent = message
+                    };
+
+
+                Validation.MarkInvalid(bindingExpressionBase, validationError);
+            }
+            else
+            {
+                Validation.ClearInvalid(bindingExpressionBase);
+            }
+
         }
 
         void SelectResult(ISearchResult searchResult)
@@ -366,7 +397,7 @@ namespace LiteDbExplorer.Controls.Editor
                         var error = Validation.GetErrors(_searchTextBox).FirstOrDefault();
                         if (error != null)
                         {
-                            _messageView.Content = Localization.ErrorText + " " + error.ErrorContent;
+                            _messageView.Content = $"{Localization.ErrorText} {error.ErrorContent}";
                             _messageView.PlacementTarget = _searchTextBox;
                             _messageView.IsOpen = true;
                         }
@@ -392,8 +423,7 @@ namespace LiteDbExplorer.Controls.Editor
             var hasFocus = IsKeyboardFocusWithin;
 
             var layer = AdornerLayer.GetAdornerLayer(_textArea);
-            if (layer != null)
-                layer.Remove(_adorner);
+            layer?.Remove(_adorner);
             _messageView.IsOpen = false;
             _textArea.TextView.BackgroundRenderers.Remove(_renderer);
             if (hasFocus)
@@ -422,11 +452,8 @@ namespace LiteDbExplorer.Controls.Editor
         {
             if (!IsClosed) return;
             var layer = AdornerLayer.GetAdornerLayer(_textArea);
-            
-            if (layer != null)
-            {
-                layer.Add(_adorner);
-            }
+
+            layer?.Add(_adorner);
 
             _textArea.TextView.BackgroundRenderers.Add(_renderer);
             IsClosed = false;
@@ -632,6 +659,11 @@ namespace LiteDbExplorer.Controls.Editor
         }
     }
 
+    static class SearchReplaceBrushes
+    {
+        public static Brush MarkerBrush => new SolidColorBrush(Colors.SaddleBrown){ Opacity = 0.40 }; //Brushes.LightGreen;
+    }
+
     /// <summary>
     /// EventArgs for <see cref="SearchReplacePanel.SearchOptionsChanged"/> event.
     /// </summary>
@@ -707,7 +739,7 @@ namespace LiteDbExplorer.Controls.Editor
 
         public SearchReplaceResultBackgroundRenderer()
         {
-            _markerBrush = Brushes.LightGreen;
+            _markerBrush = SearchReplaceBrushes.MarkerBrush;
             _markerPen = new Pen(_markerBrush, 1);
         }
 
@@ -724,9 +756,9 @@ namespace LiteDbExplorer.Controls.Editor
         public void Draw(TextView textView, DrawingContext drawingContext)
         {
             if (textView == null)
-                throw new ArgumentNullException("textView");
+                throw new ArgumentNullException(nameof(textView));
             if (drawingContext == null)
-                throw new ArgumentNullException("drawingContext");
+                throw new ArgumentNullException(nameof(drawingContext));
 
             if (CurrentResults == null || !textView.VisualLinesValid)
                 return;

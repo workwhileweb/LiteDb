@@ -35,6 +35,8 @@ namespace LiteDbExplorer.Modules.ImportData
             TargetFields = new BindableCollection<string>();
         }
 
+        public bool CanContentScroll => true;
+
         public IEnumerable<BsonType> ValidBsonTypes { get; private set; }
 
         public IObservableCollection<string> SourceFields { get; private set; }
@@ -163,6 +165,7 @@ namespace LiteDbExplorer.Modules.ImportData
         }
 
         public bool HasNext => false;
+        
 
         public Task<object> Next()
         {

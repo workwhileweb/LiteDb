@@ -33,7 +33,7 @@
                         <materialDesign:PackIcon Kind="FolderOpen" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Recent files" Name="MenuRecentItems"
+                <MenuItem Header="Recent Files" Name="MenuRecentItems"
                           ItemsSource="{Binding Path=PathDefinitions.RecentFiles}"
                           ItemContainerStyle="{StaticResource RecentItemsMenuStyle}"
                           cal:Message.Attach="OpenRecentItem($originalSourceContext)">
@@ -151,12 +151,12 @@
                         <materialDesign:PackIcon Kind="NewReleases" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Report issue..." x:Name="OpenIssuePage">
+                <MenuItem Header="Report Issue..." x:Name="OpenIssuePage">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="Bug" />
                     </MenuItem.Icon>
                 </MenuItem>
-                <MenuItem x:Name="CheckUpdates" Header="Check for updates..."
+                <MenuItem x:Name="CheckUpdates" Header="Check for Updates..."
                           Command="{Binding Path=Current.CheckForUpdatesCommand, Source={StaticResource AppUpdateManager}}">
                     <MenuItem.Icon>
                         <materialDesign:PackIcon Kind="ArrowDownBoldCircleOutline" />

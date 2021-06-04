@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
+using DynamicData.Annotations;
 using Humanizer;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
@@ -22,13 +23,15 @@ namespace LiteDbExplorer.Modules.Help
         
         public MarkdownDocViewModel()
         {
-            IconContent = new PackIcon { Kind = PackIconKind.HelpCircleOutline };
         }
+
+        public override object IconContent => new PackIcon { Kind = PackIconKind.HelpCircleOutline };
 
         public bool IsBusy { get; set; }
 
         public string MarkdownContent { get; set; }
 
+        [UsedImplicitly]
         public string NavigateUrl => _markdownDocContext?.NavigateUrl;
 
         public override void Init(IMarkdownDocContext item)
@@ -122,7 +125,7 @@ namespace LiteDbExplorer.Modules.Help
             }
             catch (Exception e)
             {
-                return Result.Fail<string>(e.Message);
+                return Result.Failure<string>(e.Message);
             }
         }
 

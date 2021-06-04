@@ -2,15 +2,17 @@
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 using LiteDbExplorer.Controls;
 using LiteDbExplorer.Core;
+using LiteDbExplorer.Modules.Shared;
 
 namespace LiteDbExplorer.Modules.DbCollection
 {
     /// <summary>
     /// Interaction logic for CollectionExplorerView.xaml
     /// </summary>
-    public partial class CollectionExplorerView : UserControl, ICollectionReferenceListView
+    public partial class CollectionExplorerView : UserControl, ICollectionReferenceListView, IActivateFocus
     {
         public CollectionExplorerView()
         {
@@ -49,6 +51,15 @@ namespace LiteDbExplorer.Modules.DbCollection
             CollectionListView.ScrollIntoItem(item);
         }
 
+        public void SelectItem(object item)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                CollectionListView.ScrollIntoItem(item);
+                CollectionListView.ListCollectionData.SelectedItem = item;
+            }, DispatcherPriority.Normal);
+        }
+
         public void ScrollIntoSelectedItem()
         {
             CollectionListView.ScrollIntoSelectedItem();
@@ -74,10 +85,22 @@ namespace LiteDbExplorer.Modules.DbCollection
             CollectionListView.FindPrevious(text, matchCase);
         }
 
+        public void FindClear()
+        {
+            CollectionListView.FindClear();
+        }
+
         public void FocusListView()
         {
             CollectionListView.ListCollectionData.Focus();
         }
 
+        public void RequestFocus()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                CollectionListView.FocusSelectedItem();
+            }, DispatcherPriority.Background);
+        }
     }
 }

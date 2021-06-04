@@ -10,8 +10,8 @@ using Caliburn.Micro;
 using Humanizer;
 using JetBrains.Annotations;
 using LiteDbExplorer.Windows;
-using LiteDB;
 using LiteDbExplorer.Core;
+using JsonSerializer = LiteDB.JsonSerializer;
 
 namespace LiteDbExplorer.Modules.Database
 {
@@ -20,8 +20,7 @@ namespace LiteDbExplorer.Modules.Database
     {
         private readonly IApplicationInteraction _applicationInteraction;
         private readonly IDatabaseInteractions _databaseInteractions;
-        private LiteDatabase _database;
-        private ushort _userVersion;
+        private int _userVersion;
         private DatabaseReference _databaseReference;
 
         [ImportingConstructor]
@@ -36,11 +35,10 @@ namespace LiteDbExplorer.Modules.Database
         public void Init(DatabaseReference databaseReference)
         {
             _databaseReference = databaseReference;
-            _database = databaseReference.LiteDatabase;
 
             DisplayName = $"Database Properties - {databaseReference.Name}";
 
-            UserVersion = _database.Engine.UserVersion;
+            UserVersion = _databaseReference.UserVersion;
 
             SetDatabaseInfo();
         }
@@ -51,7 +49,7 @@ namespace LiteDbExplorer.Modules.Database
 
         public string MetadataJson { get; private set; }
 
-        public ushort UserVersion
+        public int UserVersion
         {
             get => _userVersion;
             set
@@ -67,9 +65,9 @@ namespace LiteDbExplorer.Modules.Database
 
         public void AcceptButton()
         {
-            if (_database.Engine.UserVersion != UserVersion)
+            if (_databaseReference.UserVersion != UserVersion)
             {
-                _database.Engine.UserVersion = UserVersion;
+                _databaseReference.UserVersion = UserVersion;
             }
 
             TryClose(true);
@@ -114,7 +112,8 @@ namespace LiteDbExplorer.Modules.Database
 
         private void SetDatabaseInfo()
         {
-            var engineInfoDocument = _database.Engine.Info();
+            var engineInfoDocument = _databaseReference.InternalDatabaseInfo();
+
             var databaseInfo = new List<DisplayInfo>
             {
                 new DisplayInfo("Collections:", _databaseReference.Collections.Count),
@@ -122,8 +121,7 @@ namespace LiteDbExplorer.Modules.Database
                 new DisplayInfo("Change ID:", engineInfoDocument["changeID"].RawValue),
                 new DisplayInfo("Last page ID:", engineInfoDocument["lastPageID"].RawValue)
             };
-            // var engineInfo = engineInfoDocument.Select(p => new DisplayInfo(p.Key, p.Value));
-            // databaseInfo.AddRange(engineInfo);
+            
             DatabaseInfo = databaseInfo;
 
             var fileInfo = new FileInfo(_databaseReference.Location);

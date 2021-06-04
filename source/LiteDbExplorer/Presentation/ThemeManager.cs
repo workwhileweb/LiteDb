@@ -42,6 +42,8 @@ namespace LiteDbExplorer.Presentation
 
             public static SolidColorBrush StringForeground => GetSolidColorBrush("#D64292");
 
+            public static SolidColorBrush IdentityForeground => GetSolidColorBrush("#1c92a9");
+
             public static SolidColorBrush Default => StyleKit.MaterialDesignBody;
         }
 

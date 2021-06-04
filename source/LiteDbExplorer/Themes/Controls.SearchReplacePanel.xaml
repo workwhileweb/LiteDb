@@ -129,7 +129,11 @@
 
     <Style x:Key="SearchReplacePanelActionButton" TargetType="Button"
            BasedOn="{StaticResource MaterialDesignFlatButton}">
+        <Setter Property="Height" Value="24"/>
+        <Setter Property="Width" Value="24"/>
         <Setter Property="Padding" Value="0"/>
+        <Setter Property="materialDesign:ButtonAssist.CornerRadius" Value="24"/>
+        <Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource AncestorType={x:Type FrameworkElement}}, Path=(TextElement.Foreground)}"/>
         <Style.Triggers>
             <Trigger Property="IsMouseOver"
                      Value="True">
@@ -141,25 +145,39 @@
 
     <ControlTemplate x:Key="SearchReplacePanelTemplate"
                      TargetType="editor:SearchReplacePanel">
-        <Border Background="{DynamicResource MaterialDesignPaper}"
-                BorderBrush="{DynamicResource MaterialDesignToolBarBackground}"
-                BorderThickness="3 0 0 3"
-                Padding="5"
-                HorizontalAlignment="Right"
-                VerticalAlignment="Top"
-                Cursor="Arrow"
-                TextElement.FontFamily="{x:Static SystemFonts.MenuFontFamily}">
-
-            <Grid>
+        <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto" MinWidth="270" 
+                                  MaxWidth="{Binding Path=ActualWidth, ElementName=PART_GridResizeConstraint}"/>
+            </Grid.ColumnDefinitions>
+            <GridSplitter Width="4" Margin="-4,0,0,0" VerticalAlignment="Stretch" 
+                          Grid.Column="1" ResizeBehavior="PreviousAndNext"
+                          Background="Transparent"/>
+            <Border x:Name="PART_GridResizeConstraint" Grid.Column="0" Grid.ColumnSpan="3" Margin="8,0,0,0" VerticalAlignment="Top"/>
+            <Border Grid.Column="2" 
+                    Background="{DynamicResource MaterialDesignToolBarBackground}"
+                    BorderBrush="{DynamicResource MaterialDesignPaper}"
+                    BorderThickness="4 0 0 0"
+                    Padding="4"
+                    Cursor="Arrow"
+                    TextElement.FontFamily="{x:Static SystemFonts.MenuFontFamily}">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="6" BlurRadius="10" Direction="220" Opacity="0.4" RenderingBias="Quality"/>
+                </Border.Effect>
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
+
+                <Border x:Name="PART_TextBoxResizeConstraint" Grid.Column="1" Margin="3,0" VerticalAlignment="Top" />
 
                 <ToggleButton Name="PART_toggleFindReplace" 
                               Style="{StaticResource ExpanderToggle}"
@@ -173,23 +191,27 @@
                 <TextBox Name="PART_searchTextBox"
                          Grid.Column="1"
                          Grid.Row="0"
-                         Width="150"
+                         HorizontalAlignment="Stretch"
                          Height="24"
                          Margin="3,3,3,0"
                          Foreground="{TemplateBinding Foreground}"
                          materialDesign:HintAssist.Hint="Find..."
-                         Text="{Binding SearchPattern, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+                         Text="{Binding SearchPattern, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
+                         MaxWidth="{Binding Path=ActualWidth, ElementName=PART_TextBoxResizeConstraint}"
+                         materialDesign:ValidationAssist.UsePopup="True"
+                         materialDesign:ValidationAssist.PopupPlacement="Bottom"/>
 
                 <TextBox Name="ReplaceBox"
                          Visibility="Collapsed"
                          Grid.Column="1"
                          Grid.Row="1"
-                         Width="150"
+                         HorizontalAlignment="Stretch"
                          Height="24"
                          Margin="3,3,3,0"
                          Foreground="{TemplateBinding Foreground}"
                          materialDesign:HintAssist.Hint="Replace..."
-                         Text="{Binding ReplacePattern, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}" />
+                         Text="{Binding ReplacePattern, RelativeSource={RelativeSource TemplatedParent}, UpdateSourceTrigger=PropertyChanged, ValidatesOnExceptions=True}"
+                         MaxWidth="{Binding Path=ActualWidth, ElementName=PART_TextBoxResizeConstraint}"/>
 
                 <StackPanel Orientation="Horizontal"
                             Grid.Column="2"
@@ -246,29 +268,23 @@
                     </avalonedit:DropDownButton>-->
 
                     <Button Margin="3"
-                            Height="24"
-                            Width="24"
                             Command="avalonedit:SearchCommands.FindPrevious"
                             ToolTip="{Binding Localization.FindPreviousText, RelativeSource={RelativeSource TemplatedParent}}"
                             Style="{StaticResource SearchReplacePanelActionButton}">
                         <materialDesign:PackIcon Kind="ChevronUp" Height="24" Width="24"/>
                     </Button>
                     <Button Margin="3"
-                            Height="24"
-                            Width="24"
                             Command="avalonedit:SearchCommands.FindNext"
                             ToolTip="{Binding Localization.FindNextText, RelativeSource={RelativeSource TemplatedParent}}"
                             Style="{StaticResource SearchReplacePanelActionButton}">
                         <materialDesign:PackIcon Kind="ChevronDown" Height="24" Width="24"/>
                     </Button>
-                    <Button Height="24"
-                            Width="24"
-                            Command="avalonedit:SearchCommands.CloseSearchPanel"
+                    <Button Command="avalonedit:SearchCommands.CloseSearchPanel"
                             VerticalContentAlignment="Center"
                             HorizontalContentAlignment="Center"
                             Focusable="False"
                             Style="{StaticResource SearchReplacePanelActionButton}">
-                        <materialDesign:PackIcon Kind="Close" Height="16" Width="16"/>
+                        <materialDesign:PackIcon Kind="Close" Height="18" Width="18"/>
                     </Button>
                 </StackPanel>
 
@@ -278,8 +294,6 @@
                             Grid.Column="2"
                             Grid.Row="1">
                     <Button Margin="3"
-                            Height="24"
-                            Width="24"
                             Command="editor:SearchCommandsEx.ReplaceNext"
                             ToolTip="Replace next (Alt+R)"
                             Style="{StaticResource SearchReplacePanelActionButton}">
@@ -289,8 +303,6 @@
                                Source="{StaticResource ReplaceNext}" />
                     </Button>
                     <Button Margin="3"
-                            Height="24"
-                            Width="24"
                             Command="editor:SearchCommandsEx.ReplaceAll"
                             ToolTip="Replace all (Alt+A)"
                             Style="{StaticResource SearchReplacePanelActionButton}">
@@ -303,6 +315,7 @@
 
             </Grid>
         </Border>
+        </Grid>
         <ControlTemplate.Triggers>
             <Trigger Property="IsReplaceMode"
                      Value="True">

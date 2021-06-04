@@ -10,33 +10,7 @@ namespace LiteDbExplorer.Presentation.Behaviors
         {
             try
             {
-                if (value != null)
-                {
-                    if (value.IsDocument || value.IsArray || value.IsBinary)
-                    {
-                        return ThemeManager.TypeHighlighting.ObjectForeground;
-                    }
-                
-                    if (value.IsInt32 || value.IsInt64 || value.IsDecimal || value.IsDouble)
-                    {
-                        return ThemeManager.TypeHighlighting.NumberForeground;
-                    }
-
-                    if (value.IsBoolean)
-                    {
-                        return ThemeManager.TypeHighlighting.BooleanForeground;
-                    }
-
-                    if (value.IsDateTime)
-                    {
-                        return ThemeManager.TypeHighlighting.DateTimeForeground;
-                    }
-
-                    if (value.IsString)
-                    {
-                        return ThemeManager.TypeHighlighting.StringForeground;
-                    }
-                }
+                return GetBsonValueForeground(value?.Type);
             }
             catch (Exception e)
             {
@@ -46,5 +20,42 @@ namespace LiteDbExplorer.Presentation.Behaviors
             return ThemeManager.TypeHighlighting.Default;
         }
 
+        public static SolidColorBrush GetBsonValueForeground(BsonType? bsonType)
+        {
+            var result = ThemeManager.TypeHighlighting.Default;
+            
+            if (bsonType.HasValue)
+            {
+                switch (bsonType.Value)
+                {
+                    case BsonType.String:
+                        result = ThemeManager.TypeHighlighting.StringForeground;
+                        break;
+                    case BsonType.Boolean:
+                        result = ThemeManager.TypeHighlighting.BooleanForeground;
+                        break;
+                    case BsonType.DateTime:
+                        result = ThemeManager.TypeHighlighting.DateTimeForeground;
+                        break;
+                    case BsonType.Int32:
+                    case BsonType.Int64:
+                    case BsonType.Decimal:
+                    case BsonType.Double:
+                        result = ThemeManager.TypeHighlighting.NumberForeground;
+                        break;
+                    case BsonType.ObjectId:
+                    case BsonType.Guid:
+                        result = ThemeManager.TypeHighlighting.IdentityForeground;
+                        break;
+                    case BsonType.Document:
+                    case BsonType.Array:
+                    case BsonType.Binary:
+                        result = ThemeManager.TypeHighlighting.ObjectForeground;
+                        break;
+                }
+            }
+
+            return result;
+        }
     }
 }

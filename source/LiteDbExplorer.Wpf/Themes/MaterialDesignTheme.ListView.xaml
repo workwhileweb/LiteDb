@@ -5,6 +5,7 @@
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ListBox.xaml" />
+        <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ListView.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.TextBox.xaml" />
         <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Thumb.xaml" />
     </ResourceDictionary.MergedDictionaries>
@@ -19,7 +20,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="ListBoxItem">
                     <Border x:Name="Border"
-                            Padding="0"
+                            Padding="{TemplateBinding Padding}"
                             Background="{TemplateBinding Background}"
                             BorderBrush="{DynamicResource MaterialDesignDivider}"
                             BorderThickness="0"
@@ -77,9 +78,10 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <DockPanel Margin="{TemplateBinding Padding}">
-                            <!--removed all GridViewHeaderRowPresenter-->
+                        <!--removed all GridViewHeaderRowPresenter-->
 
+                        <DockPanel Margin="{Binding Padding, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type ListView}}}">
+                            
                             <ScrollContentPresenter Name="PART_ScrollContentPresenter"
                                                     CanContentScroll="{TemplateBinding CanContentScroll}"
                                                     CanHorizontallyScroll="False"
@@ -88,7 +90,7 @@
                         </DockPanel>
 
                         <ScrollBar Name="PART_HorizontalScrollBar"
-                                   Grid.Row="1"
+                                   Grid.Row="1" Grid.Column="0"
                                    Maximum="{TemplateBinding ScrollableWidth}"
                                    Orientation="Horizontal"
                                    ViewportSize="{TemplateBinding ViewportWidth}"
@@ -96,7 +98,7 @@
                                    Value="{Binding HorizontalOffset, Mode=OneWay, RelativeSource={RelativeSource TemplatedParent}}" />
 
                         <ScrollBar Name="PART_VerticalScrollBar"
-                                   Grid.Column="1"
+                                   Grid.Row="0" Grid.Column="1"
                                    Maximum="{TemplateBinding ScrollableHeight}"
                                    Orientation="Vertical"
                                    ViewportSize="{TemplateBinding ViewportHeight}"
@@ -107,6 +109,38 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+    </Style>
+
+    <converters1:ListViewGridViewConverter x:Key="MaterialDesignListViewWithoutHeaderTemplateConverter">
+        <converters1:ListViewGridViewConverter.DefaultValue>
+            <ControlTemplate TargetType="{x:Type ListView}">
+                <ScrollViewer>
+                    <ItemsPresenter />
+                </ScrollViewer>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsGrouping" Value="True">
+                        <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </converters1:ListViewGridViewConverter.DefaultValue>
+        <converters1:ListViewGridViewConverter.ViewValue>
+            <ControlTemplate TargetType="{x:Type ListView}">
+                <ScrollViewer Style="{DynamicResource GridViewWithoutHeaderScrollViewerStyleKey}">
+                    <ItemsPresenter />
+                </ScrollViewer>
+                <ControlTemplate.Triggers>
+                    <Trigger Property="IsGrouping" Value="True">
+                        <Setter Property="ScrollViewer.CanContentScroll" Value="false" />
+                    </Trigger>
+                </ControlTemplate.Triggers>
+            </ControlTemplate>
+        </converters1:ListViewGridViewConverter.ViewValue>
+    </converters1:ListViewGridViewConverter>
+
+    <Style x:Key="MaterialDesignListViewWithoutHeader" TargetType="{x:Type ListView}"
+           BasedOn="{StaticResource MaterialDesignListView}">
+        <Setter Property="Template" Value="{Binding RelativeSource={RelativeSource Self}, Path=View, Converter={StaticResource MaterialDesignListViewWithoutHeaderTemplateConverter}}" />
     </Style>
 
 </ResourceDictionary>

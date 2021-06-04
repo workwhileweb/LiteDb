@@ -98,15 +98,35 @@
     </Style>
 
     <!-- MarkdownViewer Template-->
-  <Style TargetType="markdig:MarkdownViewer">
-    <Setter Property="Template">
-      <Setter.Value>
-        <ControlTemplate TargetType="markdig:MarkdownViewer">
-          <FlowDocumentScrollViewer Document="{TemplateBinding Document}"
-                                    ScrollViewer.VerticalScrollBarVisibility="Auto"/>
-        </ControlTemplate>
-      </Setter.Value>
-    </Setter>
-  </Style>
+    <Style TargetType="markdig:MarkdownViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="markdig:MarkdownViewer">
+                    <FlowDocumentScrollViewer Document="{TemplateBinding Document}"
+                                              ScrollViewer.VerticalScrollBarVisibility="Auto"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="PageMarkdownViewer" TargetType="markdig:MarkdownViewer">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="markdig:MarkdownViewer">
+                    <FlowDocumentScrollViewer Document="{TemplateBinding Document}" 
+                                              HorizontalScrollBarVisibility="Disabled">
+                        <FlowDocumentScrollViewer.Resources>
+                            <Style TargetType="{x:Type FlowDocument}" x:Key="{x:Static markdig:Styles.DocumentStyleKey}">
+                                <Setter Property="FontFamily" Value="Calibri" />
+                                <Setter Property="MaxPageWidth" Value="980"/>
+                                <Setter Property="PagePadding" Value="80,20"/>
+                            </Style>
+                        </FlowDocumentScrollViewer.Resources>
+                    </FlowDocumentScrollViewer>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    
 
 </ResourceDictionary>

@@ -5,8 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:properties="clr-namespace:LiteDbExplorer.Properties"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:behaviors="clr-namespace:LiteDbExplorer.Wpf.Behaviors;assembly=LiteDbExplorer.Wpf"
              mc:Ignorable="d"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800" x:Name="CollectionListViewControl">
     <UserControl.Resources>
         <ResourceDictionary>
             <DataTemplate x:Key="HeaderTemplate">

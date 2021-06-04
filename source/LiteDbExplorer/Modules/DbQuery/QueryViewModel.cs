@@ -3,20 +3,17 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Composition;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using JetBrains.Annotations;
-using LiteDB;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Framework;
 using LiteDbExplorer.Modules.Help;
 using LiteDbExplorer.Modules.Shared;
 using LiteDbExplorer.Wpf.Framework;
 using LiteDbExplorer.Wpf.Framework.Shell;
-using LiteDbExplorer.Wpf.Modules.Exception;
 using MaterialDesignThemes.Wpf;
 
 namespace LiteDbExplorer.Modules.DbQuery
@@ -28,27 +25,22 @@ namespace LiteDbExplorer.Modules.DbQuery
     {
         private static int _queryRefCount;
         private readonly IApplicationInteraction _applicationInteraction;
+        private readonly IQueryViewsProvider _queryViewsProvider;
         private readonly IQueryHistoryProvider _queryHistoryProvider;
-        private IQueryEditorView _view;
+        private IQueryView _view;
         private DatabaseReference _currentDatabase;
 
         [ImportingConstructor]
-        public QueryViewModel(IApplicationInteraction applicationInteraction, IQueryHistoryProvider queryHistoryProvider)
+        public QueryViewModel(
+            IApplicationInteraction applicationInteraction, 
+            IQueryViewsProvider queryViewsProvider,
+            IQueryHistoryProvider queryHistoryProvider)
         {
             _applicationInteraction = applicationInteraction;
+            _queryViewsProvider = queryViewsProvider;
             _queryHistoryProvider = queryHistoryProvider;
 
             DisplayName = "Query";
-
-            IconContent = new PackIcon {Kind = PackIconKind.CodeGreaterThan};
-
-            PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName == nameof(CurrentDatabase))
-                {
-                    SetDisplay(CurrentDatabase);
-                }
-            };
 
             RunQueryCommand = new AsyncCommand(RunAllRawQuery, () => CanRunQuery);
 
@@ -61,7 +53,13 @@ namespace LiteDbExplorer.Modules.DbQuery
             QueryHistoryView.Parent = this;
 
             QueryHistoryView.FilterActiveDatabase = true;
+
+            QueryHandlersMetadata = _queryViewsProvider.ListMetadata();
+
+            CurrentQueryHandlerName = QueryHandlersMetadata.Select(p => p.Name).FirstOrDefault();
         }
+
+        public override object IconContent => new PackIcon { Kind = PackIconKind.CodeGreaterThan };
 
         public ICommand RunQueryCommand { get; }
 
@@ -70,6 +68,8 @@ namespace LiteDbExplorer.Modules.DbQuery
         public ICommand OpenHelpCommand { get; }
 
         public QueryHistoryViewModel QueryHistoryView { get; }
+
+        public IEnumerable<IQueryViewHandlerMetadata> QueryHandlersMetadata { get; }
 
         [UsedImplicitly]
         public ObservableCollection<DatabaseReference> Databases => Store.Current.Databases;
@@ -83,6 +83,7 @@ namespace LiteDbExplorer.Modules.DbQuery
             {
                 _currentDatabase = value;
                 QueryHistoryView?.SetActiveDatabase(CurrentDatabase);
+                _view?.UpdateCodeCompletion(CurrentDatabase);
             }
         }
 
@@ -105,6 +106,9 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         [UsedImplicitly]
         public bool ShowHistory { get; set; }
+
+        [UsedImplicitly]
+        public string CurrentQueryHandlerName { get; set; }
 
         public override void Init(RunQueryContext item)
         {
@@ -132,7 +136,7 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         protected override async void OnViewLoaded(object view)
         {
-            _view = view as IQueryEditorView;
+            _view = view as IQueryView;
 
             _view?.SelectEnd();
 
@@ -140,6 +144,18 @@ namespace LiteDbExplorer.Modules.DbQuery
             {
                 await Task.Delay(250);
                 await RunAllRawQuery();
+            }
+
+            _view?.UpdateCodeCompletion(CurrentDatabase);
+        }
+
+        public override void NotifyOfPropertyChange(string propertyName = null)
+        {
+            base.NotifyOfPropertyChange(propertyName);
+
+            if (propertyName == nameof(CurrentDatabase))
+            {
+                SetDisplay(CurrentDatabase);
             }
         }
 
@@ -176,73 +192,32 @@ namespace LiteDbExplorer.Modules.DbQuery
         public async Task OpenHelp()
         {
             var documentSet = IoC.Get<IDocumentSet>();
-            var context = new GithubWikiMarkdownDocContext("Using Shell - Command reference", "mbdavid", "LiteDB", "Shell");
+            var context = new GithubWikiMarkdownDocContext("Using Shell - Command reference", @"mbdavid", @"LiteDB", @"Shell");
             await documentSet.OpenDocument<MarkdownDocViewModel, IMarkdownDocContext>(context);
         }
 
-        private Task RunQuery(string query)
+        private async Task RunQuery(string query)
         {
             ActiveItem = null;
             Items.Clear();
 
             if (string.IsNullOrWhiteSpace(query))
             {
-                return Task.CompletedTask;
+                return;
             }
 
-            var rawQueries = RemoveQueryComments(query)
-                .Split(new[] { "db.", "DB." }, StringSplitOptions.RemoveEmptyEntries)
-                .Select(q => $"db.{q.Trim()}")
-                .ToList();
-
-            var resultCount = 0;
-            foreach (var rawQuery in rawQueries)
+            var maybeQueryHandler = _queryViewsProvider.FindHandler(CurrentQueryHandlerName);
+            if (maybeQueryHandler.HasNoValue)
             {
-                resultCount++;
-                
-                try
-                {
-                    var resultViewModel = IoC.Get<QueryResultViewModel>();
-                    
-                    IList<BsonValue> results;
-                    using (resultViewModel.StartTime())
-                    {
-                        results = CurrentDatabase.LiteDatabase.Engine.Run(rawQuery);
-                    }
-                    resultViewModel.SetResult(
-                        $"Result {resultCount}", 
-                        rawQuery,
-                        new QueryResult(results));
-
-                    Items.Add(resultViewModel);
-                }
-                catch (Exception e)
-                {
-                    var title = $"Query {resultCount} Error";
-                    var exceptionScreen = new ExceptionScreenViewModel(title, $"Error on Query {resultCount}:\n'{rawQuery}'", e);
-                    Items.Add(exceptionScreen);
-                }
+                _applicationInteraction.ShowAlert("Unable to get query handler.");
+                return;
             }
 
-            var queryHistory = new RawQueryHistory
-            {
-                RawQuery = query.Trim(),
-                DatabaseLocation = CurrentDatabase?.Location,
-                CreatedAt = DateTime.UtcNow,
-                LastRunAt = DateTime.UtcNow
-            };
+            var items = await maybeQueryHandler.Value.Value.RunQuery(CurrentDatabase, _queryHistoryProvider, query);
 
-            _queryHistoryProvider.Upsert(queryHistory);
+            Items.AddRange(items);
 
             ActiveItem = Items.FirstOrDefault();
-
-            return Task.CompletedTask;
-        }
-
-        private static string RemoveQueryComments(string sql)
-        {
-            const string pattern = @"(?<=^ ([^'""] |['][^']*['] |[""][^""]*[""])*) (--.*$|/\*(.|\n)*?\*/)";
-            return Regex.Replace(sql, pattern, "", RegexOptions.IgnorePatternWhitespace | RegexOptions.Multiline);
         }
 
         public Task<Result> InsertQuery(RawQueryHistory item)
@@ -255,6 +230,11 @@ namespace LiteDbExplorer.Modules.DbQuery
                 if (database != null && database != CurrentDatabase)
                 {
                     CurrentDatabase = database;
+                }
+
+                if (!string.IsNullOrEmpty(item.QueryHandlerName))
+                {
+                    CurrentQueryHandlerName = item.QueryHandlerName;
                 }
 
                 _view?.InsetDocumentText(item.RawQuery);

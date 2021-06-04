@@ -21,8 +21,8 @@ namespace LiteDbExplorer.Wpf.Controls
         /// </summary> 
         public string Text
         {
-            get { return (string)GetValue(TextProperty); }
-            set { SetValue(TextProperty, value); }
+            get => (string)GetValue(TextProperty);
+            set => SetValue(TextProperty, value);
         }
 
 
@@ -39,8 +39,8 @@ namespace LiteDbExplorer.Wpf.Controls
         /// </summary> 
         public Brush HighlightBackground
         {
-            get { return (Brush)GetValue(HighlightBackgroundProperty); }
-            set { SetValue(HighlightBackgroundProperty, value); }
+            get => (Brush)GetValue(HighlightBackgroundProperty);
+            set => SetValue(HighlightBackgroundProperty, value);
         }
 
 
@@ -56,8 +56,8 @@ namespace LiteDbExplorer.Wpf.Controls
         /// </summary> 
         public Brush HighlightForeground
         {
-            get { return (Brush)GetValue(HighlightForegroundProperty); }
-            set { SetValue(HighlightForegroundProperty, value); }
+            get => (Brush)GetValue(HighlightForegroundProperty);
+            set => SetValue(HighlightForegroundProperty, value);
         }
 
 
@@ -73,8 +73,8 @@ namespace LiteDbExplorer.Wpf.Controls
         /// </summary> 
         public bool IsMatchCase
         {
-            get { return (bool)GetValue(IsMatchCaseProperty); }
-            set { SetValue(IsMatchCaseProperty, value); }
+            get => (bool)GetValue(IsMatchCaseProperty);
+            set => SetValue(IsMatchCaseProperty, value);
         }
 
         // Real implementation about IsMatchCaseProperty which  registers a dependency property with 
@@ -89,8 +89,8 @@ namespace LiteDbExplorer.Wpf.Controls
         /// </summary> 
         public bool IsHighlight
         {
-            get { return (bool)GetValue(IsHighlightProperty); }
-            set { SetValue(IsHighlightProperty, value); }
+            get => (bool)GetValue(IsHighlightProperty);
+            set => SetValue(IsHighlightProperty, value);
         }
 
         // Real implementation about IsHighlightProperty which  registers a dependency property with 
@@ -105,8 +105,8 @@ namespace LiteDbExplorer.Wpf.Controls
         /// </summary> 
         public string SearchText
         {
-            get { return (string)GetValue(SearchTextProperty); }
-            set { SetValue(SearchTextProperty, value); }
+            get => (string)GetValue(SearchTextProperty);
+            set => SetValue(SearchTextProperty, value);
         }
 
         /// <summary> 
@@ -127,7 +127,7 @@ namespace LiteDbExplorer.Wpf.Controls
         private static void UpdateControlCallBack(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             SearchableTextControl obj = d as SearchableTextControl;
-            obj.InvalidateVisual();
+            obj?.InvalidateVisual();
         }
         #endregion
 
@@ -139,32 +139,37 @@ namespace LiteDbExplorer.Wpf.Controls
         {
 
             // Define a TextBlock to hold the search result. 
-            TextBlock displayTextBlock = this.Template.FindName("PART_TEXT", this) as TextBlock;
+            var displayTextBlock = Template.FindName("PART_TEXT", this) as TextBlock;
 
-            if (string.IsNullOrEmpty(this.Text))
+            if (displayTextBlock == null)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(Text))
             {
                 base.OnRender(drawingContext);
 
                 return;
             }
-            if (!this.IsHighlight)
+            if (!IsHighlight)
             {
-                displayTextBlock.Text = this.Text;
+                displayTextBlock.Text = Text;
                 base.OnRender(drawingContext);
 
                 return;
             }
 
             displayTextBlock.Inlines.Clear();
-            string searchstring = this.IsMatchCase ? this.SearchText ?? String.Empty : (this.SearchText ?? String.Empty).ToUpper();
+            var searchString = IsMatchCase ? SearchText ?? string.Empty : (SearchText ?? string.Empty).ToUpper();
 
-            string compareText = this.IsMatchCase ? this.Text : this.Text.ToUpper();
-            string displayText = this.Text;
+            var compareText = IsMatchCase ? Text : Text.ToUpper();
+            var displayText = Text;
 
             Run run = null;
-            while (!string.IsNullOrEmpty(searchstring) && compareText.IndexOf(searchstring, StringComparison.Ordinal) >= 0)
+            while (!string.IsNullOrEmpty(searchString) && compareText.IndexOf(searchString, StringComparison.Ordinal) >= 0)
             {
-                int position = compareText.IndexOf(searchstring, StringComparison.Ordinal);
+                int position = compareText.IndexOf(searchString, StringComparison.Ordinal);
                 run = GenerateRun(displayText.Substring(0, position), false);
 
                 if (run != null)
@@ -172,15 +177,15 @@ namespace LiteDbExplorer.Wpf.Controls
                     displayTextBlock.Inlines.Add(run);
                 }
 
-                run = GenerateRun(displayText.Substring(position, searchstring.Length), true);
+                run = GenerateRun(displayText.Substring(position, searchString.Length), true);
 
                 if (run != null)
                 {
                     displayTextBlock.Inlines.Add(run);
                 }
 
-                compareText = compareText.Substring(position + searchstring.Length);
-                displayText = displayText.Substring(position + searchstring.Length);
+                compareText = compareText.Substring(position + searchString.Length);
+                displayText = displayText.Substring(position + searchString.Length);
             }
 
             run = GenerateRun(displayText, false);
@@ -204,10 +209,10 @@ namespace LiteDbExplorer.Wpf.Controls
         {
             if (!string.IsNullOrEmpty(searchedString))
             {
-                Run run = new Run(searchedString)
+                var run = new Run(searchedString)
                 {
-                    Background = isHighlight ? this.HighlightBackground : this.Background,
-                    Foreground = isHighlight ? this.HighlightForeground : this.Foreground,
+                    Background = isHighlight ? HighlightBackground : Background,
+                    Foreground = isHighlight ? HighlightForeground : Foreground,
 
                     // Set the source text with the style which is Italic. 
                     // FontStyle = isHighlight ? FontStyles.Italic : FontStyles.Normal,

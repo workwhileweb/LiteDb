@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <!--*-->
+    <id>ZoomAndPanControl</id>
+    <!--*-->
+    <version>1.0.0</version>
+    <title>ZoomAndPanControl</title>
+    <!--*-->
+    <authors>Clifford Nelson</authors>
+    <owners>Julian Paulozzi</owners>
+    <projectUrl>https://www.codeproject.com/Articles/1119476/An-Enhanced-WPF-Custom-Control-for-Zooming-and-Pan</projectUrl>
+    <licenseUrl>https://www.codeproject.com/info/cpol10.aspx</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--*-->
+    <description>An Enhanced WPF Custom Control for Zooming and Panning</description>
+    <!--*-->
+    <releaseNotes>None</releaseNotes>
+    <copyright>
+    </copyright>
+    <tags>
+    </tags>
+    <dependencies>
+      <!--
+      <dependency id="SampleDependency" version="1.0" />
+-->
+    </dependencies>
+  </metadata>
+</package>

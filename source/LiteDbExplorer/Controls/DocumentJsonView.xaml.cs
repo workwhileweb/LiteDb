@@ -6,16 +6,14 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Threading;
-using System.Xml;
 using ICSharpCode.AvalonEdit.Folding;
-using ICSharpCode.AvalonEdit.Highlighting;
-using ICSharpCode.AvalonEdit.Highlighting.Xshd;
 using ICSharpCode.AvalonEdit.Indentation;
 using ICSharpCode.AvalonEdit.Rendering;
 using LiteDbExplorer.Controls.Editor;
 using LiteDbExplorer.Controls.JsonViewer;
 using LiteDbExplorer.Core;
 using LiteDbExplorer.Presentation;
+using LiteDbExplorer.Wpf.Modules.AvalonEdit;
 
 namespace LiteDbExplorer.Controls
 {
@@ -97,25 +95,23 @@ namespace LiteDbExplorer.Controls
 
         private void SetTheme()
         {
-            // jsonEditor.SyntaxHighlighting = ICSharpCode.AvalonEdit.Highlighting.HighlightingManager.Instance.GetDefinition("JavaScript");
-            var resourceName = @"LiteDbExplorer.Controls.SyntaxDefinitions.Json.xshd";
+            string theme = null;
             if (App.Settings.ColorTheme == ColorTheme.Dark)
             {
+                theme = JsonHighlightingProvider.ThemeDark;
                 jsonEditor.TextArea.Foreground = new SolidColorBrush(Colors.White);
                 
-                // _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(129, 206, 145, 120));
-                _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(63, 144, 238, 144));
+                // _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(63, 144, 238, 144));
                 jsonEditor.TextArea.TextView.LinkTextForegroundBrush = new SolidColorBrush(Color.FromRgb(206, 145, 120));
-                resourceName = resourceName.Replace(@".xshd", @".dark.xshd");
             }
             else
             {
-                _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(153, 144, 238, 144));
+                // _searchReplacePanel.MarkerBrush = new SolidColorBrush(Color.FromArgb(153, 144, 238, 144));
                 jsonEditor.TextArea.TextView.LinkTextForegroundBrush = new SolidColorBrush(Color.FromRgb(26, 13, 171));
                 jsonEditor.TextArea.Foreground = new SolidColorBrush(Colors.Black);
             }
 
-            jsonEditor.SyntaxHighlighting = LoadHighlightingFromAssembly(resourceName);
+            jsonEditor.SyntaxHighlighting = LocalHighlightingManager.Current.LoadDefinitionFromName(JsonHighlightingProvider.Name, theme);
         }
 
         private void CanExecuteWithOpenSearchPanel(object sender, CanExecuteRoutedEventArgs e)
@@ -132,18 +128,6 @@ namespace LiteDbExplorer.Controls
             }
         }
 
-        private static IHighlightingDefinition LoadHighlightingFromAssembly(string name)
-        {
-            // https://edi.codeplex.com/SourceControl/latest#Edi/AvalonEdit/Highlighting/SQL.xshd
-            using (var s = typeof(DocumentJsonView).Assembly.GetManifestResourceStream(name))
-            {
-                using (var reader = new XmlTextReader(s))
-                {
-                    return HighlightingLoader.Load(reader, HighlightingManager.Instance);
-                }
-            }
-        }
-        
         private static void OnDocumentSourceChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (!(d is DocumentJsonView documentJsonView))

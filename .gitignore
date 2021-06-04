@@ -263,3 +263,6 @@ paket-files/
 build/nuget.exe
 build/LiteDBExplorerPortable.zip
 build/LiteDBExplorerInstaller.exe
+
+# Not exclude local packages
+!**/nupkgs/*

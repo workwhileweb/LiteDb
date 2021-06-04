@@ -28,11 +28,11 @@ namespace LiteDbExplorer.Modules.DbDocument
         public object AutoGenContext => this;
 
         [Category("Document Preview")]
-        [DisplayName("Split Orientation")]
+        [DisplayName("Split orientation")]
         public SplitOrientation DocumentPreview_SplitOrientation { get; set; }
 
         [Category("Document Preview")]
-        [DisplayName("Content Max Length")]
+        [DisplayName("Content maximum length")]
         [Spinnable(1, 1, 64, 4069), Width(80)]
         public int DocumentPreview_ContentMaxLength { get; set; }
 

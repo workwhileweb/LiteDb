@@ -39,6 +39,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -58,7 +59,9 @@
     <Compile Include="Behaviors\ButtonClickOpenMenuBehavior.cs" />
     <Compile Include="Behaviors\DeferredContent.cs" />
     <Compile Include="Behaviors\DropBehavior.cs" />
+    <Compile Include="Behaviors\EnumCollectionExtension.cs" />
     <Compile Include="Behaviors\FocusActiveGroup.cs" />
+    <Compile Include="Behaviors\TextBlockSetHighlight.cs" />
     <Compile Include="Behaviors\KeepSelectedItem.cs" />
     <Compile Include="Behaviors\KeyGestureExtension.cs" />
     <Compile Include="Behaviors\MouseDoubleClick.cs" />
@@ -91,7 +94,7 @@
     <Compile Include="Extensions\TreeViewExtensions.cs" />
     <Compile Include="Extensions\VisualTreeExtensions.cs" />
     <Compile Include="Framework\AppWindowManager.cs" />
-    <Compile Include="Framework\AsyncCommand.cs" />
+    <Compile Include="Framework\Commands\AsyncCommand.cs" />
     <Compile Include="Framework\Commands\CommandToCommandBindings.cs" />
     <Compile Include="Framework\DataContextProxy.cs" />
     <Compile Include="Framework\FileAssociation\ApplicationInfo.cs" />
@@ -107,7 +110,7 @@
     <Compile Include="Framework\Shell\IDocument.cs" />
     <Compile Include="Framework\Shell\IToolPanel.cs" />
     <Compile Include="Framework\LayoutItemBase.cs" />
-    <Compile Include="Framework\RelayCommand.cs" />
+    <Compile Include="Framework\Commands\RelayCommand.cs" />
     <Compile Include="Framework\Services\ApplicationCommandHandler.cs" />
     <Compile Include="Framework\Services\IApplicationCommandHandler.cs" />
     <Compile Include="Framework\Services\IFileDropProvider.cs" />
@@ -122,7 +125,8 @@
     <Compile Include="Framework\Shell\IStatusBarContent.cs" />
     <Compile Include="Framework\Shell\StatusBarContentLocation.cs" />
     <Compile Include="Framework\Shell\ToolPanel.cs" />
-    <Compile Include="Framework\TaskUtilities.cs" />
+    <Compile Include="Framework\Commands\TaskUtilities.cs" />
+    <Compile Include="Framework\Win32\IconManager.cs" />
     <Compile Include="Framework\Win32\NativeMethods.cs" />
     <Compile Include="Framework\WindowBase.cs" />
     <Compile Include="Framework\Windows\BaseDialogWindow.xaml.cs">
@@ -136,8 +140,15 @@
     <Compile Include="Framework\Windows\WindowPosition.cs" />
     <Compile Include="Framework\Windows\WindowStateHandler.cs" />
     <Compile Include="LocalPaletteHelper.cs" />
+    <Compile Include="Modules\AvalonEdit\ExportHighlightingDefinitionAttribute.cs" />
+    <Compile Include="Modules\AvalonEdit\Highlighting\JsonHighlightingProvider.cs" />
+    <Compile Include="Modules\AvalonEdit\IHighlightingProvider.cs" />
+    <Compile Include="Modules\AvalonEdit\IHighlightingProviderMetadata.cs" />
+    <Compile Include="Modules\AvalonEdit\ISyntaxHighlightingServices.cs" />
+    <Compile Include="Modules\AvalonEdit\Highlighting\LogHighlightingProvider.cs" />
+    <Compile Include="Modules\AvalonEdit\LocalHighlightingManager.cs" />
     <Compile Include="Modules\Exception\ExceptionScreenViewModel.cs" />
-    <Compile Include="Modules\AvalonEdit\HighlightingProvider.cs" />
+    <Compile Include="Modules\AvalonEdit\HighlightingHelper.cs" />
     <Compile Include="Modules\Output\IOutput.cs" />
     <Compile Include="Modules\Output\IOutputLogFilter.cs" />
     <Compile Include="Modules\Output\OutputLoggerExtensions.cs" />
@@ -174,6 +185,8 @@
     </EmbeddedResource>
     <None Include="app.config" />
     <EmbeddedResource Include="Modules\AvalonEdit\Highlighting\Log.xshd" />
+    <EmbeddedResource Include="Modules\AvalonEdit\Highlighting\Json.dark.xshd" />
+    <EmbeddedResource Include="Modules\AvalonEdit\Highlighting\Json.xshd" />
     <None Include="Properties\Settings.settings">
       <Generator>PublicSettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -227,6 +240,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Themes\MaterialDesignTheme.AppButtons.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\MaterialDesignTheme.AppToolBar.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -239,7 +256,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Themes\MaterialDesignTheme.TreeViewFullRow.xaml">
+    <Page Include="Themes\MaterialDesignTheme.TreeView.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -254,7 +271,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="AvalonEdit">
-      <Version>6.0.0</Version>
+      <Version>6.0.1</Version>
     </PackageReference>
     <PackageReference Include="Caliburn.Micro">
       <Version>3.2.0</Version>
@@ -263,13 +280,13 @@
       <Version>3.0.2.4</Version>
     </PackageReference>
     <PackageReference Include="CSharpFunctionalExtensions">
-      <Version>2.1.0</Version>
+      <Version>2.4.1</Version>
     </PackageReference>
     <PackageReference Include="Extended.Wpf.Toolkit">
-      <Version>3.5.0</Version>
+      <Version>3.8.1</Version>
     </PackageReference>
     <PackageReference Include="Fody">
-      <Version>6.0.0</Version>
+      <Version>6.1.1</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
@@ -280,10 +297,10 @@
       <Version>1.6.5</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignColors">
-      <Version>1.2.0</Version>
+      <Version>1.2.2</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignExtensions">
-      <Version>2.7.0</Version>
+      <Version>2.8.0</Version>
     </PackageReference>
     <PackageReference Include="MaterialDesignThemes">
       <Version>2.6.0</Version>
@@ -292,22 +309,22 @@
       <Version>0.1.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Win32.Registry">
-      <Version>4.6.0</Version>
+      <Version>4.7.0</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>12.0.2</Version>
+      <Version>12.0.3</Version>
     </PackageReference>
     <PackageReference Include="PropertyChanged.Fody">
-      <Version>3.1.3</Version>
+      <Version>3.2.6</Version>
     </PackageReference>
     <PackageReference Include="PropertyTools.Wpf">
       <Version>3.0.0</Version>
     </PackageReference>
     <PackageReference Include="Serilog">
-      <Version>2.8.0</Version>
+      <Version>2.9.0</Version>
     </PackageReference>
     <PackageReference Include="System.Reactive">
-      <Version>4.1.6</Version>
+      <Version>4.3.2</Version>
     </PackageReference>
     <PackageReference Include="System.ValueTuple">
       <Version>4.5.0</Version>

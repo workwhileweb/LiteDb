@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <!--*-->
+    <id>MaterialDesignThemes.Extended.Wpf.Toolkit</id>
+    <!--*-->
+    <version>1.0.0</version>
+    <title>MaterialDesignThemes.Extended.Wpf.Toolkit</title>
+    <!--*-->
+    <authors>Julian Paulozzi</authors>
+    <owners>Julian Paulozzi</owners>
+    <!--
+    <licenseUrl></licenseUrl>
+    <projectUrl></projectUrl>
+    <iconUrl></iconUrl>
+-->
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <!--*-->
+    <description>None</description>
+    <!--*-->
+    <releaseNotes>None</releaseNotes>
+    <copyright>Copyright ©  2019</copyright>
+    <tags>
+    </tags>
+    <dependencies>
+      <dependency id="Extended.Wpf.Toolkit" version="3.8.1" />
+      <dependency id="MaterialDesignColors" version="1.2.2" />
+      <dependency id="MaterialDesignThemes" version="2.6.0" />
+    </dependencies>
+  </metadata>
+</package>

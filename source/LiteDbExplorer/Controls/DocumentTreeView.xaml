@@ -55,12 +55,6 @@
 
     <UserControl.ContextMenu>
         <ContextMenu>
-            <!--<MenuItem Command="Copy" CommandTarget="{Binding}">
-                        <MenuItem.Icon>
-                            <materialDesign:PackIcon Kind="ContentCopy" />
-                        </MenuItem.Icon>
-                    </MenuItem>
-                    <Separator />-->
             <MenuItem Command="local:DocumentTreeView.ExpandToLevel" 
                       Header="Expand 1 Level"
                       CommandTarget="{Binding Path=PlacementTarget,RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}}"/>
@@ -77,6 +71,7 @@
                   VirtualizingStackPanel.IsVirtualizing="True"
                   VirtualizingStackPanel.VirtualizationMode="Standard"
                   ScrollViewer.IsDeferredScrollingEnabled="{Binding Source={x:Static properties:Settings.Default},Path=DeferredScrolling}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  materialDesign:TransitionAssist.DisableTransitions="True"/>
     </Grid>
 </UserControl>

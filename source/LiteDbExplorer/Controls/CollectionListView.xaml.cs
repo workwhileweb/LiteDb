@@ -4,22 +4,25 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Threading;
+using JetBrains.Annotations;
 using LiteDbExplorer.Presentation.Converters;
-using LiteDB;
 using LiteDbExplorer.Core;
+using Action = System.Action;
+using DocumentReference = LiteDbExplorer.Core.DocumentReference;
 
 namespace LiteDbExplorer.Controls
 {
     /// <summary>
     ///     Interaction logic for CollectionListView.xaml
     /// </summary>
-    public partial class CollectionListView : UserControl
+    public partial class CollectionListView : UserControl, INotifyPropertyChanged
     {
         private readonly BsonValueToStringConverter _bsonValueToStringConverter;
 
@@ -63,12 +66,13 @@ namespace LiteDbExplorer.Controls
         private ListSortDirection _lastDirection;
         private bool _stopDoubleClick;
         private bool _listLoaded;
+        private string _highlightText;
 
         public CollectionListView()
         {
             InitializeComponent();
 
-            _bsonValueToStringConverter = new BsonValueToStringConverter { MaxLength = ContentMaxLength };
+            _bsonValueToStringConverter = new BsonValueToStringConverter { MaxLength = ContentMaxLength, CultureFormat = UserDefinedCultureFormat.Default };
 
             ListCollectionData.MouseDoubleClick += ListCollectionDataOnMouseDoubleClick;
             ListCollectionData.SelectionChanged += OnListViewSelectionChanged;
@@ -121,6 +125,16 @@ namespace LiteDbExplorer.Controls
             set => ListCollectionData.ContextMenu = value;
         }
 
+        public string HighlightText
+        {
+            get => _highlightText;
+            private set
+            {
+                _highlightText = value;
+                OnPropertyChanged();
+            }
+        }
+
         private IEnumerable<DocumentReference> DbSelectedItems
         {
             get
@@ -146,6 +160,10 @@ namespace LiteDbExplorer.Controls
                 return 0;
             }
         }
+
+        private DataTemplate HeaderTemplateArrowUp => Resources["HeaderTemplateArrowUp"] as DataTemplate;
+        private DataTemplate HeaderTemplateArrowDown => Resources["HeaderTemplateArrowDown"] as DataTemplate;
+        private DataTemplate HeaderTemplate => Resources["HeaderTemplate"] as DataTemplate;
 
         private void ListCollectionDataOnLoaded(object sender, RoutedEventArgs e)
         {
@@ -192,6 +210,18 @@ namespace LiteDbExplorer.Controls
         public void ScrollIntoSelectedItem()
         {
             ListCollectionData.ScrollIntoView(ListCollectionData.SelectedItem);
+        }
+
+        public void FocusSelectedItem()
+        {
+            if (ListCollectionData.SelectedItem != null)
+            {
+                if (ListCollectionData.ItemContainerGenerator.ContainerFromItem(ListCollectionData.SelectedItem) is ListViewItem container)
+                {
+                    container.IsSelected = true;
+                    container.Focus();
+                }
+            }
         }
         
         public void UpdateGridColumns()
@@ -243,6 +273,8 @@ namespace LiteDbExplorer.Controls
 
         public void Find(string text, bool matchCase)
         {
+            HighlightText = text;
+
             if (string.IsNullOrEmpty(text) || CollectionReference == null)
             {
                 return;
@@ -263,10 +295,13 @@ namespace LiteDbExplorer.Controls
                     return;
                 }
             }
+            
         }
 
         public void FindPrevious(string text, bool matchCase)
         {
+            HighlightText = text;
+
             if (string.IsNullOrEmpty(text) || CollectionReference == null)
             {
                 return;
@@ -289,18 +324,21 @@ namespace LiteDbExplorer.Controls
             }
         }
 
+        public void FindClear()
+        {
+            HighlightText = null;
+        }
+
         private bool ItemMatchesSearch(string matchTerm, DocumentReference document, bool matchCase)
         {
-            var stringData = JsonSerializer.Serialize(document.LiteDocument);
+            var stringData = document.Serialize(false, false);
 
             if (matchCase)
             {
                 return stringData.IndexOf(matchTerm, 0, StringComparison.InvariantCulture) != -1;
             }
-            else
-            {
-                return stringData.IndexOf(matchTerm, 0, StringComparison.InvariantCultureIgnoreCase) != -1;
-            }
+
+            return stringData.IndexOf(matchTerm, 0, StringComparison.InvariantCultureIgnoreCase) != -1;
         }
 
         private void ListCollectionDataOnMouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -359,24 +397,8 @@ namespace LiteDbExplorer.Controls
 
         private void AddGridColumn(string key)
         {
-            var column = new GridViewColumn
-            {
-                Header = new GridViewColumnHeader
-                {
-                    Content = key,
-                    Tag = key,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Stretch
-                },
-                DisplayMemberBinding = new Binding
-                {
-                    Path = new PropertyPath($"LiteDocument[{key}]"),
-                    Mode = BindingMode.OneWay,
-                    Converter = _bsonValueToStringConverter
-                },
-                HeaderTemplate = Resources["HeaderTemplate"] as DataTemplate
-            };
-            
+            var column = CreateGridViewColumn(key);
+
             GridCollectionData.Columns.Add(column);
 
             if (_listLoaded)
@@ -388,6 +410,59 @@ namespace LiteDbExplorer.Controls
 
                 }));
             }
+        }
+
+        private GridViewColumn CreateGridViewColumn(string key)
+        {
+            return new GridViewColumn
+            {
+                Header = new GridViewColumnHeader
+                {
+                    Content = key,
+                    Tag = key,
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                    ToolTip = key
+                },
+                HeaderTemplate = HeaderTemplate,
+                CellTemplate = CreateCellDataTemplate(key),
+                /*DisplayMemberBinding = new Binding
+                {
+                    Path = new PropertyPath($"LiteDocument[{key}]"),
+                    Mode = BindingMode.OneWay,
+                    Converter = _bsonValueToStringConverter
+                },*/
+            };
+        }
+
+        private DataTemplate CreateCellDataTemplate(string key)
+        {
+            var template = new DataTemplate();
+            var factory = new FrameworkElementFactory(typeof(TextBlock));
+            factory.SetBinding(TextBlock.TextProperty, new Binding
+            {
+                Path = new PropertyPath($"LiteDocument[{key}]"),
+                Mode = BindingMode.OneWay,
+                Converter = _bsonValueToStringConverter
+            });
+            
+            factory.SetBinding(Wpf.Behaviors.TextBlockSetHighlight.HightlightTextProperty, new Binding
+            {
+                Path = new PropertyPath(nameof(HighlightText)),
+                Mode = BindingMode.OneWay,
+                Source = this
+            });
+
+            /*factory.SetBinding(TextBlock.ForegroundProperty, new Binding
+            {
+                Path = new PropertyPath($"LiteDocument[{key}]"),
+                Mode = BindingMode.OneWay,
+                Converter = BsonValueToForegroundConverter.Instance
+            });*/
+
+            template.VisualTree = factory;
+
+            return template;
         }
         
         private void RemoveGridColumn(string key)
@@ -430,21 +505,12 @@ namespace LiteDbExplorer.Controls
 
                     Sort(sortBy, direction);
 
-                    if (direction == ListSortDirection.Ascending)
-                    {
-                        headerClicked.Column.HeaderTemplate =
-                            Resources["HeaderTemplateArrowUp"] as DataTemplate;
-                    }
-                    else
-                    {
-                        headerClicked.Column.HeaderTemplate =
-                            Resources["HeaderTemplateArrowDown"] as DataTemplate;
-                    }
+                    headerClicked.Column.HeaderTemplate = direction == ListSortDirection.Ascending ? HeaderTemplateArrowUp : HeaderTemplateArrowDown;
 
                     // Remove arrow from previously sorted header  
                     if (_lastHeaderClicked != null && _lastHeaderClicked != headerClicked)
                     {
-                        _lastHeaderClicked.Column.HeaderTemplate = Resources["HeaderTemplate"] as DataTemplate;
+                        _lastHeaderClicked.Column.HeaderTemplate = HeaderTemplate;
                     }
 
                     _lastHeaderClicked = headerClicked;
@@ -460,6 +526,14 @@ namespace LiteDbExplorer.Controls
         {  
             var dataView =  (ListCollectionView)CollectionViewSource.GetDefaultView(ListCollectionData.ItemsSource);
             dataView.CustomSort = new SortBsonValue(sortBy, direction == ListSortDirection.Descending);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

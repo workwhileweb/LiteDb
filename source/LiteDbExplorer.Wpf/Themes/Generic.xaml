@@ -30,7 +30,6 @@
     <SolidColorBrush x:Key="MahApps.Metro.Brushes.ToggleSwitchButton.ThumbIndicatorCheckedBrush.Win10"
                      Color="{DynamicResource Primary500Foreground}" />
 
-
     <Style TargetType="controls:ExceptionViewer">
         <Setter Property="ControlsBorderBrush" Value="{DynamicResource MaterialDesignDivider}" />
     </Style>

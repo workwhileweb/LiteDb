@@ -30,12 +30,12 @@ namespace LiteDbExplorer.Modules.Database
         public DatabasesExplorerViewModel(
             IDatabaseInteractions databaseInteractions,
             IApplicationInteraction applicationInteraction, 
-            IRecentFilesProvider recentFilesProvider)
+            IRecentDatabaseFilesProvider recentDatabaseFilesProvider)
         {
             _databaseInteractions = databaseInteractions;
             _applicationInteraction = applicationInteraction;
 
-            PathDefinitions = recentFilesProvider;
+            PathDefinitions = recentDatabaseFilesProvider;
 
             CloseDatabaseCommand = new AsyncCommand<DatabaseReference>(CloseDatabase, CanCloseDatabase, this);
             EditDbPropertiesCommand = new AsyncCommand<DatabaseReference>(EditDbProperties, CanEditDbProperties, this);
@@ -51,14 +51,14 @@ namespace LiteDbExplorer.Modules.Database
             
             ImportDataCommand = new RelayCommand(_ => ImportData(), _ => CanImportData());
 
-            OpenRecentItemCommand = new AsyncCommand<RecentFileInfo>(OpenRecentItem);
+            OpenRecentItemCommand = new AsyncCommand<RecentDatabaseFileInfo>(OpenRecentItem);
 
             NodeDefaulActionCommand = new AsyncCommand<object>(NodeDefaultAction);
 
             Store.Current.Databases.CollectionChanged += OnDatabasesCollectionChanged;
         }
 
-        public IRecentFilesProvider PathDefinitions { get; }
+        public IRecentDatabaseFilesProvider PathDefinitions { get; }
 
         public ICommand CloseDatabaseCommand { get; }
 
@@ -92,6 +92,9 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public bool HasAnyDatabaseOpen => Store.Current.Databases.Any();
 
+        [UsedImplicitly]
+        public bool IsEmpty => Databases == null || !Databases.Any();
+
         public DatabaseReference SelectedDatabase { get; private set; }
 
         public CollectionReference SelectedCollection { get; private set; }
@@ -103,7 +106,10 @@ namespace LiteDbExplorer.Modules.Database
 
         private void OnDatabasesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            Commands.ShowNavigationPanel.ExecuteOnMain(true);
+            Commands.ShowNavigationPanel.ExecuteOnMainWindow(true);
+
+            NotifyOfPropertyChange(nameof(IsEmpty));
+            NotifyOfPropertyChange(nameof(HasAnyDatabaseOpen));
 
             if (e.Action == NotifyCollectionChangedAction.Add)
             {
@@ -119,7 +125,7 @@ namespace LiteDbExplorer.Modules.Database
         }
 
         [UsedImplicitly]
-        public async Task OpenRecentItem(RecentFileInfo info)
+        public async Task OpenRecentItem(RecentDatabaseFileInfo info)
         {
             if (info == null)
             {
@@ -279,7 +285,7 @@ namespace LiteDbExplorer.Modules.Database
         [UsedImplicitly]
         public async Task AddFile(DatabaseReference databaseReference)
         {
-            await _databaseInteractions.AddFileToDatabase(databaseReference)
+            await _databaseInteractions.AddFileToDatabase(this, databaseReference)
                 .Tap(async reference =>
                 {
                     await _applicationInteraction.ActivateDefaultCollectionView(reference.CollectionReference, reference.Items);

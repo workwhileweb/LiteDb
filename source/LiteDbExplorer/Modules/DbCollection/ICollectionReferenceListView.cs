@@ -12,5 +12,7 @@ namespace LiteDbExplorer.Modules.DbCollection
         void FindPrevious(string text, bool matchCase);
         void FocusListView();
         Action CollectionLoadedAction { get; set; }
+        void SelectItem(object item);
+        void FindClear();
     }
 }

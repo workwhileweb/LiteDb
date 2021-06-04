@@ -1,7 +1,12 @@
-﻿using System.ComponentModel.Composition;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel.Composition;
 using System.Diagnostics;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
+using DynamicData;
+using DynamicData.Binding;
 using JetBrains.Annotations;
 using LiteDbExplorer.Presentation;
 using LiteDbExplorer.Wpf.Framework.Shell;
@@ -17,33 +22,52 @@ namespace LiteDbExplorer.Modules.StartPage
         private readonly IApplicationInteraction _applicationInteraction;
         private bool _showStartPageOnOpen;
 
+        private readonly IDisposable _cleanUp;
+        private readonly ReadOnlyObservableCollection<RecentDatabaseFileInfo> _recentFilesFiltered;
+
         [ImportingConstructor]
         public StartPageViewModel(
             IDatabaseInteractions databaseInteractions, 
             IApplicationInteraction applicationInteraction,
-            IRecentFilesProvider recentFilesProvider)
+            IRecentDatabaseFilesProvider recentDatabaseFilesProvider)
         {
             _databaseInteractions = databaseInteractions;
             _applicationInteraction = applicationInteraction;
 
-            PathDefinitions = recentFilesProvider;
+            PathDefinitions = recentDatabaseFilesProvider;
 
             ShowStartPageOnOpen = Properties.Settings.Default.ShowStartPageOnOpen;
             
-            PathDefinitions.RecentFiles.CollectionChanged += (sender, args) =>
-            {
-                NotifyOfPropertyChange(nameof(RecentFilesIsEmpty));
-            };
+            var recentFilesTermFilter = this.WhenValueChanged(vm => vm.SearchTerm)
+                .Throttle(TimeSpan.FromMilliseconds(150))
+                .Select(CreatePredicate);
+
+            _cleanUp = PathDefinitions.RecentFiles
+                .ToObservableChangeSet()
+                .Filter(recentFilesTermFilter)
+                .Sort(
+                    SortExpressionComparer<RecentDatabaseFileInfo>
+                        .Descending(p => p.FixedAt.HasValue)
+                        .ThenByDescending(p => p.FixedAt ?? p.LastOpenedAt)
+                )
+                .ObserveOnDispatcher()
+                .Bind(out _recentFilesFiltered)
+                .Do(p =>
+                {
+                    NotifyOfPropertyChange(nameof(RecentFilesListIsEmpty));
+                    NotifyOfPropertyChange(nameof(RecentFilesListEmptyMessage));
+                })
+                .Subscribe();
         }
         
         public override string DisplayName => "Start";
 
         public override string InstanceId => "StartPage";
 
-        public override object IconContent => IconProvider.GetResourceDrawingImageIcon("AppIconImage", new ImageIconOptions{Height = 16});
+        public override object IconContent => IconProvider.GetResourceDrawingImageIcon(@"AppIconImage", new ImageIconOptions{Height = 16});
 
-        public IRecentFilesProvider PathDefinitions { get; }
-        
+        public IRecentDatabaseFilesProvider PathDefinitions { get; }
+
         public bool ShowStartPageOnOpen
         {
             get => _showStartPageOnOpen;
@@ -58,14 +82,52 @@ namespace LiteDbExplorer.Modules.StartPage
         }
 
         [UsedImplicitly]
-        public bool RecentFilesIsEmpty => !PathDefinitions.RecentFiles.Any();
+        public bool RecentFilesListIsEmpty => !_recentFilesFiltered.Any();
+
+        [UsedImplicitly]
+        public string RecentFilesListEmptyMessage
+        {
+            get
+            {
+                if (!RecentFilesListIsEmpty)
+                {
+                    return null;
+                }
+
+                return !string.IsNullOrWhiteSpace(SearchTerm)
+                    ? $"No results found for '{SearchTerm}'"
+                    : "No recent items in the list";
+            }
+        }
+
+        public string SearchTerm { get; set; }
+
+        [UsedImplicitly]
+        public ReadOnlyObservableCollection<RecentDatabaseFileInfo> RecentFilesFiltered => _recentFilesFiltered;
+
+        private Func<RecentDatabaseFileInfo, bool> CreatePredicate(string term)
+        {
+            if (string.IsNullOrWhiteSpace(term))
+            {
+                return info => true;
+            }
+
+            var lowerTerm = term.ToLower();
+            return info => info.FileName.ToLower().Contains(lowerTerm) || info.DirectoryPath.ToLower().Contains(lowerTerm);
+        }
 
         public void SaveSettings()
         {
             Properties.Settings.Default.ShowStartPageOnOpen = ShowStartPageOnOpen;
             Properties.Settings.Default.Save();
         }
-        
+
+        [UsedImplicitly]
+        public void ClearSearch()
+        {
+            SearchTerm = null;
+        }
+
         [UsedImplicitly]
         public async Task OpenDatabase()
         {
@@ -73,24 +135,24 @@ namespace LiteDbExplorer.Modules.StartPage
         }
 
         [UsedImplicitly]
-        public async Task OpenRecentItem(RecentFileInfo recentFileInfo)
+        public async Task OpenRecentItem(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            if (recentFileInfo == null)
+            if (recentDatabaseFileInfo == null)
             {
                 return;
             }
 
-            if (recentFileInfo.FileNotFound.HasValue && recentFileInfo.FileNotFound == true)
+            if (recentDatabaseFileInfo.FileNotFound.HasValue && recentDatabaseFileInfo.FileNotFound == true)
             {
-                var message = $"File {recentFileInfo.FullPath} not found.\n\nRemove from list?";
+                var message = $"File {recentDatabaseFileInfo.FullPath} not found.\n\nRemove from list?";
                 if (_applicationInteraction.ShowConfirm(message, "File not found!"))
                 {
-                    RemoveFromList(recentFileInfo);
+                    RemoveFromList(recentDatabaseFileInfo);
                 }
                 return;
             }
 
-            await _databaseInteractions.OpenDatabase(recentFileInfo.FullPath);
+            await _databaseInteractions.OpenDatabase(recentDatabaseFileInfo.FullPath);
         }
         
         [UsedImplicitly]
@@ -112,60 +174,63 @@ namespace LiteDbExplorer.Modules.StartPage
         }
 
         [UsedImplicitly]
-        public void RevealInExplorer(RecentFileInfo recentFileInfo)
+        public void RevealInExplorer(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            if (recentFileInfo != null)
+            if (recentDatabaseFileInfo != null)
             {
-                _applicationInteraction.RevealInExplorer(recentFileInfo.FullPath);
+                _applicationInteraction.RevealInExplorer(recentDatabaseFileInfo.FullPath);
             }
         }
 
         [UsedImplicitly]
-        public void CopyPath(RecentFileInfo recentFileInfo)
+        public void CopyPath(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            if (recentFileInfo != null)
+            if (recentDatabaseFileInfo != null)
             {
-                _applicationInteraction.PutClipboardText(recentFileInfo.FullPath);
+                _applicationInteraction.PutClipboardText(recentDatabaseFileInfo.FullPath);
             }
         }
 
         [UsedImplicitly]
-        public void RemoveFromList(RecentFileInfo recentFileInfo)
+        public void RemoveFromList(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            if (recentFileInfo != null)
+            if (recentDatabaseFileInfo != null)
             {
-                PathDefinitions.RemoveRecentFile(recentFileInfo.FullPath);
+                PathDefinitions.RemoveRecentFile(recentDatabaseFileInfo.FullPath);
             }
         }
 
         [UsedImplicitly]
-        public void PinItem(RecentFileInfo recentFileInfo)
+        public void PinItem(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            if (recentFileInfo != null)
+            if (recentDatabaseFileInfo != null)
             {
-                PathDefinitions.SetRecentFileFixed(recentFileInfo.FullPath, true);
+                PathDefinitions.SetRecentFileFixed(recentDatabaseFileInfo.FullPath, true);
             }
         }
 
         [UsedImplicitly]
-        public bool CanPinItem(RecentFileInfo recentFileInfo)
+        public bool CanPinItem(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            return recentFileInfo != null && !recentFileInfo.IsFixed;
+            return recentDatabaseFileInfo != null && !recentDatabaseFileInfo.IsFixed;
         }
 
         [UsedImplicitly]
-        public void UnPinItem(RecentFileInfo recentFileInfo)
+        public void UnPinItem(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            if (recentFileInfo != null)
+            if (recentDatabaseFileInfo != null)
             {
-                PathDefinitions.SetRecentFileFixed(recentFileInfo.FullPath, false);
+                PathDefinitions.SetRecentFileFixed(recentDatabaseFileInfo.FullPath, false);
             }
         }
 
         [UsedImplicitly]
-        public bool CanUnPinItem(RecentFileInfo recentFileInfo)
+        public bool CanUnPinItem(RecentDatabaseFileInfo recentDatabaseFileInfo)
         {
-            return recentFileInfo != null && recentFileInfo.IsFixed;
+            return recentDatabaseFileInfo != null && recentDatabaseFileInfo.IsFixed;
         }
     }
+
+    
+
 }

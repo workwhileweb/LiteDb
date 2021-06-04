@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -6,6 +7,8 @@ using System.Windows.Data;
 using LiteDbExplorer.Presentation.Converters;
 using LiteDbExplorer.Windows;
 using LiteDB;
+using LiteDbExplorer.Core;
+using Serilog;
 using Xceed.Wpf.Toolkit;
 
 namespace LiteDbExplorer.Controls
@@ -16,49 +19,96 @@ namespace LiteDbExplorer.Controls
         Window
     }
 
+    public class BsonValueEditorContext
+    {
+        public BsonValueEditorContext(OpenEditorMode openMode, string bindingPath, BsonValue bindingValue, object bindingSource, bool readOnly, string keyName)
+        {
+            OpenMode = openMode;
+            BindingPath = bindingPath;
+            BindingValue = bindingValue;
+            BindingSource = bindingSource;
+            ReadOnly = readOnly;
+            KeyName = keyName;
+        }
+
+        public OpenEditorMode OpenMode { get; private set; }
+        public string BindingPath { get; private set; }
+        public BsonValue BindingValue { get; private set; }
+        public object BindingSource { get; private set; }
+        public bool ReadOnly { get; private set; }
+        public string KeyName { get; private set; }
+
+        public Action ChangedCallback { get; set; }
+
+        public void SetChanged(object sender)
+        {
+            ChangedCallback?.Invoke();
+        }
+    }
+
     public class BsonValueEditor
     {
-        // TODO: Infer Null value type to handle
+        private static readonly ILogger Logger = Log.ForContext<BsonValueEditor>();
 
-        public static FrameworkElement GetBsonValueEditor(
-            OpenEditorMode openMode,
-            string bindingPath,
-            BsonValue bindingValue,
-            object bindingSource,
-            bool readOnly,
-            string keyName)
+        private static double DefaultWindowHeight =>
+            Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight);
+
+        public static FrameworkElement GetBsonValueEditor(BsonValueEditorContext editorContext, ICultureFormat cultureFormat)
         {
             var binding = new Binding
             {
-                Path = new PropertyPath(bindingPath),
-                Source = bindingSource,
+                Path = new PropertyPath(editorContext.BindingPath),
+                Source = editorContext.BindingSource,
                 Mode = BindingMode.TwoWay,
                 Converter = new BsonValueToNetValueConverter(),
-                UpdateSourceTrigger = UpdateSourceTrigger.Explicit
+                UpdateSourceTrigger = UpdateSourceTrigger.Explicit,
             };
 
-            if (bindingValue.IsArray)
+            void AddValueChangedListener(FrameworkElement associatedObject, DependencyProperty dependencyProperty)
             {
-                var arrayValue = bindingValue as BsonArray;
+                if (associatedObject == null || dependencyProperty == null)
+                {
+                    return;
+                }
 
-                if (openMode == OpenEditorMode.Window)
+                var descriptor =
+                    DependencyPropertyDescriptor.FromProperty(dependencyProperty, associatedObject.GetType());
+                descriptor?.AddValueChanged(associatedObject, (sender, args) =>
+                {
+                    if (sender is FrameworkElement frameworkElement && !frameworkElement.IsLoaded)
+                    {
+                        return;
+                    }
+
+                    // Logger.Debug("BsonValue changed: {senderType}, {propertyName}", sender.GetType(), dependencyProperty.Name);
+
+                    editorContext.SetChanged(sender);
+                });
+            }
+
+            if (editorContext.BindingValue.IsArray)
+            {
+                var arrayValue = editorContext.BindingValue as BsonArray;
+
+                if (editorContext.OpenMode == OpenEditorMode.Window)
                 {
                     var button = new Button
                     {
-                        Content = $"[Array] {arrayValue?.Count} {keyName}",
-                        Style = StyleKit.MaterialDesignEntryButtonStyle
+                        Content = $"[Array] {arrayValue?.Count} {editorContext.KeyName}",
+                        Style = StyleKit.MaterialDesignEntryButtonStyle,
+                        Height = 25
                     };
 
                     button.Click += (s, a) =>
                     {
-                        arrayValue = bindingValue as BsonArray;
+                        arrayValue = editorContext.BindingValue as BsonArray;
 
                         var windowController = new WindowController {Title = "Array Editor"};
-                        var control = new ArrayEntryControl(arrayValue, readOnly, windowController);
+                        var control = new ArrayEntryControl(arrayValue, editorContext.ReadOnly, windowController);
                         var window = new DialogWindow(control, windowController)
                         {
                             Owner = Application.Current.MainWindow,
-                            Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight),
+                            Height = DefaultWindowHeight,
                             MinWidth = 400,
                             MinHeight = 400,
                         };
@@ -67,8 +117,8 @@ namespace LiteDbExplorer.Controls
                         {
                             arrayValue?.Clear();
                             arrayValue?.AddRange(control.EditedItems);
-                            
-                            button.Content = $"[Array] {arrayValue?.Count} {keyName}";
+                            button.Content = $"[Array] {arrayValue?.Count} {editorContext.KeyName}";
+                            editorContext.SetChanged(control);
                         }
                     };
 
@@ -79,7 +129,7 @@ namespace LiteDbExplorer.Controls
                 {
                     LoadButton =
                     {
-                        Content = $"[Array] {arrayValue?.Count} {keyName}"
+                        Content = $"[Array] {arrayValue?.Count} {editorContext.KeyName}"
                     }
                 };
 
@@ -87,8 +137,8 @@ namespace LiteDbExplorer.Controls
                 {
                     if (contentView.ContentLoaded) return;
 
-                    arrayValue = bindingValue as BsonArray;
-                    var control = new ArrayEntryControl(arrayValue, readOnly);
+                    arrayValue = editorContext.BindingValue as BsonArray;
+                    var control = new ArrayEntryControl(arrayValue, editorContext.ReadOnly);
                     control.CloseRequested += (sender, args) => { contentView.Content = null; };
                     contentView.Content = control;
                 };
@@ -96,31 +146,38 @@ namespace LiteDbExplorer.Controls
                 return contentView;
             }
 
-            if (bindingValue.IsDocument)
+            if (editorContext.BindingValue.IsDocument)
             {
                 var expandLabel = "[Document]";
-                if (openMode == OpenEditorMode.Window)
+                if (editorContext.OpenMode == OpenEditorMode.Window)
                 {
                     var button = new Button
                     {
                         Content = expandLabel,
-                        Style = StyleKit.MaterialDesignEntryButtonStyle
+                        Style = StyleKit.MaterialDesignEntryButtonStyle,
+                        Height = 25
                     };
 
                     button.Click += (s, a) =>
                     {
                         var windowController = new WindowController {Title = "Document Editor"};
-                        var bsonDocument = bindingValue as BsonDocument;
-                        var control = new DocumentEntryControl(bsonDocument, readOnly, windowController);
+                        var bsonDocument = editorContext.BindingValue as BsonDocument;
+                        var control = new DocumentEntryControl(bsonDocument, editorContext.ReadOnly, windowController);
                         var window = new DialogWindow(control, windowController)
                         {
                             Owner = Application.Current.MainWindow,
-                            Height = Math.Min(Math.Max(636, SystemParameters.VirtualScreenHeight / 1.61), SystemParameters.VirtualScreenHeight),
+                            Height = DefaultWindowHeight,
                             MinWidth = 400,
                             MinHeight = 400,
                         };
 
-                        window.ShowDialog();
+                        if (window.ShowDialog() == true)
+                        {
+                            if (control.DocumentHasChanges)
+                            {
+                                editorContext.SetChanged(control);
+                            }    
+                        }
                     };
 
                     return button;
@@ -136,10 +193,13 @@ namespace LiteDbExplorer.Controls
 
                 contentView.LoadButton.Click += (s, a) =>
                 {
-                    if (contentView.ContentLoaded) return;
+                    if (contentView.ContentLoaded)
+                    {
+                        return;
+                    }
 
-                    var bsonDocument = bindingValue as BsonDocument;
-                    var control = new DocumentEntryControl(bsonDocument, readOnly);
+                    var bsonDocument = editorContext.BindingValue as BsonDocument;
+                    var control = new DocumentEntryControl(bsonDocument, editorContext.ReadOnly);
                     control.CloseRequested += (sender, args) => { contentView.Content = null; };
 
                     contentView.Content = control;
@@ -148,110 +208,128 @@ namespace LiteDbExplorer.Controls
                 return contentView;
             }
 
-            if (bindingValue.IsBoolean)
+            if (editorContext.BindingValue.IsBoolean)
             {
                 var check = new CheckBox
                 {
-                    IsEnabled = !readOnly,
+                    IsEnabled = !editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0)
                 };
 
                 check.SetBinding(ToggleButton.IsCheckedProperty, binding);
+
+                AddValueChangedListener(check, ToggleButton.IsCheckedProperty);
+
                 return check;
             }
 
-            if (bindingValue.IsDateTime)
+            if (editorContext.BindingValue.IsDateTime)
             {
                 var datePicker = new DateTimePicker
                 {
                     TextAlignment = TextAlignment.Left,
-                    IsReadOnly = readOnly,
+                    IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0),
+                    Format = DateTimeFormat.Custom,
+                    CultureInfo = cultureFormat.Culture,
+                    FormatString = cultureFormat.DateTimeFormat,
                 };
 
                 datePicker.SetBinding(DateTimePicker.ValueProperty, binding);
 
+                AddValueChangedListener(datePicker, DateTimePicker.ValueProperty);
+
                 return datePicker;
             }
 
-            if (bindingValue.IsDouble)
+            if (editorContext.BindingValue.IsDouble)
             {
                 var numberEditor = new DoubleUpDown
                 {
                     TextAlignment = TextAlignment.Left,
-                    IsReadOnly = readOnly,
+                    IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0)
                 };
 
                 numberEditor.SetBinding(DoubleUpDown.ValueProperty, binding);
+                AddValueChangedListener(numberEditor, DoubleUpDown.ValueProperty);
+
                 return numberEditor;
             }
 
-            if (bindingValue.IsDecimal)
+            if (editorContext.BindingValue.IsDecimal)
             {
                 var numberEditor = new DecimalUpDown
                 {
                     TextAlignment = TextAlignment.Left,
-                    IsReadOnly = readOnly,
+                    IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0)
                 };
 
                 numberEditor.SetBinding(DecimalUpDown.ValueProperty, binding);
+                AddValueChangedListener(numberEditor, DecimalUpDown.ValueProperty);
+
                 return numberEditor;
             }
 
-            if (bindingValue.IsInt32)
+            if (editorContext.BindingValue.IsInt32)
             {
                 var numberEditor = new IntegerUpDown
                 {
                     TextAlignment = TextAlignment.Left,
-                    IsReadOnly = readOnly,
+                    IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0)
                 };
 
                 numberEditor.SetBinding(IntegerUpDown.ValueProperty, binding);
-
+                AddValueChangedListener(numberEditor, IntegerUpDown.ValueProperty);
+                
                 return numberEditor;
             }
 
-            if (bindingValue.IsInt64)
+            if (editorContext.BindingValue.IsInt64)
             {
                 var numberEditor = new LongUpDown
                 {
                     TextAlignment = TextAlignment.Left,
-                    IsReadOnly = readOnly,
+                    IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(0, 0, 0, 0)
                 };
 
                 numberEditor.SetBinding(LongUpDown.ValueProperty, binding);
+                AddValueChangedListener(numberEditor, LongUpDown.ValueProperty);
+
                 return numberEditor;
             }
 
-            if (bindingValue.IsGuid || bindingValue.Type == BsonType.Guid)
+            if (editorContext.BindingValue.IsGuid || editorContext.BindingValue.Type == BsonType.Guid)
             {
                 var guidEditor = new MaskedTextBox
                 {
-                    IsReadOnly = readOnly,
+                    IsReadOnly = editorContext.ReadOnly,
                     VerticalAlignment = VerticalAlignment.Center,
                     Mask = @"AAAAAAAA-AAAA-AAAA-AAAA-AAAAAAAAAAAA",
                     ValueDataType = typeof(Guid)
                 };
 
                 guidEditor.SetBinding(MaskedTextBox.ValueProperty, binding);
+                AddValueChangedListener(guidEditor, MaskedTextBox.ValueProperty);
+                
+
                 return guidEditor;
             }
 
-            if (bindingValue.IsString)
+            if (editorContext.BindingValue.IsString)
             {
                 var stringEditor = new TextBox
                 {
-                    IsReadOnly = readOnly,
+                    IsReadOnly = editorContext.ReadOnly,
                     AcceptsReturn = true,
                     VerticalAlignment = VerticalAlignment.Center,
                     MaxHeight = 200,
@@ -260,10 +338,12 @@ namespace LiteDbExplorer.Controls
                 };
 
                 stringEditor.SetBinding(TextBox.TextProperty, binding);
+                AddValueChangedListener(stringEditor, TextBox.TextProperty);
+
                 return stringEditor;
             }
 
-            if (bindingValue.IsBinary)
+            if (editorContext.BindingValue.IsBinary)
             {
                 var text = new TextBlock
                 {
@@ -274,11 +354,11 @@ namespace LiteDbExplorer.Controls
                 return text;
             }
 
-            if (bindingValue.IsObjectId)
+            if (editorContext.BindingValue.IsObjectId)
             {
                 var text = new TextBox
                 {
-                    Text = bindingValue.AsString,
+                    Text = editorContext.BindingValue.AsString,
                     IsReadOnly = true,
                     VerticalAlignment = VerticalAlignment.Center,
                 };
@@ -294,6 +374,8 @@ namespace LiteDbExplorer.Controls
                 VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             };
             defaultEditor.SetBinding(TextBox.TextProperty, binding);
+            AddValueChangedListener(defaultEditor, TextBox.TextProperty);
+
             return defaultEditor;
         }
     }

@@ -13,6 +13,8 @@ namespace LiteDbExplorer.Modules.DbQuery
 
         public string GroupKey { get; set; }
 
+        public string QueryHandlerName { get; set; }
+
         public string DatabaseLocation
         {
             get => _databaseLocation;
@@ -28,6 +30,8 @@ namespace LiteDbExplorer.Modules.DbQuery
         public DateTime? LastRunAt { get; set; }
 
         public string RawQuery { get; set; }
+
+        public int DatabaseVersion { get; set; }
 
         [JsonIgnore]
         public string Name { get; private set; }
@@ -78,5 +82,7 @@ namespace LiteDbExplorer.Modules.DbQuery
         }
 
         public static IEqualityComparer<RawQueryHistory> RawSourceComparer { get; } = new RawSourceEqualityComparer();
+
+        
     }
 }

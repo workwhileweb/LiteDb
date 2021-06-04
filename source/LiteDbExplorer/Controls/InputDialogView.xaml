@@ -7,23 +7,26 @@
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:system="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d"
-             d:DesignHeight="150" d:DesignWidth="250">
+             d:DesignHeight="180" d:DesignWidth="250">
     <Grid Margin="16" MinWidth="230">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBox x:Name="ValueTextBox" 
+        
+        <TextBlock Grid.Row="0" Text="{Binding Message}" 
+                   Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                   TextWrapping="Wrap"/>
+
+        <TextBox Grid.Row="1" x:Name="ValueTextBox" 
                  materialDesign:HintAssist.Hint="{Binding Hint}"
-                 materialDesign:TextFieldAssist.TextBoxViewMargin="1 0 1 0"
-                 materialDesign:HintAssist.FloatingScale="1.50"
                  Style="{DynamicResource MaterialDesignFloatingHintTextBox}"
-                 FontSize="16"
-                 Margin="0 6 0 8"
-                 Grid.Row="0" />
-        <TextBlock Grid.Row="1" Text="{Binding Message}" Style="{StaticResource MaterialDesignCaptionTextBlock}"/>
-        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="2"
+                 Margin="0 5 0 20"
+                />
+        
+        <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Grid.Row="3"
                     Margin="0 8 0 0">
             <Button IsDefault="True" Style="{DynamicResource MaterialDesignFlatButton}"
                     Command="materialDesign:DialogHost.CloseDialogCommand">

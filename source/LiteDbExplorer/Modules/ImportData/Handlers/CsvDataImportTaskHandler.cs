@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.Composition;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
+using System.Windows.Interactivity;
 using Caliburn.Micro;
 using CSharpFunctionalExtensions;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Forge.Forms;
 using Forge.Forms.Annotations;
-using LiteDbExplorer.Controls;
 using LiteDbExplorer.Modules.Shared;
+using LiteDbExplorer.Presentation.Behaviors;
+using LiteDbExplorer.Wpf.Behaviors;
 
 namespace LiteDbExplorer.Modules.ImportData.Handlers
 {
@@ -25,17 +28,13 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
     public class CsvDataImportTaskHandler : Screen, IDataImportTaskHandler, IStepsScreen, IOwnerViewLocator
     {
         private readonly SourceOptions _sourceOptions;
-        private readonly TargetOptions _targetOptions;
-        private readonly DataPreviewHolder _dataPreviewHolder;
 
         [ImportingConstructor]
         public CsvDataImportTaskHandler(Lazy<IApplicationInteraction> lazyApplicationInteraction)
         {
             DisplayName = "Import CSV Options";
 
-            _sourceOptions = new SourceOptions(this, lazyApplicationInteraction);
-            _targetOptions = new TargetOptions();
-            _dataPreviewHolder = new DataPreviewHolder();
+            _sourceOptions = new SourceOptions(lazyApplicationInteraction);
         }
 
         public string HandlerDisplayName => "CSV";
@@ -44,85 +43,55 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
         public object SourceOptionsContext => _sourceOptions;
 
-        public object TargetOptionsContext => _targetOptions;
-
-        public object DataPreview => _dataPreviewHolder;
+        public bool CanContentScroll => true;
 
         public bool HasNext => true;
 
-        public DataTable ItemsSource { get; private set; }
-
         public Task<object> Next()
         {
-            var viewModel = IoC.Get<DocumentMapperViewModel>();
-
-            IEnumerable<string> sourceFields = null;
-            
-            if (ItemsSource != null)
-            {
-                sourceFields = ItemsSource.Columns.OfType<DataColumn>().Select(p => p.ColumnName);
-            }
-
-            var collectionReference = _targetOptions.GetTargetCollection();
-
-            viewModel.Init(sourceFields, collectionReference);
-
-            return Task.FromResult<object>(viewModel);
+            return _sourceOptions.Next();
         }
 
         public bool Validate()
         {
-            return ModelState.Validate(SourceOptionsContext) && ModelState.Validate(TargetOptionsContext);
+            return ModelState.Validate(SourceOptionsContext);
         }
 
         public UIElement GetOwnView(object context)
         {
-            return new DynamicFormStackView(SourceOptionsContext, TargetOptionsContext, DataPreview);
+            return _sourceOptions.GetOwnView(context);
         }
 
-        public Task ProcessFile(Maybe<string> maybeFilePath)
-        {
-            ItemsSource = maybeFilePath.HasValue ? ToDataTable(maybeFilePath.Value, _sourceOptions) : null;
 
-            _dataPreviewHolder.RefreshView(ItemsSource);
-
-            return Task.CompletedTask;
-        }
-
-        public static DataTable ToDataTable(string path, SourceOptions options)
-        {
-            var configuration = new Configuration
-            {
-                Delimiter = options.Delimiter,
-                HasHeaderRecord = options.FileContainsHeaders
-            };
-
-            using (var reader = new StreamReader(path))
-            using (var csv = new CsvReader(reader, configuration))
-            {
-                // Do any configuration to `CsvReader` before creating CsvDataReader.
-                using (var dr = new CsvDataReader(csv))
-                {		
-                    var dt = new DataTable();
-                    dt.Load(dr);
-
-                    return dt;
-                }
-            }
-        }
-
-        [Form(Grid = new[] { 1d, 1d })]
+        [Form(Grid = new[] { 1d, 1d }, Mode = DefaultFields.None)]
         [Heading("Source Options")]
-        public class SourceOptions : ImportSourceFileOptions
+        public class SourceOptions : ImportSourceFromFileScreen, IStepsScreen, IOwnerViewLocator
         {
-            private readonly CsvDataImportTaskHandler _handler;
+            private readonly DataGrid _dataGrid;
+            private Maybe<string> _maybeFilePath;
 
-            public SourceOptions(CsvDataImportTaskHandler handler, Lazy<IApplicationInteraction> lazyApplicationInteraction) 
+            public SourceOptions(Lazy<IApplicationInteraction> lazyApplicationInteraction) 
                 : base(lazyApplicationInteraction)
             {
-                _handler = handler;
                 Delimiter = DelimiterOptions.Keys.FirstOrDefault();
+
+                _dataGrid = new DataGrid
+                {
+                    AutoGenerateColumns = true,
+                    CanUserAddRows = false,
+                    IsReadOnly = true,
+                    SelectionUnit = DataGridSelectionUnit.FullRow,
+                    GridLinesVisibility = DataGridGridLinesVisibility.All,
+                    EnableRowVirtualization = true,
+                    EnableColumnVirtualization = true,
+                };
+
+                Interaction.GetBehaviors(_dataGrid).Add(new EscapeAccessKeyColumnHeaderBehavior());
             }
+
+            public bool CanContentScroll => false;
+
+            public bool HasNext => true;
 
             public IReadOnlyDictionary<string, string> DelimiterOptions => new Dictionary<string, string>
             {
@@ -135,19 +104,23 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
                 {"", "Other"}
             };
 
+            /*[Field(Row = "0")]
+            public int SkipFirstLines { get; set; }*/
+
             [Field(Row = "0")]
+            public bool FileContainsHeaders { get; set; } = true;
+
+            [Field(Row = "1")]
             [Value(Must.NotBeNull)]
             [SelectFrom("{Binding DelimiterOptions}", DisplayPath = "Value", ValuePath = "Key")]
             public string Delimiter { get; set; }
 
-            [Field(Row = "0", IsVisible = "{Binding Delimiter|IsEmpty}")]
+            [Field(Row = "1", IsVisible = "{Binding Delimiter|IsEmpty}")]
             public string OtherDelimiter { get; set; }
 
-            [Field(Row = "1")]
-            public int SkipFirstLines { get; set; }
+            public DataTable ItemsSource { get; private set; }
 
-            [Field(Row = "1")]
-            public bool FileContainsHeaders { get; set; } = true;
+            public object DataPreview => _dataGrid;
 
             protected override (string title, string filter) GetFileFilter()
             {
@@ -156,16 +129,160 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
 
             protected override Task OnFileOpen(Maybe<string> maybeFilePath)
             {
-                return _handler.ProcessFile(maybeFilePath);
+                return ProcessFile(maybeFilePath);
+            }
+
+            public Task<object> Next()
+            {
+                var targetOptions = new TargetOptions(this);
+                return Task.FromResult<object>(targetOptions);
+            }
+
+            public bool Validate()
+            {
+                return ModelState.Validate(this);
+            }
+
+            public Task ProcessFile(Maybe<string> maybeFilePath)
+            {
+                _maybeFilePath = maybeFilePath;
+
+                ItemsSource = maybeFilePath.HasValue ? ToDataTable(maybeFilePath.Value, this) : null;
+
+                RefreshPreview(ItemsSource);
+
+                PropertyChanged -= OnOptionsPropertyChanged;
+                
+                if (_maybeFilePath.HasValue)
+                {
+                    PropertyChanged += OnOptionsPropertyChanged;
+                }
+
+                return Task.CompletedTask;
+            }
+
+            private void OnOptionsPropertyChanged(object sender, PropertyChangedEventArgs e)
+            {
+                if (new[] {nameof(Delimiter), nameof(FileContainsHeaders), nameof(OtherDelimiter)}.Contains(e.PropertyName))
+                {
+                    ItemsSource = _maybeFilePath.HasValue ? ToDataTable(_maybeFilePath.Value, this) : null;
+                    RefreshPreview(ItemsSource);
+                }
+            }
+
+            public void RefreshPreview(DataTable itemsSource)
+            {
+                _dataGrid.ItemsSource = itemsSource?.DefaultView;
+            }
+
+            public UIElement GetOwnView(object context)
+            {
+                return new DynamicFormGrid(
+                    new DynamicFormGrid.Item(this, GridLength.Auto),
+                    new DynamicFormGrid.Item(DataPreview, new GridLength(1, GridUnitType.Star), true)
+                );
+            }
+
+            public static DataTable ToDataTable(string path, SourceOptions options)
+            {
+                var configuration = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    Delimiter = options.Delimiter,
+                };
+
+                if (string.IsNullOrEmpty(options.Delimiter) && !string.IsNullOrEmpty(options.OtherDelimiter))
+                {
+                    configuration.Delimiter = options.OtherDelimiter;
+                }
+
+                var createColumns = !options.FileContainsHeaders;
+                var dt = new DataTable();
+
+                using (var reader = new StreamReader(path))
+                using (var csv = new CsvReader(reader, configuration))
+                {
+                    // Track: https://github.com/JoshClose/CsvHelper/issues/1240
+                    if (createColumns)
+                    {
+                        while (csv.Read())
+                        {
+                            if (createColumns)
+                            {
+                                for (var i = 0; i < csv.Context.Record.Length; i++)
+                                {
+                                    dt.Columns.Add($"Column_{i}");
+                                }
+                                createColumns = false;
+                            }
+
+                            var row = dt.NewRow();
+                            for (var i = 0; i < csv.Context.Record.Length; i++)
+                            {
+                                row[i] = csv.Context.Record[i];
+                            }
+
+                            dt.Rows.Add(row);
+                        }
+                    }
+                    else
+                    {
+                        // Do any configuration to `CsvReader` before creating CsvDataReader.
+                        using (var dr = new CsvDataReader(csv))
+                        {	
+                            dt.Load(dr);
+                        }   
+                    }
+                }
+
+                return dt;
             }
         }
 
+        [Form(Grid = new[] { 1d, 1d }, Mode = DefaultFields.None)]
         [Heading("Target Options")]
-        public class TargetOptions : ImportTargetDefaultOptions
+        public class TargetOptions : ImportTargetSelectorScreen, IStepsScreen, IOwnerViewLocator
         {
+            private readonly SourceOptions _sourceOptions;
+
+            public TargetOptions(SourceOptions sourceOptions)
+            {
+                _sourceOptions = sourceOptions;
+            }
+
+            public bool CanContentScroll => true;
+
+            public bool HasNext => true;
+
+            public Task<object> Next()
+            {
+                var viewModel = IoC.Get<DocumentMapperViewModel>();
+
+                IEnumerable<string> sourceFields = null;
+
+                if (_sourceOptions.ItemsSource != null)
+                {
+                    sourceFields = _sourceOptions.ItemsSource.Columns.OfType<DataColumn>().Select(p => p.ColumnName);
+                }
+
+                var collectionReference = GetTargetCollection();
+
+                viewModel.Init(sourceFields, collectionReference);
+
+                return Task.FromResult<object>(viewModel);
+            }
+
+            public bool Validate()
+            {
+                return ModelState.Validate(this);
+            }
+
+            public UIElement GetOwnView(object context)
+            {
+                return new DynamicFormView(this);
+            }
         }
 
-        [Heading("Preview")]
+        /*[Heading("Preview")]
         [Form(Mode = DefaultFields.None)]
         public class DataPreviewHolder : PropertyChangedBase
         {
@@ -194,7 +311,7 @@ namespace LiteDbExplorer.Modules.ImportData.Handlers
             {
                 _dataGrid.ItemsSource = itemsSource?.DefaultView;
             }
-        }
+        }*/
 
     }
 }

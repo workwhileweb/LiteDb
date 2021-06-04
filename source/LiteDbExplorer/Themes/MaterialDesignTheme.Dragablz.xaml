@@ -606,6 +606,7 @@
     <Style TargetType="{x:Type dragablz:DragablzItemsControl}" x:Key="TabablzDragablzItemsControlStyle">
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="IsTabStop" Value="False"/>
         <Setter Property="ItemsPanel">
             <Setter.Value>
                 <ItemsPanelTemplate>
@@ -711,7 +712,8 @@
                                             Content="{TemplateBinding HeaderPrefixContent}"
                                             ContentStringFormat="{TemplateBinding HeaderPrefixContentStringFormat}"
                                             ContentTemplate="{TemplateBinding HeaderPrefixContentStringFormat}"
-                                            ContentTemplateSelector="{TemplateBinding HeaderPrefixContentTemplateSelector}" />
+                                            ContentTemplateSelector="{TemplateBinding HeaderPrefixContentTemplateSelector}" 
+                                            IsTabStop="False"/>
                             <dragablz:DragablzItemsControl x:Name="PART_HeaderItemsControl"
                                                            Grid.Column="1"
                                                            FixedItemCount="{TemplateBinding FixedHeaderCount}"
@@ -745,7 +747,8 @@
                                             ContentStringFormat="{TemplateBinding HeaderSuffixContentStringFormat}"
                                             ContentTemplate="{TemplateBinding HeaderSuffixContentStringFormat}"
                                             ContentTemplateSelector="{TemplateBinding HeaderSuffixContentTemplateSelector}"
-                                            HorizontalAlignment="Stretch" />
+                                            HorizontalAlignment="Stretch" 
+                                            IsTabStop="False"/>
                         </Grid>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -813,7 +816,8 @@
                                                     Content="{TemplateBinding HeaderPrefixContent}"
                                                     ContentStringFormat="{TemplateBinding HeaderPrefixContentStringFormat}"
                                                     ContentTemplate="{TemplateBinding HeaderPrefixContentStringFormat}"
-                                                    ContentTemplateSelector="{TemplateBinding HeaderPrefixContentTemplateSelector}" />
+                                                    ContentTemplateSelector="{TemplateBinding HeaderPrefixContentTemplateSelector}"
+                                                    IsTabStop="False"/>
                                     <dragablz:DragablzItemsControl x:Name="PART_HeaderItemsControl"
                                                                    Grid.Row="1"
                                                                    ItemsSource="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=Items}"
@@ -848,7 +852,8 @@
                                                     ContentStringFormat="{TemplateBinding HeaderSuffixContentStringFormat}"
                                                     ContentTemplate="{TemplateBinding HeaderSuffixContentStringFormat}"
                                                     ContentTemplateSelector="{TemplateBinding HeaderSuffixContentTemplateSelector}"
-                                                    VerticalAlignment="Top" />
+                                                    VerticalAlignment="Top" 
+                                                    IsTabStop="False"/>
                                 </Grid>
                             </Grid>
                             <ControlTemplate.Triggers>
